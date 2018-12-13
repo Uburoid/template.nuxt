@@ -86,7 +86,7 @@ module.exports = {
     },
 
     serverMiddleware: [
-        //'~/api'
+        '~/api'
     ],
 
     router: {

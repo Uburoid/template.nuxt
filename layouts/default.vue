@@ -4,7 +4,7 @@
     
     <v-toolbar fixed app clipped-left clipped-right flat>
         <nuxt-link to="/">
-            <img alt="bnMAP.pro" class="top-toolbar-logo" src="~assets/default_user.png" height="32"/>
+            <img class="top-toolbar-logo" src="~assets/default_user.png" height="36">
         </nuxt-link>
 
         <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
