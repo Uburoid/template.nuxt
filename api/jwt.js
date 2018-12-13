@@ -1,41 +1,56 @@
+const fs = require('fs-extra');
+const path = require('path');
+
+let saveTo = path.join(process.cwd(), 'keys');
+fs.ensureDirSync(saveTo);
+
+let publicFile = path.join(saveTo, 'public.key');
+let privateFile = path.join(saveTo, 'private.key');
+
+let public_key = fs.existsSync(publicFile) && fs.readFileSync(publicFile, 'utf8');
+let private_key = fs.existsSync(privateFile) && fs.readFileSync(privateFile, 'utf8');
+
+(async () => {
+    if(!(public_key && private_key)) {
+        const crypto = require('crypto2');
+    
+        const keys = await crypto.createKeyPair();
+        let { privateKey, publicKey } = keys;
+        
+        public_key = publicKey;
+        private_key = privateKey;
+
+        await Promise.all([
+            fs.writeFile(publicFile, publicKey),
+            fs.writeFile(privateFile, privateKey)
+        ]);
+    }
+})();
+
 import jsonwebtoken from 'jsonwebtoken';
 
 class JWT {
-    constructor({ req, public_key, private_key, secret = 'my secret' } = {}) {
-        this.req = req;
-
-        this.jwt = jsonwebtoken;
-        
+    constructor({ public_key, private_key }) {
         this.public_key = public_key;
         this.private_key = private_key;
-
-        this.secret = secret;
     }
 
-    /* sign(payload, private_key, options = { algorithm: 'RS256', expiresIn: process.env.TOKEN_EXPIRATION_TIME || '3600s' }) {
+    static async create({ hash }) {
+
+    }
+
+    sign(payload) {
         delete payload.iat;
         delete payload.exp;
 
-        return this.jwt.sign(payload, private_key, options);
-    } */
-    sign(payload, options = { expiresIn: process.env.TOKEN_EXPIRATION_TIME || '3600s' }) {
-        delete payload.iat;
-        delete payload.exp;
-        
-        let rsa = this.public_key && this.private_key;
-
-        rsa && (options = { ...options, algorithm: 'RS256' });
-
-        return this.jwt.sign(payload, rsa ? private_key : this.secret, options);
+        return jsonwebtoken.sign(payload, this.private_key, { algorithm: 'RS256', expiresIn: process.env.TOKEN_EXPIRATION_TIME || '3600s' });
     }
 
     verify(token) {
-        let payload = this.jwt.decode(token) || {};
+        let payload = jsonwebtoken.decode(token) || {};
 
         try {
-            let rsa = this.public_key && this.private_key;
-
-            this.jwt.verify(token, rsa ? public_key : this.secret);
+            jsonwebtoken.verify(token, this.public_key);
 
         }
         catch(err) {
@@ -54,4 +69,4 @@ class JWT {
     }
 }
 
-module.exports = { JWT }
+module.exports = { JWT: JWT.create }

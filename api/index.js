@@ -1,12 +1,4 @@
 import express from 'express'
-const cookieParser = require('cookie-parser');
-
-//import jwt from 'express-jwt'
-//import jsonwebtoken from 'jsonwebtoken'
-
-//import axios from 'axios';
-
-// Create express router
 const router = express.Router();
 
 // Transform req & res to have the same API as express
@@ -14,7 +6,6 @@ const router = express.Router();
 const app = express();
 
 router.use(express.json());
-router.use(cookieParser());
 
 router.use((req, res, next) => {
     Object.setPrototypeOf(req, app.request);
@@ -103,7 +94,7 @@ router.all(patterns, multipartDetector, async (req, res, next) => {
     let object = new Types[type]({ req, res });
 
     try {
-        let result = await object[action](req.body, { req, res });
+        let result = await object[action](req.body);
 
         if(result) {
             result.$sendAsFile ? res.sendFile(result.file) : res.json(result);
@@ -116,21 +107,15 @@ router.all(patterns, multipartDetector, async (req, res, next) => {
 })
 
 router.use((err, req, res, next) => {
-        if (err.name === 'UnauthorizedError') {
-            res.status(401).send('invalid token...');
-        }
-        else {        
-            let error = {
-                code: err.httpStatusCode || err.code || 400,
-                message: err.message,
-                stack: err.stack
-            };
-            
-            //res.status(err.httpStatusCode || err.code || 400).json(err);
-            res.status(error.code).json(error);
-        }
-    }
-);
+    let error = {
+        code: err.httpStatusCode || err.code || 400,
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+    };
+    
+    res.status(error.code).json(error);
+});
 
 process.on('unhandledRejection', err => {
     console.log('unhandledRejection => ', err);
