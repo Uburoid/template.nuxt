@@ -35,8 +35,8 @@ class JWT {
         this.private_key = private_key;
     }
 
-    static async create({ hash }) {
-
+    static async create({ key, public_key, private_key }) {
+        
     }
 
     sign(payload) {
