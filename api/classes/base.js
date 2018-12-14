@@ -49,7 +49,7 @@ class API extends Base {
         debugger
         let jwt = JWT();
 
-        jwt.verify('asd')
+        jwt.verify('asd');
 
         /* if(!payload) {
             this.token = req.cookies['token'];
