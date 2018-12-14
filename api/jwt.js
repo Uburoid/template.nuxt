@@ -1,6 +1,6 @@
-import jsonwebtoken from 'jsonwebtoken';
+const jsonwebtoken = require('jsonwebtoken');
 
-async function JWT({ public_key, private_key }) {
+const JWT = async ({ public_key, private_key } = {}) => {
 
     if(!(public_key && private_key)) {
         
@@ -69,4 +69,4 @@ async function JWT({ public_key, private_key }) {
     }
 }
 
-module.exports = { JWT }
+module.exports = { JWT };

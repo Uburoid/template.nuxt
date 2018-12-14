@@ -8,7 +8,7 @@ class Test extends API {
     }
 
     get() {
-        return { status: 'ok' };
+        return { status: 'ok0' };
     }
 }
 

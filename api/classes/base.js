@@ -46,8 +46,10 @@ class Base {
 class API extends Base {
     constructor(...args) {
         super(...args);
-
+        debugger
         let jwt = JWT();
+
+        jwt.verify('asd')
 
         /* if(!payload) {
             this.token = req.cookies['token'];
