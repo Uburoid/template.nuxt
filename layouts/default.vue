@@ -109,7 +109,7 @@
                     click: () => ({})
                 }
             ],
-            title: 'Vuetify.js'
+            //title: 'Vuetify.js'
         }),
         computed: {
             account_items() {
@@ -123,6 +123,7 @@
                 account: state => state.account,
                 user: state => state.account.user,
                 profile: state => state.account.user.profile,
+                title: state => state.title
             })
         }
     }

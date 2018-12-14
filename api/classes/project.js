@@ -1,7 +1,16 @@
 
-const { Base } = require('./base');
+const { Base, API } = require('./base');
 const FormData = require('form-data');
 
+class Test extends API {
+    constructor(...args) {
+        super(...args);
+    }
+
+    get() {
+        return { status: 'ok' };
+    }
+}
 
 class Analytics extends Base {
     constructor(...args) {
@@ -23,4 +32,4 @@ class Member extends Base {
     }
 }
 
-module.exports = { Member, Analytics };
+module.exports = { Member, Analytics, Test };

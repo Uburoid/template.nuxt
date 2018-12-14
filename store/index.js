@@ -7,10 +7,13 @@ export const state = () => ({
             },
             email: 'anonymous@example.com'
         },
-        access: 1000
-    }
-})
+        access: 0
+    },
+    title: 'init'
+});
 
 export const mutations = {
     
-}
+};
+
+export const strict = true;

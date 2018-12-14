@@ -1,4 +1,3 @@
-const base = require('./base');
 const auth = require('./auth');
 const project = require('./project');
 
@@ -67,18 +66,7 @@ const code = () => {
             methods = methods + 
             `
             ${key}: async (params = {}, options = {}) => {
-                let config = {
-                    context: this.context,
-                    endpoint: '/${name}.${key}',
-                    method: 'post',
-                    payload: params
-                };
-
-                config = { ...config, ...options };
-
-                let response = await this.execute(config);
-
-                return response && response.data; 
+                return this.fetch('${name}.${key}', params, options);
             },
             `        
         
@@ -109,6 +97,21 @@ const code = () => {
 
             help() {
                 return ${JSON.stringify(classes, void 0, 2)}
+            }
+
+            async fetch(endpoint, params = {}, options = {}) {
+                let config = {
+                    context: this.context,
+                    endpoint,
+                    method: 'post',
+                    payload: params
+                };
+
+                config = { ...config, ...options };
+
+                let response = await this.execute(config);
+
+                return response && response.data; 
             }
 
             ${class_body}

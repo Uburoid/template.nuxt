@@ -6,8 +6,8 @@ module.exports = {
     //mode: 'spa',
 
     server: {
-        port: process.env.NUXT_PORT,
-        host: process.env.NUXT_HOST
+        host: process.env.NUXT_HOST,
+        port: process.env.NUXT_PORT
     },
 
     env: {
@@ -54,9 +54,9 @@ module.exports = {
     */
     plugins: [
         '@/plugins/vuetify',
+        '@/plugins/axios',
+        '@/plugins/server',
         //'@/plugins/eventbus',
-        //'@/plugins/axios',
-        //'@/plugins/server_api',
         //'@/plugins/croppa',
         //'@/plugins/utils',
         //'@/plugins/beforeEach', //not correct work in nuxt
@@ -90,6 +90,6 @@ module.exports = {
     ],
 
     router: {
-        //middleware: ['auth']
+        middleware: ['auth']
     }
 }

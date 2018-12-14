@@ -1,3 +1,4 @@
+const { JWT } = require('../jwt.js');
 const fs = require('fs-extra');
 
 const LRU = require("lru-cache");
@@ -10,7 +11,7 @@ class Base {
     constructor({ req, res }) {
 
         this.fs = fs;
-        this.jwt = jwt;
+        //this.jwt = jwt;
         this.cache = cache;
 
         this.req = req;
@@ -46,12 +47,14 @@ class API extends Base {
     constructor(...args) {
         super(...args);
 
-        if(!payload) {
+        let jwt = JWT();
+
+        /* if(!payload) {
             this.token = req.cookies['token'];
             this.payload = jwt.decode(this.token);
         }
-        else this.payload = payload;
+        else this.payload = payload; */
     }
 }
 
-module.exports = { Base };
+module.exports = { Base, API };

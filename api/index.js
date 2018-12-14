@@ -80,7 +80,7 @@ let multipartDetector = function(req, res, next) {
 const { Types, code } = require('./classes');
 
 router.all('/_server_', (req, res) => {
-    console.log('request');
+    console.log('request _server_');
 
     res.end(code);
 })
