@@ -1,4 +1,5 @@
 const LRU = require("lru-cache");
+const cookie = require("cookie");
 
 const axios_cache = new LRU();
 
@@ -56,25 +57,29 @@ class LocalServer {
             let [key, value] = entry;
 
             Object.defineProperty(this, key, {
-                get: () => ({})
+                get: () => {
+                    const Type = Types[key];
+
+                    let { req, res } = context;
+
+                    req.cookies = cookie.parse(req.headers.cookie || '') || {};
+
+                    res.cookie = (name, val, options) => {
+                        res.setHeader('set-cookie', cookie.serialize(name, val, options));
+                    }
+
+                    return new Type({ req, res });
+                }
             });
         }, {});
-
-        const handler = {
-            get(target, propKey, receiver) {
-                const Type = Types[propKey];
-
-                let { req, res } = context;
-                return new Type({ req, res });
-            }
-        };
-
-        return new Proxy(this, handler);
     }
+
 }
 
 export default async (context, inject) => {
     let server = void 0;
+
+    await context.$axios({ url: '/_load_default_key_pair_' }); //CALL TO LOAD DEFAULT KEYS!
 
     if(process.browser) {
         let response = await context.$axios({ url: '/_server_' });
@@ -85,6 +90,7 @@ export default async (context, inject) => {
     }
 
     if(process.server) {
+
         let { Types } = require('../api/classes');
         server = new LocalServer({ context, Types });
     }

@@ -1,11 +1,13 @@
-import express from 'express'
+const express = require('express');
 const router = express.Router();
+const cookieParser = require('cookie-parser');
 
 // Transform req & res to have the same API as express
 // So we can use res.status() & res.json()
 const app = express();
 
 router.use(express.json());
+router.use(cookieParser());
 
 router.use((req, res, next) => {
     Object.setPrototypeOf(req, app.request);
@@ -78,12 +80,22 @@ let multipartDetector = function(req, res, next) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 const { Types, code } = require('./classes');
+const { loadDefaultKeyPair } = require('./jwt');
 
-router.all('/_server_', (req, res) => {
+router.all('/_load_default_key_pair_', async (req, res) => {
+    console.log('request _load_default_key_pair_');
+
+    await loadDefaultKeyPair();
+
+    res.end();
+});
+
+router.all('/_server_', async (req, res) => {
     console.log('request _server_');
+    await loadDefaultKeyPair();
 
     res.end(code);
-})
+});
 
 let patterns = ['/:type\.:action', '/:type'];
 

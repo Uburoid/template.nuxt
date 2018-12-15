@@ -1,38 +1,55 @@
 const jsonwebtoken = require('jsonwebtoken');
+const LRU = require('lru-cache');
 
-const JWT = async ({ public_key, private_key } = {}) => {
+const crypto = require('crypto2');
+const fs = require('fs-extra');
+const path = require('path');
 
-    if(!(public_key && private_key)) {
-        
-        const fs = require('fs-extra');
-        const path = require('path');
-        
+let cache = new LRU({
+    //maxAge: 1000 * 60 //one min
+})
+
+const loadDefaultKeyPair = async () => {
+
+    let pair = cache.get('$');
+    
+    if(!pair) {    
         let saveTo = path.join(process.cwd(), 'keys');
         fs.ensureDirSync(saveTo);
         
         let publicFile = path.join(saveTo, 'public.key');
         let privateFile = path.join(saveTo, 'private.key');
         
-        public_key = fs.existsSync(publicFile) && fs.readFileSync(publicFile, 'utf8');
-        private_key = fs.existsSync(privateFile) && fs.readFileSync(privateFile, 'utf8');
+        let public_key = fs.existsSync(publicFile) && fs.readFileSync(publicFile, 'utf8');
+        let private_key = fs.existsSync(privateFile) && fs.readFileSync(privateFile, 'utf8');
         
         if(!(public_key && private_key)) {
-            const crypto = require('crypto2');
         
             const keys = await crypto.createKeyPair();
             let { privateKey, publicKey } = keys;
             
             public_key = publicKey;
             private_key = privateKey;
-    
+
             await Promise.all([
                 fs.writeFile(publicFile, publicKey),
                 fs.writeFile(privateFile, privateKey)
             ]);
         }
 
-    }
+        cache.set('$', { public_key, private_key });
 
+        return { public_key, private_key };
+    }
+    else {
+        let { public_key, private_key } = pair;
+
+        return { public_key, private_key };
+    }
+}
+
+const JWT = ({ key, public_key, private_key } = {}) => {
+    
     const sign = (payload) => {
         delete payload.iat;
         delete payload.exp;
@@ -69,4 +86,4 @@ const JWT = async ({ public_key, private_key } = {}) => {
     }
 }
 
-module.exports = { JWT };
+module.exports = { JWT, loadDefaultKeyPair };

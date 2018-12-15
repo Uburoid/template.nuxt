@@ -12,15 +12,22 @@
     "debug": "node --inspect-brk=9232 node_modules/nuxt/bin/nuxt"
   },
   "dependencies": {
+    "array-sort": "^1.0.0",
     "axios": "^0.18.0",
     "busboy": "^0.2.14",
+    "cookie-parser": "^1.4.3",
     "crypto2": "^2.0.0",
+    "decypher": "^0.13.0",
     "dotenv": "^6.2.0",
     "form-data": "^2.3.3",
     "fs-extra": "^7.0.1",
+    "json-dry": "^1.0.9",
     "jsonwebtoken": "^8.4.0",
     "lru-cache": "^5.1.1",
     "memorystream": "^0.3.1",
+    "nanoid": "^2.0.0",
+    "neo4j-driver": "^1.7.2",
+    "normalizr": "^3.3.0",
     "nuxt": "^2.2.0",
     "vuetify": "^1.3.6"
   },

@@ -1,4 +1,3 @@
-const { JWT } = require('../jwt.js');
 const fs = require('fs-extra');
 
 const LRU = require("lru-cache");
@@ -46,10 +45,18 @@ class Base {
 class API extends Base {
     constructor(...args) {
         super(...args);
-        debugger
-        let jwt = JWT();
 
-        jwt.verify('asd');
+        this.token = this.req.cookies['token'];
+    }
+
+}
+
+class SecuredAPI extends Base {
+    constructor(...args) {
+        super(...args);
+        
+        
+        !this.token && this.res.cookie('token', 'jwt', { httpOnly: true });
 
         /* if(!payload) {
             this.token = req.cookies['token'];
@@ -57,6 +64,10 @@ class API extends Base {
         }
         else this.payload = payload; */
     }
+
+    /* static async create(...args) {
+        super.create(...args);
+    } */
 }
 
-module.exports = { Base, API };
+module.exports = { Base, API, SecuredAPI };
