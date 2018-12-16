@@ -56,12 +56,12 @@ class NeoDriver extends DatabaseDriver {
         super(params);
     }
 
-    async query({ cql, params, options }) {
+    async query({ query, params, options }) {
         const session = driver.session();
-
+        debugger
         return new Promise((resolve, reject) => {
             session
-                .run(cql, params)
+                .run(query, params)
                 .then(function (result) {
                     result.records = result.records.map(function (record) {
                         let rec = record.get('node'); //TODO set option to return all keys from record

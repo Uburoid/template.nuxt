@@ -65,10 +65,18 @@
 
 <script>
     import { mapState } from 'vuex';
+    let map_state = {
+        title: state => state.title
+    };
 
     export default {
         components: {
             drawer: () => import('@/components/drawler')
+        },
+        asyncData() {
+            map_state = {
+                title: state => state.title
+            }
         },
         data: () => ({
             drawer: true,
@@ -108,7 +116,8 @@
                     to: '/signup',
                     click: () => ({})
                 }
-            ],
+            ]
+            
             //title: 'Vuetify.js'
         }),
         computed: {
@@ -123,7 +132,7 @@
                 account: state => state.account,
                 user: state => state.account.user,
                 profile: state => state.account.user.profile,
-                title: state => state.title
+                ...map_state
             })
         }
     }

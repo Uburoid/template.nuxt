@@ -1,3 +1,47 @@
+(async () => {
+    let { Node, Relation, Member, member2member } = require('./models/base_model');
+
+    let schema = Member.schema;
+    
+    let some_data = {
+        fake_fld: 'val',
+        _id: ['101', 99],
+        name: 'Peter The First',
+        parent: [{
+            name: 'Ivan IV'
+        },{
+            name: 'Ivan V'
+        }],
+        children: [
+            {
+                name: 'Volodya'
+            },
+            {
+                name: 'Masha',
+                children: {
+                    name: 'Valya'
+                }
+            
+            },
+        ]
+    }
+    
+    let validated = Member.validate(some_data, {
+        use_defaults: true,
+        convert_types: false
+    });
+    
+    let saved = await Member.save(some_data);
+    let updated = await Member.update(some_data);
+    let deleted = await Member.delete(some_data);
+    let found = await Member.findOne(some_data);
+    
+    console.log(schema);
+    
+})();
+
+
+
 const express = require('express');
 const router = express.Router();
 const cookieParser = require('cookie-parser');
@@ -82,16 +126,17 @@ let multipartDetector = function(req, res, next) {
 const { Types, code } = require('./classes');
 const { loadDefaultKeyPair } = require('./jwt');
 
-router.all('/_load_default_key_pair_', async (req, res) => {
+/* router.all('/_load_default_key_pair_', async (req, res) => {
     console.log('request _load_default_key_pair_');
 
     await loadDefaultKeyPair();
 
     res.end();
-});
+}); */
 
 router.all('/_server_', async (req, res) => {
     console.log('request _server_');
+
     await loadDefaultKeyPair();
 
     res.end(code);

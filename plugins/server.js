@@ -79,10 +79,9 @@ class LocalServer {
 export default async (context, inject) => {
     let server = void 0;
 
-    await context.$axios({ url: '/_load_default_key_pair_' }); //CALL TO LOAD DEFAULT KEYS!
+    let response = await context.$axios({ url: '/_server_' });//CALL TO LOAD DEFAULT KEYS!
 
     if(process.browser) {
-        let response = await context.$axios({ url: '/_server_' });
 
         const Server = (new Function(response.data))();
         

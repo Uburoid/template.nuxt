@@ -16,4 +16,21 @@ export const mutations = {
     
 };
 
+export const actions = {
+    async nuxtServerInit (context, { req }) {
+        /* try {
+            let name = await this.$server.member.echo({ name: 'hello', add: { my: 'friend' }}, { cache: false });
+            console.log(name)
+        }
+        catch(err) {
+            console.error(err);
+        } */
+        debugger
+
+        let user = !req.headers.cookie && await this.$server.account.shadow();
+
+        console.log(req)
+    }
+};
+
 export const strict = true;

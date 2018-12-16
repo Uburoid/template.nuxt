@@ -1,9 +1,9 @@
-const auth = require('./auth');
+const account = require('./account');
 const project = require('./project');
 
 let classes = {
     //...base,
-    ...auth,
+    ...account,
     ...project
 }
 
