@@ -134,28 +134,34 @@ class BaseModel {
     static write(data) {
         if(!data) return void 0;
 
-        let isRelation = this.prototype instanceof Relation;
-
         let { $labels, $type, $direction = 'out', $start, $end, ...fields } = this.schema;
 
-        let query = [];
-        let where = [];
+        let isRelation = this.prototype instanceof Relation;
 
-        if(!isRelation) {
-            data.$identifier = `node_${generate('0123456789', 3)}`;
-            query.push(`(${data.$identifier} :${$labels.join(':')})`);
-            //query.push(`${data.$identifier}`);
+        const identifier = `ident_${generate('0123456789', 3)}`;
+            
+        let result = {
+            identifier,
+            select: ``,
+            keys: {},
+            params: {},
+            with: ``,
+            extractedWith: ``
+        }
+
+        if(isRelation) {
+            result.type = $type;
+            result.direction = $direction;
+
+            result.start = data.$parent;
+            result.end = $end.write(data);
         }
         else {
-            query.push(`${$direction === 'in' ? '<' : ''}-[rel_${data.$identifier} :${$type}]-${$direction === 'out' ? '>' : ''}`);
-
-            let { query: node_query, where: node_where } = $end.write(data);
-            query = [...query, ...node_query];
-            where = [...where, ...node_where];
-
+            result.$labels = $labels;
+            //result.relations = {};
         }
 
-        where = Object.entries(isRelation ? data.$rel : data).reduce((memo, entry) => {
+        result = Object.entries(isRelation ? data.$rel : data).reduce((memo, entry) => {
             let [key, value] = entry;
 
             let field = fields[key];
@@ -163,32 +169,29 @@ class BaseModel {
             if(field) {
                 let { type, required = false, isKey = false } = field;
 
-                type = Array.isArray(type) ? type[0] || field : type || field;
+                type = Array.isArray(type) ? type[0] : type;
+                type = type || field;
 
                 if(type.prototype instanceof Relation) {
                     value = Array.isArray(value) ? value : [value];
 
                     value.map(value => {
-                        let { query: rel_query, where: rel_where } = type.write(value);
-                        query = [...query, ...rel_query];
-                        memo = [...memo, ...rel_where];
+                        value.$parent = memo;
+                        
+                        memo.relations = memo.relations || [];
+                        memo.relations.push({ [key]: type.write(value) });
                     });
 
                 }
-                else memo.push(`${key} = ${value}`);
+                else {
+                    isKey ? memo.keys[key] = value : memo.params[key] = value;
+                }
             }
 
             return memo;
-        }, []);
-
-
-        if(isRelation) {
-            /* let { query: node_query, where: node_where } = $end.write(data);
-            query = [...query, ...node_query];
-            where = [...where, ...node_where]; */
-        }
+        }, result);
         
-        return { query, where };
+        return result;
 
         //return { empty: !!!root, entities, data, map: this.normalizrSchema.map, root, pivot, nodes, relations };
     }
