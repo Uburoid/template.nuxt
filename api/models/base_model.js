@@ -139,33 +139,55 @@ class BaseModel {
         let { $labels, $type, $direction = 'out', $start, $end, ...fields } = this.schema;
 
         let query = [];
+        let where = [];
 
         if(!isRelation) {
-            query.push(`MATCH (node :${$labels.join(':')})`);
+            data.$identifier = `node_${generate('0123456789', 3)}`;
+            query.push(`(${data.$identifier} :${$labels.join(':')})`);
+            //query.push(`${data.$identifier}`);
         }
         else {
-            query.push(`${$direction === 'in' ? '<' : ''}-[node :${$type}]-${$direction === 'out' ? '>' : ''}`);
+            query.push(`${$direction === 'in' ? '<' : ''}-[rel_${data.$identifier} :${$type}]-${$direction === 'out' ? '>' : ''}`);
+
+            let { query: node_query, where: node_where } = $end.write(data);
+            query = [...query, ...node_query];
+            where = [...where, ...node_where];
+
         }
 
-        let where = Object.entries(data).reduce((memo, entry) => {
+        where = Object.entries(isRelation ? data.$rel : data).reduce((memo, entry) => {
             let [key, value] = entry;
 
             let field = fields[key];
 
-            let { type, required = false, isKey = false } = field;
+            if(field) {
+                let { type, required = false, isKey = false } = field;
 
-            type = type || field;
+                type = Array.isArray(type) ? type[0] || field : type || field;
 
-            if(type.prototype instanceof Relation) {
-                let { query: rel_query, where: rel_where } = type.write(value.$rel);
-                query = [...query, ...rel_query];
-                memo = [...memo, ...rel_where];
+                if(type.prototype instanceof Relation) {
+                    value = Array.isArray(value) ? value : [value];
+
+                    value.map(value => {
+                        let { query: rel_query, where: rel_where } = type.write(value);
+                        query = [...query, ...rel_query];
+                        memo = [...memo, ...rel_where];
+                    });
+
+                }
+                else memo.push(`${key} = ${value}`);
             }
-            else memo.push(`${key} = ${value}`);
 
             return memo;
         }, []);
 
+
+        if(isRelation) {
+            /* let { query: node_query, where: node_where } = $end.write(data);
+            query = [...query, ...node_query];
+            where = [...where, ...node_where]; */
+        }
+        
         return { query, where };
 
         //return { empty: !!!root, entities, data, map: this.normalizrSchema.map, root, pivot, nodes, relations };
@@ -301,17 +323,17 @@ class Member extends Node {
             $labels: ['Участник'],
             name: String,
             parent: {
-                type: member2member
+                type: parent
             },
             children: {
-                type: [member2member]
+                type: [child]
             }
         }
 
     }
 }
 
-class member2member extends Relation {
+class parent extends Relation {
     static get schema() {
         return {
             ...super.schema,
@@ -330,6 +352,25 @@ class member2member extends Relation {
     }
 }
 
+class child extends Relation {
+    static get schema() {
+        return {
+            ...super.schema,
+            $type: 'родитель',
+            $direction: 'in', // || in
+            $start: Member,
+            $end: Member,
+
+            some_field: {
+                type: String,
+                default: (obj) => ' Date.now() ',
+                modificators: ['trim', 'toUpperCase', 'toLowerCase']
+            }
+        }
+
+    }
+}
+
 
 //module.exports = { Node, Relation };
-module.exports = { Node, Relation, Member, member2member };
+module.exports = { Node, Relation, Member, parent, child };
