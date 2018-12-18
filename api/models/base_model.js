@@ -142,7 +142,6 @@ class BaseModel {
             
         let result = {
             identifier,
-            select: ``,
             keys: {},
             params: {},
             with: ``,
@@ -152,24 +151,27 @@ class BaseModel {
         if(isRelation) {
             result.type = $type;
             result.direction = $direction;
+            result.select = data.$select;
 
             result.start = data.$parent;
             result.end = $end.write(data);
         }
         else {
             result.$labels = $labels;
-            //result.relations = {};
+            result.collect = !!data.$collect;
         }
 
-        result = Object.entries(isRelation ? data.$rel : data).reduce((memo, entry) => {
+        result = Object.entries(isRelation ? data.$rel || {} : data).reduce((memo, entry) => {
             let [key, value] = entry;
 
             let field = fields[key];
 
             if(field) {
-                let { type, required = false, isKey = false } = field;
+                let { type, required = false, isKey = false, system } = field;
 
-                type = Array.isArray(type) ? type[0] : type;
+                let $collect = Array.isArray(type);
+
+                type = $collect ? type[0] : type;
                 type = type || field;
 
                 if(type.prototype instanceof Relation) {
@@ -177,9 +179,12 @@ class BaseModel {
 
                     value.map(value => {
                         value.$parent = memo;
+                        value.$select = required ? 'MATCH' : 'OPTIONAL MATCH';
+                        value.$collect = $collect;
                         
-                        memo.relations = memo.relations || [];
-                        memo.relations.push({ [key]: type.write(value) });
+                        memo.relations = memo.relations || {};
+                        memo.relations[key] = memo.relations[key] || [];
+                        memo.relations[key].push(type.write(value));
                     });
 
                 }
@@ -208,6 +213,8 @@ class BaseModel {
     static async update(data) {
         let validated = this.validate(data, { use_defaults: false, convert_types: true });
 
+        validated = this.write(validated);
+
         return validated;
     }
 
@@ -218,7 +225,7 @@ class BaseModel {
     }
 
     static async findOne(params) {
-        let validated = this.validate(params, { use_defaults: false, convert_types: true });
+        let validated = this.validate(params, { use_defaults: false, convert_types: true }); //?
 
         return validated;
     }
@@ -283,6 +290,7 @@ class Graph extends BaseModel {
             created: {
                 type: Date,
                 required: true,
+                system: true,
                 default: (obj) => {
                     return new Date() / 1;
                 }
@@ -290,6 +298,7 @@ class Graph extends BaseModel {
             updated: {
                 type: Date,
                 required: true,
+                system: true,
                 default: (obj) => {
                     return obj.created || new Date() / 1;
                 }
@@ -326,7 +335,8 @@ class Member extends Node {
             $labels: ['Участник'],
             name: String,
             parent: {
-                type: parent
+                type: parent,
+                required: true
             },
             children: {
                 type: [child]

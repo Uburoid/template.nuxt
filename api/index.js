@@ -31,8 +31,8 @@
         convert_types: false
     });
     
-    let saved = await Member.save(some_data);
     let updated = await Member.update(some_data);
+    let saved = await Member.save(some_data);
     let deleted = await Member.delete(some_data);
     let found = await Member.findOne(some_data);
     
