@@ -5,20 +5,41 @@
     
     let some_data = {
         fake_fld: 'val',
-        _id: ['101', 99],
+        _id: [23, '101', 99],
+        uniq: 100,
         name: 'Peter The First',
         parent: [{
+            $rel: {
+                _id: 300
+            },
+            _id: 400,
             name: 'Ivan IV'
         },{
+            $rel: {
+                _id: 302
+            },
+            _id: 402,
             name: 'Ivan V'
         }],
         children: [
             {
+                $rel: {
+                    _id: 303
+                },
+                _id: 403,
                 name: 'Volodya'
             },
             {
+                $rel: {
+                    _id: 304
+                },
+                _id: 404,
                 name: 'Masha',
                 children: {
+                    $rel: {
+                        _id: 301
+                    },
+                    _id: 405,
                     name: 'Valya'
                 }
             

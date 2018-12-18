@@ -144,8 +144,9 @@ class BaseModel {
             identifier,
             keys: {},
             params: {},
-            with: ``,
-            extractedWith: ``
+            //with: ``,
+            //extractedWith: ``,
+            isRelation
         }
 
         if(isRelation) {
@@ -179,7 +180,8 @@ class BaseModel {
 
                     value.map(value => {
                         value.$parent = memo;
-                        value.$select = required ? 'MATCH' : 'OPTIONAL MATCH';
+                        //value.$select = required ? 'MATCH' : 'OPTIONAL MATCH';
+                        value.$select = 'MERGE';
                         value.$collect = $collect;
                         
                         memo.relations = memo.relations || {};
@@ -215,6 +217,76 @@ class BaseModel {
 
         validated = this.write(validated);
 
+        const format = (object) => {
+            return Object.entries(object).map(entry => {
+                let [key, value] = entry;
+    
+                let condition = `${[key]}: ${JSON.stringify(value)}`.replace(/\"/g, "'");
+                return condition;
+            });
+        }
+
+        const traverse = (leaf) => {
+            let cql = [];
+
+            let keys = format(leaf.keys);
+            if(!keys.length) throw new Error(`No keys provided for ${leaf.identifier}`);
+
+            if(leaf.isRelation) {
+                let end = leaf.end;
+
+                let end_keys = format(end.keys);
+                if(!end_keys.length) throw new Error(`No keys provided for ${end.identifier}`);
+
+                let relation = `${leaf.direction === 'in' ? '<' : ''}-[${leaf.identifier} :\`${leaf.type}\` {${keys}}]-${leaf.direction === 'out' ? '>' : ''}`;
+                let start = `MERGE (${leaf.start.identifier})`;
+                let set = `SET ${end.identifier} += $${end.identifier}, ${leaf.identifier} += $${leaf.identifier}`;
+                end = `(${end.identifier} :${end.$labels.map(label => '`' + label + '`').join(':')} {${end_keys}})`;
+
+                let query = `${start}${relation}${end}\n${set}`;
+
+                cql.push(query);
+            }
+            else {
+                let start = `MERGE (${leaf.identifier} :${leaf.$labels.map(label => '`' + label + '`').join(':')} {${keys}})`;
+                let set = `SET ${leaf.identifier} += $${leaf.identifier}`;
+
+                let query = `${start}\n${set}`;
+
+                cql.push(query);
+
+                for(let key in leaf.relations) {
+                    cql = [...cql, ...leaf.relations[key].map(relation => traverse(relation)[0])];
+                }
+
+            }
+
+            return cql;
+        }
+
+        const traverse1 = (leaf) => {
+            let params = {};
+
+            params[leaf.identifier] = leaf.params;
+            if(leaf.isRelation) {
+                params[leaf.end.identifier] = leaf.end.params;
+
+                params = { ...params, ...traverse1(leaf.end) };
+            }
+            else {
+                for(let key in leaf.relations) {
+                    params = { ...params, ...leaf.relations[key].map(relation => traverse1(relation)) };
+                }
+
+            }
+
+            return params;
+        }
+
+        let params = traverse1(validated);
+        let cql = traverse(validated);
+
+
         return validated;
     }
 
@@ -225,7 +297,7 @@ class BaseModel {
     }
 
     static async findOne(params) {
-        let validated = this.validate(params, { use_defaults: false, convert_types: true }); //?
+        let validated = this.validate(params, { use_defaults: false, convert_types: false }); //?
 
         return validated;
     }
@@ -333,6 +405,10 @@ class Member extends Node {
         return {
             ...super.schema,
             $labels: ['Участник'],
+            uniq: {
+                type: Number,
+                isKey: true
+            },
             name: String,
             parent: {
                 type: parent,
