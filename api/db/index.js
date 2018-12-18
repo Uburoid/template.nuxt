@@ -25,24 +25,9 @@ const neo4jIntsToStrings = (json) => {
     return Object.assign(
         json,
         pluckAndModify(([, value]) => typeof value === 'object', neo4jIntsToStrings),
-        pluckAndModify(([, value]) => neo4j.isInt(value), value => value.toString()),
+        pluckAndModify(([, value]) => neo4j.isInt(value), value => Number(value.toString())),
     );
 };
-
-/* const neo4jIntsToStrings = (json) => {
-    const pluckAndModify = (isMatch, transformValue) =>
-        Object.entries(json || {})
-            .filter(isMatch)
-            .reduce((acc, [key, value]) => ({ ...acc, [key]: transformValue(value) }), 
-            {});
-
-    
-    return {
-        ...json,
-        ...pluckAndModify(([, value]) => typeof value === 'object', neo4jIntsToStrings),
-        ...pluckAndModify(([, value]) => neo4j.isInt(value), value => value.toString())
-    }
-}; */
 
 class DatabaseDriver {
     constructor({} = {}) {
@@ -63,12 +48,14 @@ class NeoDriver extends DatabaseDriver {
             session
                 .run(query, params)
                 .then(function (result) {
-                    result.records = result.records.map(function (record) {
-                        let rec = record.get('node'); //TODO set option to return all keys from record
+                    result.records = result.records.map(record => {
+                        let nodes = {};
 
-                        rec = neo4jIntsToStrings(rec);
+                        for(let key of record.keys) {
+                            nodes[key] = neo4jIntsToStrings(record.get(key).properties);
+                        }
 
-                        return rec;
+                        return nodes;
                     });
                     
                     resolve(result.records);

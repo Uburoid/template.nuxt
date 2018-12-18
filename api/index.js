@@ -10,7 +10,8 @@
         name: 'Peter The First',
         parent: [{
             $rel: {
-                _id: 300
+                _id: 300,
+                some_field: 'many data'
             },
             _id: 400,
             name: 'Ivan IV'
@@ -37,7 +38,8 @@
                 name: 'Masha',
                 children: {
                     $rel: {
-                        _id: 301
+                        _id: 501,
+                        some_field: '555'
                     },
                     _id: 405,
                     name: 'Valya'
@@ -52,8 +54,8 @@
         convert_types: false
     });
     
-    let updated = await Member.update(some_data);
     let saved = await Member.save(some_data);
+    let updated = await Member.update(some_data);
     let deleted = await Member.delete(some_data);
     let found = await Member.findOne(some_data);
     

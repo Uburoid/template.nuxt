@@ -6,6 +6,7 @@ const arraySort = require('array-sort'); //mistical Array.sort error
 const intersect = require('../intersect');
 
 const generate = require('nanoid/generate');
+const cypher = require('decypher').helpers;
 
 class BaseModel {
     constructor() {
@@ -191,7 +192,17 @@ class BaseModel {
 
                 }
                 else {
-                    isKey ? memo.keys[key] = value : memo.params[key] = value;
+                    memo.params[key] = value;
+
+                    if(isKey === true) {
+                        memo.keys[key] = value;
+                    }
+                    else {
+                        if(isKey === 'system') {
+                            //TODO: this should be in WHERE THEN!
+                            //memo.params[key] = field.default(identifier);
+                        };
+                    }
                 }
             }
 
@@ -204,88 +215,142 @@ class BaseModel {
     }
 
     static async save(data) {
-        let validated = this.validate(data, { use_defaults: true, convert_types: true });
 
-        validated = this.write(validated);
-
-        return validated;
+        return this.update(data, true);
         //await driver.query({ cql, params: node_params, options });
     }
 
-    static async update(data) {
-        let validated = this.validate(data, { use_defaults: false, convert_types: true });
+    static async update(data, save = false) {
+        let validated = this.validate(data, { use_defaults: save, convert_types: true });
 
-        validated = this.write(validated);
+        let write = this.write(validated);
 
-        const format = (object) => {
-            return Object.entries(object).map(entry => {
-                let [key, value] = entry;
-    
-                let condition = `${[key]}: ${JSON.stringify(value)}`.replace(/\"/g, "'");
-                return condition;
-            });
-        }
+        const traverse = (leaf, acc) => {
+            acc = acc || [];
 
-        const traverse = (leaf) => {
-            let cql = [];
+            let query = {
+                cql: '',
+                params: {}
+            }
 
-            let keys = format(leaf.keys);
-            if(!keys.length) throw new Error(`No keys provided for ${leaf.identifier}`);
+            //let keys = format(leaf.keys);
+            //if(!keys.length) throw new Error(`No keys provided for ${leaf.identifier}`);
 
             if(leaf.isRelation) {
-                let end = leaf.end;
+                query.relation = leaf.identifier;
+                query.remove = `ident_${generate('0123456789', 3)}`;
 
-                let end_keys = format(end.keys);
-                if(!end_keys.length) throw new Error(`No keys provided for ${end.identifier}`);
+                let end = cypher.nodePattern({
+                    labels: leaf.end.$labels,
+                    identifier: leaf.end.identifier,
+                    data: leaf.end.keys 
+                });
 
-                let relation = `${leaf.direction === 'in' ? '<' : ''}-[${leaf.identifier} :\`${leaf.type}\` {${keys}}]-${leaf.direction === 'out' ? '>' : ''}`;
-                let start = `MERGE (${leaf.start.identifier})`;
-                let set = `SET ${end.identifier} += $${end.identifier}, ${leaf.identifier} += $${leaf.identifier}`;
-                end = `(${end.identifier} :${end.$labels.map(label => '`' + label + '`').join(':')} {${end_keys}})`;
+                let relation = cypher.relationshipPattern({
+                    direction: leaf.direction,
+                    identifier: leaf.identifier,
+                    type: leaf.type,
+                    data: leaf.keys,
+                    source: {
+                        identifier: leaf.start.identifier
+                    },
+                    target: {
+                        identifier: leaf.end.identifier,
+                    }
+                });
 
-                let query = `${start}${relation}${end}\n${set}`;
+                let remove = cypher.relationshipPattern({
+                    direction: leaf.direction,
+                    identifier: query.remove,
+                    type: leaf.type,
+                    source: {
+                        identifier: leaf.start.identifier
+                    },
+                    target: {
+                        identifier: leaf.end.identifier,
+                    }
+                });
 
-                cql.push(query);
+                query.cql = `${end}|${relation}|${remove}`;
+
+                query.params[leaf.identifier] = { ...leaf.params };
+
+                leaf = leaf.end;
             }
             else {
-                let start = `MERGE (${leaf.identifier} :${leaf.$labels.map(label => '`' + label + '`').join(':')} {${keys}})`;
-                let set = `SET ${leaf.identifier} += $${leaf.identifier}`;
-
-                let query = `${start}\n${set}`;
-
-                cql.push(query);
-
-                for(let key in leaf.relations) {
-                    cql = [...cql, ...leaf.relations[key].map(relation => traverse(relation)[0])];
-                }
-
+                query.cql = cypher.nodePattern({
+                    labels: leaf.$labels,
+                    identifier: leaf.identifier,
+                    data: leaf.keys
+                });
             }
 
-            return cql;
+            query.node = leaf.identifier;
+            query.params[leaf.identifier] = { ...leaf.params };
+
+            for(let key in leaf.relations) {
+                leaf.relations[key].forEach(relation => traverse(relation, acc));
+            }
+
+            acc.push(query);
+
+            return acc;
         }
 
-        const traverse1 = (leaf) => {
-            let params = {};
+        let query = traverse(write);
+        
+        let { cql, params, result } = query.reverse().reduce((memo, element) => {
+            let [node, relation, remove] = element.cql.split('|');
 
-            params[leaf.identifier] = leaf.params;
+            const populate = (element, identifier) => {
+                return element ? `MERGE ${element} SET ${identifier} ${save ? '=' : '+='} $${identifier}\n` : '';
+            }
+
+            remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : '';
+
+            let cql = `${populate(node, element.node)}${remove}${populate(relation, element.relation)}`;
+            memo.cql.push(cql);
+            
+            memo.result.push(element.node);
+            element.relation && memo.result.push(element.relation);
+
+            memo.params = { ...memo.params, ...element.params };
+
+            return memo;
+        }, { cql: [], params: {}, result: [] })
+
+        cql = `${cql.join('\n')}\nRETURN ${result.join(',')}`;
+
+        let records = await driver.query({ query: cql, params });
+        let nodes = records.pop();
+
+        const traverseWrite = (leaf, nodes) => {
+            let relations = {}; 
+
             if(leaf.isRelation) {
-                params[leaf.end.identifier] = leaf.end.params;
+                relations = leaf.end.relations;
 
-                params = { ...params, ...traverse1(leaf.end) };
+                leaf = {
+                    ...nodes[leaf.end.identifier],
+                    $rel: nodes[leaf.identifier]
+                }
             }
             else {
-                for(let key in leaf.relations) {
-                    params = { ...params, ...leaf.relations[key].map(relation => traverse1(relation)) };
-                }
+                relations = leaf.relations;
 
+                leaf = {
+                    ...nodes[leaf.identifier],
+                }
             }
 
-            return params;
+            for(let key in relations) {
+                leaf[key] = relations[key].map(relation => traverseWrite(relation, nodes));
+            }
+
+            return leaf;
         }
 
-        let params = traverse1(validated);
-        let cql = traverse(validated);
-
+        validated = this.validate(traverseWrite(write, nodes), { use_defaults: false, convert_types: true });
 
         return validated;
     }
@@ -321,13 +386,12 @@ for fields (Object):
 type: String || Number || Date || Boolean || Realtion // OR IN ARRAY [String || Number || Date || Boolean || Realtion]
 required: true || false
 
-for not Relation type:
-isKey: true || false // CREATE CONSTRAINT
+isKey: true || false || 'system' // CREATE CONSTRAINT
 index: true || false // CREATE INDEX
 
 default: Function (obj)
 modificators: [<modificator_name>] from modificators object
-
+set_on: 'create' || 'update'
  */
 
 class Graph extends BaseModel {
@@ -352,17 +416,19 @@ class Graph extends BaseModel {
         return {
             ...super.schema,
             _id: {
+                //isKey: 'system',
                 isKey: true,
                 type: String,
                 required: true,
                 default: (obj) => {
                     return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 6);
+                    //return `ID(${identifier})`;
                 }
             },
             created: {
                 type: Date,
                 required: true,
-                system: true,
+                set_on: 'create',
                 default: (obj) => {
                     return new Date() / 1;
                 }
@@ -370,7 +436,7 @@ class Graph extends BaseModel {
             updated: {
                 type: Date,
                 required: true,
-                system: true,
+                set_on: 'update',
                 default: (obj) => {
                     return obj.created || new Date() / 1;
                 }
