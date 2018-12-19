@@ -132,7 +132,9 @@ class BaseModel {
         //return { empty: !!!root, entities, data, map: this.normalizrSchema.map, root, pivot, nodes, relations };
     }
 
-    static write(data) {
+    static write(data, options = { populate_system: true }) {
+        options = { populate_system: true, ...options };
+
         if(!data) return void 0;
 
         let { $labels, $type, $direction = 'out', $start, $end, ...fields } = this.schema;
@@ -206,7 +208,7 @@ class BaseModel {
                         default:
                     }
 
-                    params[key] = system ? field.default(value) : value;
+                    params[key] = (system && options.populate_system) ? field.default(value) : value;
 
                     if(isKey === true) {
                         memo.keys[key] = value;
@@ -228,10 +230,12 @@ class BaseModel {
         //return { empty: !!!root, entities, data, map: this.normalizrSchema.map, root, pivot, nodes, relations };
     }
 
-    static async delete(params) {
-        let validated = this.validate(data, { use_defaults: false, convert_types: true });
+    static async delete(params, options) {
+        //options = { strict: false, ...options };
 
-        let write = this.write(validated);
+        let validated = this.validate(params, { use_defaults: false, convert_types: false });
+
+        let write = this.write(validated, { populate_system: false });
 
         const traverse = (leaf, acc) => {
             acc = acc || [];
@@ -239,65 +243,21 @@ class BaseModel {
             let query = {
                 cql: '',
                 params: {},
-                create_params: {},
-                update_params: {}
             }
 
             if(leaf.isRelation) {
-                query.relation = leaf.identifier;
-                query.remove = `ident_${generate('0123456789', 4)}`;
-
-                let end = cypher.nodePattern({
-                    labels: leaf.end.$labels,
-                    identifier: leaf.end.identifier,
-                    data: leaf.end.keys 
-                });
-
-                let relation = cypher.relationshipPattern({
-                    direction: leaf.direction,
-                    identifier: leaf.identifier,
-                    type: leaf.type,
-                    data: leaf.keys,
-                    source: {
-                        identifier: leaf.start.identifier
-                    },
-                    target: {
-                        identifier: leaf.end.identifier,
-                    }
-                });
-
-                let remove = cypher.relationshipPattern({
-                    direction: leaf.direction,
-                    identifier: query.remove,
-                    type: leaf.type,
-                    source: {
-                        identifier: leaf.start.identifier
-                    },
-                    target: {
-                        identifier: leaf.end.identifier,
-                    }
-                });
-
-                query.cql = `${end}|${relation}|${remove}`;
-
-                query.params[leaf.identifier] = { ...leaf.params };
-                query.params[`create_${leaf.identifier}`] = { ...leaf.create_params };
-                query.params[`update_${leaf.identifier}`] = { ...leaf.update_params };
-
                 leaf = leaf.end;
             }
-            else {
-                query.cql = cypher.nodePattern({
-                    labels: leaf.$labels,
-                    identifier: leaf.identifier,
-                    data: leaf.keys
-                });
-            }
 
-            query.node = leaf.identifier;
-            query.params[leaf.identifier] = { ...leaf.params };
-            query.params[`create_${leaf.identifier}`] = { ...leaf.create_params };
-            query.params[`update_${leaf.identifier}`] = { ...leaf.update_params };
+            query.identifier = leaf.identifier;
+            
+            query.cql = cypher.nodePattern({
+                labels: leaf.$labels,
+                identifier: leaf.identifier,
+                //data: leaf.keys
+            });
+
+            query.params = { ...query.params, ...leaf.params };
 
             for(let key in leaf.relations) {
                 leaf.relations[key].forEach(relation => traverse(relation, acc));
@@ -310,71 +270,50 @@ class BaseModel {
 
         let query = traverse(write);
         
-        let { cql, params, result } = query.reverse().reduce((memo, element) => {
-            let [node, relation, remove] = element.cql.split('|');
-
-            const populate = (cql, identifier) => {
-                if(cql) {
-                    cql = `MERGE ${cql}\n`;
-
-                    let on_create = `ON CREATE SET ${identifier} = $create_${identifier}, ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
-                    let on_update = `ON MATCH SET ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
-
-                    cql = `${cql}${on_create}${on_update}`;
-
-                    return cql;
-                }
-
-                return '';
-            }
-
-            remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : ''; //TODO: IS THIS NECESSARY?
-
-            let cql = `${populate(node, element.node)}${remove}${populate(relation, element.relation)}`;
-            memo.cql.push(cql);
+        let cql = query.reverse().reduce((memo, element) => {
+            let cql = element.cql;
             
-            memo.result.push(element.node);
-            element.relation && memo.result.push(element.relation);
+            let where = Object.entries(element.params).map(entry => {
+                let [key, value] = entry;
 
-            memo.params = { ...memo.params, ...element.params };
+                let isArray = Array.isArray(value);
+    
+                if(isArray) {
+                    value = `[${value.map(value => typeof(value) === 'string' ? `'${value}'` : value).join(',')}]`;
+                }
+                else {
+                    let isRegexp = typeof(value) === 'string' && value.slice(0, 1) === '~';
+    
+                    if(isRegexp) {
+                        value = value.slice(1);
+    
+                        operator = '=~';
+                    }
+    
+                    typeof(value) === 'string' && (value = `'${value}'`);
+                }
+    
+                return `${element.identifier}.${key} ${isArray ? 'IN' : '='} ${value}`;
+            });
 
+            //cql = `OPTIONAL MATCH ${cql}\nWHERE ${where.join(' AND ')} WITH accumulator + [${element.identifier} {.*}] AS accumulator`;
+            //cql = `${options.strict ? 'MATCH' : 'OPTIONAL MATCH'} ${cql}\nWHERE ${where.join(' AND ')}\nWITH ${element.identifier}, accumulator + [${element.identifier} {.*}] AS accumulator\nDETACH DELETE ${element.identifier}\nWITH accumulator`;
+            cql = `OPTIONAL MATCH ${cql}\nWHERE ${where.join(' AND ')}\nWITH ${element.identifier}, accumulator + [${element.identifier} {.*}] AS accumulator\nDETACH DELETE ${element.identifier}\nWITH accumulator`;
+
+            memo.push(cql);
+            
             return memo;
-        }, { cql: [], params: {}, result: [] })
+        }, [])
 
-        cql = `${cql.join('\n')}\nRETURN ${result.join(',')}`;
+        cql = `WITH [] AS accumulator\n${cql.join('\n')}\nRETURN accumulator`;
+        //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
 
-        let records = await driver.query({ query: cql, params });
+        let records = await driver.query({ query: cql });
         let nodes = records.pop();
+        
+        nodes = nodes ? nodes.accumulator.filter(node => node) : [];
 
-        const traverseWrite = (leaf, nodes) => {
-            let relations = {}; 
-
-            if(leaf.isRelation) {
-                relations = leaf.end.relations;
-
-                leaf = {
-                    ...nodes[leaf.end.identifier],
-                    $rel: nodes[leaf.identifier]
-                }
-            }
-            else {
-                relations = leaf.relations;
-
-                leaf = {
-                    ...nodes[leaf.identifier],
-                }
-            }
-
-            for(let key in relations) {
-                leaf[key] = relations[key].map(relation => traverseWrite(relation, nodes));
-            }
-
-            return leaf;
-        }
-
-        validated = this.validate(traverseWrite(write, nodes), { use_defaults: false, convert_types: true });
-
-        return validated;
+        return nodes;
     }
 
     static async save(data) {

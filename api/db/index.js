@@ -16,6 +16,7 @@ const neo4j = require('neo4j-driver').v1;
 const driver = neo4j.driver(process.env.NEO_URL, neo4j.auth.basic("neo4j", "123"));
 
 const neo4jIntsToStrings = (json) => {
+    if(!json) return void 0;
 
     const pluckAndModify = (isMatch, transformValue) =>
         Object.entries(json)
@@ -52,7 +53,7 @@ class NeoDriver extends DatabaseDriver {
                         let nodes = {};
 
                         for(let key of record.keys) {
-                            nodes[key] = neo4jIntsToStrings(record.get(key).properties);
+                            nodes[key] = neo4jIntsToStrings(record.get(key).properties || record.get(key));
                         }
 
                         return nodes;
