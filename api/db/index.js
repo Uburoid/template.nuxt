@@ -47,7 +47,7 @@ class NeoDriver extends DatabaseDriver {
         return new Promise((resolve, reject) => {
             session
                 .run(query, params)
-                .then(function (result) {
+                .then(result => {
                     result.records = result.records.map(record => {
                         let nodes = {};
 
@@ -61,8 +61,8 @@ class NeoDriver extends DatabaseDriver {
                     resolve(result.records);
                     session.close();
                 })
-                .catch(function (error) {
-                    console.log(error);
+                .catch(error => {
+                    console.log(query, error);
                     reject(error);
                 });
                 

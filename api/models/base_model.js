@@ -51,7 +51,7 @@ class BaseModel {
                 }
             }
 
-            let { type = String, required = false, isKey = false, index = false, default: _default, modificators } = value;
+            let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
             
             let isArray = Array.isArray(type);
             type = isArray ? type[0] : type;
@@ -70,7 +70,7 @@ class BaseModel {
                         throw new Error(`${this.prototype.name}.${key} required a value!`);
                     }
     
-                    if(!value && _default && options.use_defaults) {
+                    if(!value && _default && (options.use_defaults || system)) {
                         value = _default(data);
                     }
 
@@ -139,7 +139,7 @@ class BaseModel {
 
         let isRelation = this.prototype instanceof Relation;
 
-        const identifier = `ident_${generate('0123456789', 3)}`;
+        const identifier = `ident_${generate('0123456789', 4)}`;
             
         let result = {
             identifier,
@@ -254,7 +254,7 @@ class BaseModel {
 
             if(leaf.isRelation) {
                 query.relation = leaf.identifier;
-                query.remove = `ident_${generate('0123456789', 3)}`;
+                query.remove = `ident_${generate('0123456789', 4)}`;
 
                 let end = cypher.nodePattern({
                     labels: leaf.end.$labels,
@@ -290,8 +290,8 @@ class BaseModel {
                 query.cql = `${end}|${relation}|${remove}`;
 
                 query.params[leaf.identifier] = { ...leaf.params };
-                query.create_params[leaf.identifier] = { ...leaf.create_params };
-                query.update_params[leaf.identifier] = { ...leaf.update_params };
+                query.params[`create_${leaf.identifier}`] = { ...leaf.create_params };
+                query.params[`update_${leaf.identifier}`] = { ...leaf.update_params };
 
                 leaf = leaf.end;
             }
@@ -305,8 +305,8 @@ class BaseModel {
 
             query.node = leaf.identifier;
             query.params[leaf.identifier] = { ...leaf.params };
-            query.create_params[leaf.identifier] = { ...leaf.create_params };
-            query.update_params[leaf.identifier] = { ...leaf.update_params };
+            query.params[`create_${leaf.identifier}`] = { ...leaf.create_params };
+            query.params[`update_${leaf.identifier}`] = { ...leaf.update_params };
 
             for(let key in leaf.relations) {
                 leaf.relations[key].forEach(relation => traverse(relation, acc));
@@ -322,18 +322,24 @@ class BaseModel {
         let { cql, params, result } = query.reverse().reduce((memo, element) => {
             let [node, relation, remove] = element.cql.split('|');
 
-            const populate = (cql, identifier, element) => {
-                cql = element ? `MERGE ${cql} SET ${identifier} ${save ? '=' : '+='} $${identifier}\n` : '';
+            const populate = (cql, identifier) => {
+                if(cql) {
+                    cql = `MERGE ${cql}\n`;
 
-                let on_create = cypher.escapeLiteralMap(element.create_params);
-                let on_update = cypher.escapeLiteralMap(element.update_params);
+                    let on_create = `ON CREATE SET ${identifier} = $create_${identifier}, ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
+                    let on_update = `ON MATCH SET ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
 
-                return cql;
+                    cql = `${cql}${on_create}${on_update}`;
+
+                    return cql;
+                }
+
+                return '';
             }
 
-            remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : '';
+            remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : ''; //TODO: IS THIS NECESSARY?
 
-            let cql = `${populate(node, element.node, element)}${remove}${populate(relation, element.relation, element)}`;
+            let cql = `${populate(node, element.node)}${remove}${populate(relation, element.relation)}`;
             memo.cql.push(cql);
             
             memo.result.push(element.node);
