@@ -169,7 +169,7 @@ class BaseModel {
             let field = fields[key];
 
             if(field) {
-                let { type, required = false, isKey = false, system } = field;
+                let { type, required = false, isKey = false, system, set_on } = field;
 
                 let $collect = Array.isArray(type);
 
@@ -192,14 +192,28 @@ class BaseModel {
 
                 }
                 else {
-                    memo.params[key] = value;
+                    let params = memo.params;
+
+                    switch(set_on) {
+                        case 'create':
+                            memo.create_params = memo.create_params || {};
+                            params = memo.create_params;
+                            break;
+                        case 'update':
+                            memo.update_params = memo.update_params || {};
+                            params = memo.update_params;
+                            break;
+                        default:
+                    }
+
+                    params[key] = system ? field.default(value) : value;
 
                     if(isKey === true) {
                         memo.keys[key] = value;
                     }
                     else {
                         if(isKey === 'system') {
-                            //TODO: this should be in WHERE THEN!
+                            //TODO: this should be in WHERE!
                             //memo.params[key] = field.default(identifier);
                         };
                     }
@@ -230,7 +244,9 @@ class BaseModel {
 
             let query = {
                 cql: '',
-                params: {}
+                params: {},
+                create_params: {},
+                update_params: {}
             }
 
             //let keys = format(leaf.keys);
@@ -274,6 +290,8 @@ class BaseModel {
                 query.cql = `${end}|${relation}|${remove}`;
 
                 query.params[leaf.identifier] = { ...leaf.params };
+                query.create_params[leaf.identifier] = { ...leaf.create_params };
+                query.update_params[leaf.identifier] = { ...leaf.update_params };
 
                 leaf = leaf.end;
             }
@@ -287,6 +305,8 @@ class BaseModel {
 
             query.node = leaf.identifier;
             query.params[leaf.identifier] = { ...leaf.params };
+            query.create_params[leaf.identifier] = { ...leaf.create_params };
+            query.update_params[leaf.identifier] = { ...leaf.update_params };
 
             for(let key in leaf.relations) {
                 leaf.relations[key].forEach(relation => traverse(relation, acc));
@@ -302,13 +322,18 @@ class BaseModel {
         let { cql, params, result } = query.reverse().reduce((memo, element) => {
             let [node, relation, remove] = element.cql.split('|');
 
-            const populate = (element, identifier) => {
-                return element ? `MERGE ${element} SET ${identifier} ${save ? '=' : '+='} $${identifier}\n` : '';
+            const populate = (cql, identifier, element) => {
+                cql = element ? `MERGE ${cql} SET ${identifier} ${save ? '=' : '+='} $${identifier}\n` : '';
+
+                let on_create = cypher.escapeLiteralMap(element.create_params);
+                let on_update = cypher.escapeLiteralMap(element.update_params);
+
+                return cql;
             }
 
             remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : '';
 
-            let cql = `${populate(node, element.node)}${remove}${populate(relation, element.relation)}`;
+            let cql = `${populate(node, element.node, element)}${remove}${populate(relation, element.relation, element)}`;
             memo.cql.push(cql);
             
             memo.result.push(element.node);
@@ -354,7 +379,7 @@ class BaseModel {
 
         return validated;
     }
-
+////////////////////////////////////
     static async find(params) {
         let validated = this.validate(params, { use_defaults: false, convert_types: false });
 
@@ -392,6 +417,7 @@ index: true || false // CREATE INDEX
 default: Function (obj)
 modificators: [<modificator_name>] from modificators object
 set_on: 'create' || 'update'
+system: value only from default
  */
 
 class Graph extends BaseModel {
@@ -428,6 +454,7 @@ class Graph extends BaseModel {
             created: {
                 type: Date,
                 required: true,
+                system: true,
                 set_on: 'create',
                 default: (obj) => {
                     return new Date() / 1;
@@ -436,6 +463,7 @@ class Graph extends BaseModel {
             updated: {
                 type: Date,
                 required: true,
+                system: true,
                 set_on: 'update',
                 default: (obj) => {
                     return obj.created || new Date() / 1;
