@@ -438,8 +438,8 @@ class BaseModel {
 
         cql = `${cql.join('\n')}\nRETURN ${result.join(',')}`;
 
-        let records = await driver.query({ query: cql, params });
-        let nodes = records.pop();
+        let nodes = await driver.query({ query: cql, params });
+        //let nodes = records.pop();
 
         const traverseWrite = (leaf, nodes) => {
             let relations = {}; 
@@ -582,12 +582,63 @@ class BaseModel {
         console.log(cql);
         //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
 
-        let records = await driver.query({ query: cql });
+        let nodes = await driver.query({ query: cql });
         //let nodes = records.pop();
         
-        //nodes = nodes ? nodes.accumulator.filter(node => node) : [];
+        const traverseWrite = (leaf, nodes) => {
+            let relations = {}; 
 
-        return records;
+            if(leaf.isRelation) {
+                relations = leaf.end.relations;
+
+                let node = Array.isArray(nodes[leaf.end.identifier]) ? nodes[leaf.end.identifier] : [nodes[leaf.end.identifier]];
+                let relation = Array.isArray(nodes[leaf.identifier]) ? nodes[leaf.identifier] : [nodes[leaf.identifier]];
+
+                leaf = node.map((item, inx) => {
+                    return {
+                        ...item,
+                        $rel: relation[inx]
+                    }
+                });
+
+                /* leaf = {
+                    ...nodes[leaf.end.identifier],
+                    $rel: nodes[leaf.identifier]
+                } */
+            }
+            else {
+                relations = leaf.relations;
+
+                let node = Array.isArray(nodes[leaf.identifier]) ? nodes[leaf.identifier] : [nodes[leaf.identifier]];
+
+                leaf = node.map((item, inx) => {
+                    return {
+                        ...item
+                    }
+                });
+
+                /* leaf = {
+                    ...nodes[leaf.identifier],
+                } */
+            }
+
+            for(let key in relations) {
+                leaf = leaf.reduce((memo, item) => {
+                    item[key] = relations[key].map(relation => traverseWrite(relation, nodes));
+                    
+                    relations[key] && memo.push(item[key]);
+                    //console.log(item[key]);
+                    return memo;
+                }, []);
+                //leaf[key] = relations[key].map(relation => traverseWrite(relation, nodes));
+            }
+
+            return leaf;
+        }
+
+        validated = this.validate(traverseWrite(write, nodes), { use_defaults: false, convert_types: true });
+
+        return validated;
     }
 
     static async findOne(params) {

@@ -49,18 +49,31 @@ class NeoDriver extends DatabaseDriver {
             session
                 .run(query, params)
                 .then(result => {
+                    let cache = {};
                     let nodes = {};
                     result.records = result.records.forEach(record => {
 
                         for(let key of record.keys) {
                             let value = record.get(key);
+                            let identity = value && value.identity.toString();
                             value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
                             if(value) {
-                                if(nodes[key]) {
+                                if(!cache[identity]) {
+                                    cache[identity] = true;
+
+                                    //nodes[key] = nodes[key] || {};
+                                    //nodes[key][identity] = value;
+                                    if(nodes[key]) {
+                                        nodes[key] = Array.isArray(nodes[key]) ? nodes[key] : [nodes[key]];
+                                        nodes[key].push(value);
+                                    }
+                                    else nodes[key] = value
+                                }
+                                /* if(nodes[key]) {
                                     nodes[key] = Array.isArray(nodes[key]) ? nodes[key] : [nodes[key]];
                                     nodes[key].push(value);
                                 }
-                                else nodes[key] = value
+                                else nodes[key] = value */
                             }
                         }
                     });
