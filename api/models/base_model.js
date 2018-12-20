@@ -586,57 +586,21 @@ class BaseModel {
         //let nodes = records.pop();
         
         const traverseWrite = (leaf, nodes) => {
-            let relations = {}; 
+            let relations = leaf.end ? leaf.end.relations : leaf.relations; 
 
-            if(leaf.isRelation) {
-                relations = leaf.end.relations;
-
-                let node = Array.isArray(nodes[leaf.end.identifier]) ? nodes[leaf.end.identifier] : [nodes[leaf.end.identifier]];
-                let relation = Array.isArray(nodes[leaf.identifier]) ? nodes[leaf.identifier] : [nodes[leaf.identifier]];
-
-                leaf = node.map((item, inx) => {
-                    return {
-                        ...item,
-                        $rel: relation[inx]
-                    }
-                });
-
-                /* leaf = {
-                    ...nodes[leaf.end.identifier],
-                    $rel: nodes[leaf.identifier]
-                } */
-            }
-            else {
-                relations = leaf.relations;
-
-                let node = Array.isArray(nodes[leaf.identifier]) ? nodes[leaf.identifier] : [nodes[leaf.identifier]];
-
-                leaf = node.map((item, inx) => {
-                    return {
-                        ...item
-                    }
-                });
-
-                /* leaf = {
-                    ...nodes[leaf.identifier],
-                } */
-            }
+            let node = { ...nodes[leaf.end ? leaf.end.identifier : leaf.identifier] };
+            leaf.end && (node.$rel = { ...nodes[leaf.identifier] });
 
             for(let key in relations) {
-                leaf = leaf.reduce((memo, item) => {
-                    item[key] = relations[key].map(relation => traverseWrite(relation, nodes));
-                    
-                    relations[key] && memo.push(item[key]);
-                    //console.log(item[key]);
-                    return memo;
-                }, []);
-                //leaf[key] = relations[key].map(relation => traverseWrite(relation, nodes));
+                let relation = relations[key].pop();
+                node[key] = traverseWrite(relation, nodes);
             }
 
-            return leaf;
+            return node;
         }
 
-        validated = this.validate(traverseWrite(write, nodes), { use_defaults: false, convert_types: true });
+        let traversed = traverseWrite(write, nodes);
+        validated = this.validate(traversed, { use_defaults: false, convert_types: true });
 
         return validated;
     }

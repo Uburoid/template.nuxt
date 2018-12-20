@@ -50,15 +50,18 @@ class NeoDriver extends DatabaseDriver {
                 .run(query, params)
                 .then(result => {
                     let cache = {};
-                    let nodes = {};
-                    result.records = result.records.forEach(record => {
+                    result.records = result.records.map(record => {
+                        let nodes = {};
 
                         for(let key of record.keys) {
                             let value = record.get(key);
                             let identity = value && value.identity.toString();
+                            
                             value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
+
                             if(value) {
-                                if(!cache[identity]) {
+                                nodes[key] = value;
+                                /* if(!cache[identity] || (cache[identity] && !nodes[key])) {
                                     cache[identity] = true;
 
                                     //nodes[key] = nodes[key] || {};
@@ -68,7 +71,7 @@ class NeoDriver extends DatabaseDriver {
                                         nodes[key].push(value);
                                     }
                                     else nodes[key] = value
-                                }
+                                } */
                                 /* if(nodes[key]) {
                                     nodes[key] = Array.isArray(nodes[key]) ? nodes[key] : [nodes[key]];
                                     nodes[key].push(value);
@@ -76,9 +79,11 @@ class NeoDriver extends DatabaseDriver {
                                 else nodes[key] = value */
                             }
                         }
+
+                        return nodes;
                     });
                     
-                    resolve(nodes);
+                    resolve(result.records);
                     session.close();
                 })
                 .catch(error => {

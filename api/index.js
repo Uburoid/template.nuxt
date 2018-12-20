@@ -56,8 +56,8 @@
         name: 'Peter The First',
         parent: true,
         children: {
-            children: true
-        
+            children: true,
+            parent: true
         }
     }
     
