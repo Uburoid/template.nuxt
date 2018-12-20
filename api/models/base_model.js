@@ -303,7 +303,7 @@ class BaseModel {
             memo.push(cql);
             
             return memo;
-        }, [])
+        }, []);
 
         cql = `WITH [] AS accumulator\n${cql.join('\n')}\nRETURN accumulator`;
         //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
@@ -475,7 +475,119 @@ class BaseModel {
     static async find(params) {
         let validated = this.validate(params, { use_defaults: false, convert_types: false });
 
-        return validated;
+        let write = this.write(validated, { populate_system: false });
+
+        const traverse = (leaf, acc) => {
+            acc = acc || [];
+
+            let query = {
+                cql: '',
+                params: {},
+                selector: 'MATCH'
+            }
+
+            //let keys = format(leaf.keys);
+            //if(!keys.length) throw new Error(`No keys provided for ${leaf.identifier}`);
+
+            if(leaf.isRelation) {
+                query.relation = leaf.identifier;
+                query.selector = leaf.end.collect ? 'OPTIONAL MATCH' : 'MATCH';
+
+                let relation = cypher.relationshipPattern({
+                    direction: leaf.direction,
+                    identifier: leaf.identifier,
+                    type: leaf.type,
+                    source: {
+                        identifier: leaf.start.identifier
+                    },
+                    target: {
+                        labels: leaf.end.$labels,
+                        identifier: leaf.end.identifier,
+                    }
+                });
+
+                query.cql = `${relation}`;
+
+                query.params[leaf.identifier] = { ...leaf.params };
+
+                leaf = leaf.end;
+            }
+            else {
+                query.cql = cypher.nodePattern({
+                    labels: leaf.$labels,
+                    identifier: leaf.identifier,
+                });
+            }
+
+            query.node = leaf.identifier;
+            query.params[leaf.identifier] = { ...leaf.params };
+
+            for(let key in leaf.relations) {
+                leaf.relations[key].forEach(relation => traverse(relation, acc));
+            }
+
+            acc.push(query);
+
+            return acc;
+        }
+
+        let query = traverse(write);
+        
+        let cql = query.reverse().reduce((memo, element) => {
+            let cql = element.cql;
+
+            
+
+                let where = Object.entries(element.params).reduce((memo, entry) => {
+                    let [identifier, params] = entry;
+
+                    params = Object.entries(params).map(entry => {
+                        let [key, value] = entry;
+                            
+                        let isArray = Array.isArray(value);
+            
+                        if(isArray) {
+                            value = `[${value.map(value => typeof(value) === 'string' ? `'${value}'` : value).join(',')}]`;
+                        }
+                        else {
+                            let isRegexp = typeof(value) === 'string' && value.slice(0, 1) === '~';
+            
+                            if(isRegexp) {
+                                value = value.slice(1);
+            
+                                operator = '=~';
+                            }
+            
+                            typeof(value) === 'string' && (value = `'${value}'`);
+                        }
+            
+                        return `${identifier}.${key} ${isArray ? 'IN' : '='} ${value}`;
+                    });
+                    
+                    params.length && memo.push(params.join(' AND '));
+                    return memo;
+                }, []);    
+
+//                return `${element.cql} WHERE ${where.join(' AND ')}`;
+
+            cql = `OPTIONAL MATCH ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
+            //cql = `${element.selector} ${cql}\nWHERE ${where.join(' AND ')}`;
+
+            memo.push(cql);
+            
+            return memo;
+        }, []);
+
+        cql = `${cql.join('\n')}\nRETURN *`;
+        console.log(cql);
+        //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
+
+        let records = await driver.query({ query: cql });
+        //let nodes = records.pop();
+        
+        //nodes = nodes ? nodes.accumulator.filter(node => node) : [];
+
+        return records;
     }
 
     static async findOne(params) {

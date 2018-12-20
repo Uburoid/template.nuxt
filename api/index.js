@@ -48,6 +48,18 @@
             },
         ]
     }
+
+    let some_data1 = {
+        fake_fld: 'val',
+        _id: ['23', '101', 99],
+        uniq: 100,
+        name: 'Peter The First',
+        parent: true,
+        children: {
+            children: true
+        
+        }
+    }
     
     let validated = Member.validate(some_data, {
         use_defaults: true,
@@ -55,9 +67,9 @@
     });
     
     //let saved = await Member.save(some_data);
-    let updated = await Member.update(some_data);
-    let deleted = await Member.delete(some_data, { strict: true });
-    let found = await Member.findOne(some_data);
+    //let updated = await Member.update(some_data);
+    //let deleted = await Member.delete(some_data, { strict: true });
+    let found = await Member.find(some_data1);
     
     console.log(schema);
     
