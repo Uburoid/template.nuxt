@@ -582,7 +582,7 @@ class BaseModel {
         console.log(cql);
         //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
 
-        let nodes = await driver.query({ query: cql });
+        let records = await driver.query({ query: cql });
         //let nodes = records.pop();
         
         const traverseWrite = (leaf, nodes) => {
@@ -592,14 +592,22 @@ class BaseModel {
             leaf.end && (node.$rel = { ...nodes[leaf.identifier] });
 
             for(let key in relations) {
-                let relation = relations[key].pop();
-                node[key] = traverseWrite(relation, nodes);
+                let [relation] = relations[key];
+                node[key] = node[key] || [];
+                node[key].push(traverseWrite(relation, nodes));
             }
 
             return node;
         }
 
-        let traversed = traverseWrite(write, nodes);
+        const merge = require('deepmerge');
+
+        let traversed = {};
+        for(let nodes of records) {
+            let populated = traverseWrite(write, nodes);
+            traversed = merge(populated, traversed);
+        }
+        
         validated = this.validate(traversed, { use_defaults: false, convert_types: true });
 
         return validated;
