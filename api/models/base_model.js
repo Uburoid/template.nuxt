@@ -45,6 +45,13 @@ class BaseModel {
         let validated = Object.entries(fields).reduce((memo, entry) => {
             let [key, value] = entry;
 
+            if(key.slice(0, 1) === '$') {
+                value = data[key];
+                value && (memo[key] = value);
+
+                return memo;
+            }
+
             if(typeof(value) !== 'object') {
                 value = {
                     type: value
@@ -600,13 +607,65 @@ class BaseModel {
             return node;
         }
 
+        const trav = (from, to, cb) => {
+            let next = cb(from, to, (next, key) => {
+                next = Array.isArray(next) ? next: [next];
+
+                next.forEach(obj => {
+                    let inx = 0;
+
+                    if(to[key]) {
+                        inx = to[key].push({}) - 1;
+                    }
+                    else to[key] = [{}];
+
+                    trav(obj, to[key][inx], cb);
+
+                    !!!Object.keys(to[key][inx]).length && to[key].pop();
+                    /* to[key] = to[key] || [];
+                    trav(obj, to[key], cb); */
+                });
+            });
+        }
+
+        /* trav(write, (obj, cb) => {
+            let relations = obj.relations;
+
+            for(let key in relations) {
+                let [relation] = relations[key];
+                //node[key] = node[key] || [];
+                //node[key].push(traverseWrite(relation, nodes));
+                cb(relation);
+            }
+        }); */
+
         const merge = require('deepmerge');
 
         let traversed = {};
+        let root_obj = traversed;
+
+        for(let nodes of records) {
+            trav(write, traversed, (leaf, to, cb) => {
+                let relations = leaf.end ? leaf.end.relations : leaf.relations; 
+
+                let value = nodes[leaf.end ? leaf.end.identifier : leaf.identifier];
+                let node = { ...value };
+                leaf.end && (node.$rel = { ...nodes[leaf.identifier] });
+
+                value && Object.assign(to, node); //do assign to save reference!
+
+                for(let key in relations) {
+                    let relation = relations[key];
+                    cb(relation, key);
+                }
+            });
+        };
+
+        /* let traversed = {};
         for(let nodes of records) {
             let populated = traverseWrite(write, nodes);
             traversed = merge(populated, traversed);
-        }
+        } */
         
         validated = this.validate(traversed, { use_defaults: false, convert_types: true });
 
@@ -663,6 +722,7 @@ class Graph extends BaseModel {
     static get schema() {
         return {
             ...super.schema,
+            $ID: String,
             _id: {
                 //isKey: 'system',
                 isKey: true,

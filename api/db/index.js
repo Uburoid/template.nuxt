@@ -26,7 +26,7 @@ const neo4jIntsToStrings = (json) => {
     return Object.assign(
         json,
         pluckAndModify(([, value]) => typeof value === 'object', neo4jIntsToStrings),
-        pluckAndModify(([, value]) => neo4j.isInt(value), value => Number(value.toString())),
+        pluckAndModify(([, value]) => neo4j.isInt(value), value => neo4j.integer.inSafeRange(value) ? value.toNumber() : value.toString())
     );
 };
 
@@ -55,11 +55,11 @@ class NeoDriver extends DatabaseDriver {
 
                         for(let key of record.keys) {
                             let value = record.get(key);
-                            let identity = value && value.identity.toString();
+                            let identity = value && (neo4j.integer.inSafeRange(value.identity) ? value.identity.toNumber() : value.identity.toString());
                             
                             value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
-
                             if(value) {
+                                value.$ID = identity;
                                 nodes[key] = value;
                                 /* if(!cache[identity] || (cache[identity] && !nodes[key])) {
                                     cache[identity] = true;
