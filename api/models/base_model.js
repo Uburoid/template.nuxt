@@ -647,7 +647,7 @@ class BaseModel {
         }
 
         const trav = (from, to, cb) => {
-            let next = cb(from, to, (next, key) => {
+            cb(from, to, (next, key) => {
                 next = Array.isArray(next) ? next: [next];
 
                 next.forEach(obj => {
@@ -665,11 +665,12 @@ class BaseModel {
             });
         }
 
-        let traversed = {};
+        let traversed = [{}];
+        let inx = 0;
 
         for(let nodes of records) {
             if(!!Object.keys(nodes).length) {
-                trav(write, traversed, (leaf, to, cb) => {
+                trav(write, traversed[inx], (leaf, to, cb) => {
                     let relations = leaf.end ? leaf.end.relations : leaf.relations; 
     
                     let value = nodes[leaf.end ? leaf.end.identifier : leaf.identifier];
@@ -683,6 +684,9 @@ class BaseModel {
                         cb(relation, key);
                     }
                 });
+
+                traversed.push({});
+                inx++;
             }
         };
 

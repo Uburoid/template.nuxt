@@ -60,6 +60,14 @@
             parent: true
         }
     }
+
+    let some_data2 = {
+        parent: true,
+        children: {
+            children: true,
+            parent: true
+        }
+    }
     
     let validated = Member.validate(some_data, {
         use_defaults: true,
@@ -69,7 +77,7 @@
     //let saved = await Member.save(some_data);
     //let updated = await Member.update(some_data);
     //let deleted = await Member.delete(some_data, { strict: true });
-    let found = await Member.find(some_data1);
+    let found = await Member.find(some_data2);
     
     console.log(schema);
     
