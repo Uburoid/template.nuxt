@@ -13,7 +13,7 @@ const stringify = (obj_from_json) => {
 }
 
 const neo4j = require('neo4j-driver').v1;
-const driver = neo4j.driver(process.env.NEO_URL, neo4j.auth.basic("neo4j", "123"));
+const driver = neo4j.driver(process.env.NEO_URL, neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true});
 
 const neo4jIntsToStrings = (json) => {
     if(!json) return void 0;
@@ -55,10 +55,14 @@ class NeoDriver extends DatabaseDriver {
 
                         for(let key of record.keys) {
                             let value = record.get(key);
-                            let identity = value && (neo4j.integer.inSafeRange(value.identity) ? value.identity.toNumber() : value.identity.toString());
+                            //let identity = value && (neo4j.integer.inSafeRange(value.identity) ? value.identity.toNumber() : value.identity.toString());
+                            //let identity = value && (neo4j.integer.inSafeRange(value.identity) ? value.identity.toNumber() : value.identity.toString());
                             
-                            value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
+                            //value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
                             if(value) {
+                                let identity = value.identity;
+                                value = value.properties || value;
+                                
                                 value.$ID = identity;
                                 nodes[key] = value;
                                 /* if(!cache[identity] || (cache[identity] && !nodes[key])) {
