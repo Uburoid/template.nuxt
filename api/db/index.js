@@ -43,6 +43,7 @@ class NeoDriver extends DatabaseDriver {
     }
 
     async query({ query, params, options }) {
+        console.log(query);
         const session = driver.session();
         debugger
         return new Promise((resolve, reject) => {

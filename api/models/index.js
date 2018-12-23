@@ -2,9 +2,10 @@ const { Node, Relation } = require('./base_model');
 const generate = require('nanoid/generate');
 
 class Email extends Node {
-    get schema() {
+    static get schema() {
         
         let schema = {
+            ...super.schema,
             $labels: ['Email'],
 
             address: {
@@ -22,8 +23,9 @@ class Email extends Node {
 }
 
 class Metrics extends Node {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $labels: ['Метрика'],
 
             accounts: [metrics2account]
@@ -35,17 +37,12 @@ class Metrics extends Node {
 
 class metrics2account extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: Metrics,
-                required: true
-            },
+            ...super.schema,
+            $start: Metrics,
             $type: 'используется',
-            $end: {
-                type: Account,
-                required: true
-            }
+            $end: Account
         }
 
         return schema;
@@ -53,10 +50,12 @@ class metrics2account extends Relation {
 }
 
 class Browser extends Metrics {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $labels: ['Метрика', 'Браузер'],
-            name: String
+            name: String,
+            version: String
         }
 
         return schema;
@@ -65,8 +64,9 @@ class Browser extends Metrics {
 
 
 class Account extends Node {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $labels: ['Участник'],
             name: {
                 type: String,
@@ -82,8 +82,9 @@ class Account extends Node {
 }
 
 class Anonymous extends Account {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $labels: ['Участник', 'Аноним'],
         }
 
@@ -92,8 +93,9 @@ class Anonymous extends Account {
 }
 
 class Member extends Account {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $labels: ['Участник'],
 
             
@@ -146,9 +148,10 @@ class Member extends Account {
 }
 
 class RootMember extends Member {
-    get schema() {
+    static get schema() {
         
         return {
+            ...super.schema,
             $labels: ['Основатель', 'Участник']
 
         }
@@ -156,9 +159,10 @@ class RootMember extends Member {
 }
 
 class List extends Node {
-    get schema() {
+    static get schema() {
         
         let schema = {
+            ...super.schema,
             $labels: ['Список'],
 
             members: [
@@ -174,9 +178,10 @@ class List extends Node {
 }
 
 class Wallet extends Node {
-    get schema() {
+    static get schema() {
         
         let schema = {
+            ...super.schema,
             $labels: ['Кошелек'],
 
             club_address: String,
@@ -197,17 +202,12 @@ class Wallet extends Node {
 
 class member2wallet extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: Member,
-                required: true
-            },
+            ...super.schema,
+            $start: Member,
             $type: 'имеет',
-            $end: {
-                type: Wallet,
-                required: true
-            }
+            $end: Wallet
         }
 
         return schema;
@@ -216,18 +216,13 @@ class member2wallet extends Relation {
 
 class wallet2member extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $direction: 'in',
-            $start: {
-                type: Wallet,
-                required: true
-            },
+            $start: Wallet,
             $type: 'имеет',
-            $end: {
-                type: Member,
-                required: true
-            }
+            $end: Member
         }
 
         return schema;
@@ -236,17 +231,12 @@ class wallet2member extends Relation {
 
 class list2member extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: List,
-                required: true
-            },
+            ...super.schema,
+            $start: List,
             $type: 'позиция',
-            $end: {
-                type: Member,
-                required: true
-            },
+            $end: Member,
             номер: Number
         }
 
@@ -256,17 +246,12 @@ class list2member extends Relation {
 
 class member2list extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: Member,
-                required: true
-            },
+            ...super.schema,
+            $start: Member,
             $type: 'список',
-            $end: {
-                type: List,
-                required: true
-            }
+            $end: List
         }
 
         return schema;
@@ -275,17 +260,12 @@ class member2list extends Relation {
 
 class email2member extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: Email,
-                required: true
-            },
+            ...super.schema,
+            $start: Email,
             $type: 'принадлежит',
-            $end: {
-                type: Member,
-                required: true
-            }
+            $end: Member
         }
 
         return schema;
@@ -294,18 +274,13 @@ class email2member extends Relation {
 
 class member2email extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $direction: 'in',
-            $start: {
-                type: Member,
-                required: true
-            },
+            $start: Member,
             $type: 'принадлежит',
-            $end: {
-                type: Email,
-                required: true
-            }
+            $end: Email
         }
 
         return schema;
@@ -314,16 +289,11 @@ class member2email extends Relation {
 
 class member2member extends Relation {
 
-    get schema() {
+    static get schema() {
         let schema = {
-            $start: {
-                type: Member,
-                required: true
-            },
-            $end: {
-                type: Member,
-                required: true
-            },
+            ...super.schema,
+            $start: Member,
+            $end: Member,
             номер: Number
         }
 
@@ -332,8 +302,9 @@ class member2member extends Relation {
 }
 
 class referer extends member2member {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $type: 'реферер',
             $refs: {
                 self: true, // || single || many NOT IMPLEMENTED YET
@@ -347,8 +318,9 @@ class referer extends member2member {
 }
 
 class referal extends member2member {
-    get schema() {
+    static get schema() {
         let schema = {
+            ...super.schema,
             $type: 'реферал',
             $end: {
                 type: Member,

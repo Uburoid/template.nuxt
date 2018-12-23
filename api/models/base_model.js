@@ -36,6 +36,10 @@ class BaseModel {
     static validate(data, options = {}) {
         if(!data) return void 0;
 
+        /* if(data.$ID && cache[data.$ID]) {
+            return {};
+        } */
+
         options = { use_defaults: true, convert_types: true, ...options };
 
         let isRelation = this.prototype instanceof Relation;
@@ -73,7 +77,7 @@ class BaseModel {
                     value = type.validate(value, options);
                 }
                 else {
-                    if(!value && required && !_default) {
+                    if(!value && options.convert_types && required && !_default) {
                         throw new Error(`${this.prototype.name}.${key} required a value!`);
                     }
     
@@ -238,9 +242,11 @@ class BaseModel {
     }
 
     static async delete(params, options) {
-        //options = { strict: false, ...options };
+        options = { keys: 'strict', ...options, mode: 'delete' }; //soft || strict || any
 
-        let validated = this.validate(params, { use_defaults: false, convert_types: false });
+        return this.find(params, options);
+
+        /* let validated = this.validate(params, { use_defaults: false, convert_types: false });
 
         let write = this.write(validated, { populate_system: false });
 
@@ -276,7 +282,27 @@ class BaseModel {
         }
 
         let query = traverse(write);
-        
+
+        let hasKeys = false;
+
+        switch(options.keys) {
+            case 'strict':
+                hasKeys = query.every(row => {
+                    return Object.keys(row.params || {}).length;
+                });
+                break;
+            case 'soft':
+                hasKeys = query.some(row => {
+                    return Object.keys(row.params || {}).length;
+                });
+                break;
+            case 'any':
+                hasKeys = true
+                break;
+        }
+
+        if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
+
         let cql = query.reverse().reduce((memo, element) => {
             let cql = element.cql;
             
@@ -320,7 +346,7 @@ class BaseModel {
         
         nodes = nodes ? nodes.accumulator.filter(node => node) : [];
 
-        return nodes;
+        return nodes; */
     }
 
     static async save(data) {
@@ -411,6 +437,13 @@ class BaseModel {
         }
 
         let query = traverse(write);
+
+        let hasKeys = query.every(row => {
+            return Object.keys(row.params[row.node]).length;
+        });
+
+        if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
+        
         
         let { cql, params, result } = query.reverse().reduce((memo, element) => {
             let [node, relation, remove] = element.cql.split('|');
@@ -518,7 +551,9 @@ class BaseModel {
         return validated;
     }
 ////////////////////////////////////
-    static async find(params) {
+    static async find(params, options = {}) {
+        options = { mode: 'find', keys: 'strict', ...options }; //mode: find || delete; keys: soft || strict || any
+
         let validated = this.validate(params, { use_defaults: false, convert_types: false });
 
         let write = this.write(validated, { populate_system: false });
@@ -578,7 +613,40 @@ class BaseModel {
         }
 
         let query = traverse(write);
-        
+
+        let finalize = 'RETURN *';
+
+        if(options.mode === 'delete') {
+            let hasKeys = false;
+
+            switch(options.keys) {
+                case 'strict':
+                    hasKeys = query.every(row => {
+                        return Object.keys(row.params[row.node] || {}).length;
+                    });
+                    break;
+                case 'soft':
+                    hasKeys = query.some(row => {
+                        return Object.keys(row.params[row.node] || {}).length;
+                    });
+                    break;
+                case 'any':
+                    hasKeys = true
+                    break;
+            }
+            
+            if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
+
+            let nodes = query.map(row => `${row.node} AS _${row.node}`).join(',');
+            let nodes_to_delete = query.map(row => `_${row.node}`).join(',');
+            
+            let acc = query.map(row => `${row.node} {.*, identity: ID(${row.node})} AS ${row.node}${row.relation ? `,${row.relation} {.*, identity: ID(${row.relation})} AS ${row.relation}` : ''}`).join(',');
+
+            let nodes_to_return = query.map(row => `${row.node}${row.relation ? `,${row.relation}` : ''}`).join(',');
+
+            finalize = `WITH ${nodes},\n${acc}\nDETACH DELETE ${nodes_to_delete}\nRETURN ${nodes_to_return}`;
+        }
+
         let cql = query.reverse().reduce((memo, element) => {
             let cql = element.cql;
 
@@ -624,8 +692,8 @@ class BaseModel {
             return memo;
         }, []);
 
-        cql = `${cql.join('\n')}\nRETURN *`;
-        console.log(cql);
+        cql = `${cql.join('\n')}\n${finalize}`;
+        //console.log(cql);
         //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
 
         let records = await driver.query({ query: cql });
@@ -660,37 +728,99 @@ class BaseModel {
 
                     trav(obj, to[key][inx], cb);
 
-                    !!!Object.keys(to[key][inx]).length && to[key].pop();
+                    if(!!!Object.keys(to[key][inx]).length) {
+                        //to[key].pop();
+                        delete to[key];
+                    }
+                    //!!!Object.keys(to[key][inx]).length && to[key].pop();
                 });
             });
         }
 
-        let traversed = [{}];
-        let inx = 0;
+        let traversed = [];
+        //let inx = 0;
+
+        let cache = {};
+        const merge = require('deepmerge');
 
         for(let nodes of records) {
             if(!!Object.keys(nodes).length) {
+                let inx = traversed.push({}) - 1;
+
                 trav(write, traversed[inx], (leaf, to, cb) => {
                     let relations = leaf.end ? leaf.end.relations : leaf.relations; 
     
                     let value = nodes[leaf.end ? leaf.end.identifier : leaf.identifier];
                     let node = { ...value };
                     leaf.end && (node.$rel = { ...nodes[leaf.identifier] });
-    
+
+                    /* if(cache[node.$ID]) {
+                        node = cache[node.$ID];
+                        //traversed.pop();
+                    }; */
+
+                    //to = cache[node.$ID] || to;
                     value && Object.assign(to, node); //do assign to save reference!
+
+
+                    (cache[node.$ID] = cache[node.$ID] ? merge(cache[node.$ID], node) : node);
     
                     for(let key in relations) {
                         let relation = relations[key];
                         cb(relation, key);
                     }
                 });
-
-                traversed.push({});
-                inx++;
             }
         };
 
-        validated =  !!Object.keys(traversed).length ? this.validate(traversed, { use_defaults: false, convert_types: true }) : void 0;
+        const overwriteMerge = (target, source, options) => {
+            let result = source.map(src => {
+                cache[src.$ID] = merge(cache[src.$ID], src);
+
+                return cache[src.$ID];
+            });
+
+            //let result = source.slice(); //source.map(src => cache[src.$ID]);
+
+            target = target.map(src => {
+                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: (target, source) => source });
+
+                return cache[src.$ID];
+            });
+            
+            target.forEach(src => {
+                //src = merge(cache[src.$ID], src);
+
+                src.$ID && !result.find(dst => dst.$ID === src.$ID) && result.push(src);
+            });
+
+            return result;
+        };
+
+        if(traversed.length) {
+            traversed = traversed.reduce((memo, node) => {
+                memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node, { arrayMerge: overwriteMerge }) : node;
+    
+                return memo;
+
+            }, {});
+
+            traversed = Object.values(traversed);
+
+            validated = traversed.map(node => this.validate(node, { use_defaults: false, convert_types: true }));
+
+            /* validated = validated.map(node => this.validate(node, { use_defaults: false, convert_types: true }));
+
+
+            validated = validated.reduce((memo, node) => {
+                memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node) : node;
+    
+                return memo;
+            }, {});
+    
+            validated = Object.values(validated); */
+        }
+        else validated = void 0;
 
         return validated;
     }
@@ -799,7 +929,7 @@ class Relation extends Graph {
     }
 }
 
-class Member extends Node {
+/* class Member extends Node {
     static get schema() {
         return {
             ...super.schema,
@@ -857,8 +987,8 @@ class child extends Relation {
         }
 
     }
-}
+} */
 
 
 //module.exports = { Node, Relation };
-module.exports = { Node, Relation, Member, parent, child };
+module.exports = { Node, Relation };
