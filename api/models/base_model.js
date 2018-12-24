@@ -170,6 +170,7 @@ class BaseModel {
 
             result.start = data.$parent;
             result.end = $end.write(data);
+            result.required = data.$required;
         }
         else {
             result.$labels = $labels;
@@ -184,6 +185,7 @@ class BaseModel {
             if(field) {
                 let { type, required = false, isKey = false, system, set_on } = field;
 
+                let $required = required;
                 let $collect = Array.isArray(type);
 
                 type = $collect ? type[0] : type;
@@ -197,6 +199,7 @@ class BaseModel {
                         //value.$select = required ? 'MATCH' : 'OPTIONAL MATCH';
                         value.$select = 'MERGE';
                         value.$collect = $collect;
+                        value.$required = $required;
                         
                         memo.relations = memo.relations || {};
                         memo.relations[key] = memo.relations[key] || [];
@@ -572,7 +575,7 @@ class BaseModel {
 
             if(leaf.isRelation) {
                 query.relation = leaf.identifier;
-                query.selector = leaf.end.collect ? 'OPTIONAL MATCH' : 'MATCH';
+                query.selector = leaf.required ? 'MATCH' : 'OPTIONAL MATCH';
 
                 let relation = cypher.relationshipPattern({
                     direction: leaf.direction,
@@ -684,7 +687,8 @@ class BaseModel {
 
 //                return `${element.cql} WHERE ${where.join(' AND ')}`;
 
-            cql = `OPTIONAL MATCH ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
+            cql = `${element.selector} ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
+            //cql = `OPTIONAL MATCH ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
             //cql = `${element.selector} ${cql}\nWHERE ${where.join(' AND ')}`;
 
             memo.push(cql);

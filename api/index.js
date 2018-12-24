@@ -2,8 +2,10 @@
     let models = require('./models');
     let schema = models.Browser.schema;
 
-    let found = await models.Browser.find({
-        member: true
+    let found = await models.Email.find({
+        member: {
+            wallet: true
+        }
     });
 
     console.log(found)
