@@ -3,25 +3,41 @@
     let models = require('./models');
     
     const { schema: Schema, normalize } = require('normalizr');
+    let found;
 
-    let found = await models.Email.find({
+    found = await models.Email.find({
         address: 'wonderwoman@atlant.club',
-        //address: ['mychrome51@gmail.com', 'admin@atlant.club'],
+        //address: ['mychrome51@gmail.com', 'wonderwoman@atlant.club'],
         //address: '~mychrome51.*',
         member: {
-            //wallet: true,
+            
+            list: {
+                members: {
+                    email: true
+                }
+            },
+            /* wallet: {
+                member: true
+            },
             referer: {
                 email: true,
                 referals: true
-            }
+            } */
         }
     });
+
+    found = await models.List.find({
+        members: true,
+        member: true
+    });
+
+    found = await models.Club.find({});
 
     //found.pin = Date.now();
 
     //found = models.Email.omitRelations(found);
 
-    //let updated = await models.Email.save(found[0]);
+    let updated = await models.Club.save(found[0]);
 
     console.log(found);
 
@@ -100,7 +116,7 @@
         convert_types: true
     }); */
     
-    let schema = new Schema.Entity(models.Email.name, {}, { idAttribute: '_id' });
+    /* let schema = new Schema.Entity(models.Email.name, {}, { idAttribute: '_id' });
     Object.entries(models.Email.schema).forEach(entry => {
         let [key, value] = entry;
 
@@ -127,7 +143,10 @@
             });
         }
 
-    });
+    }); */
+
+    //let schema = models.Email.normalize_schema();
+    let schema = models.List.normalize_schema();
 
     let _database = new Schema.Entity('database', {
         data: [schema]

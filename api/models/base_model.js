@@ -27,6 +27,7 @@ class BaseModel {
         };
 
         return new Proxy(this, handler); */
+
     }
 
     static get schema() {
@@ -45,7 +46,7 @@ class BaseModel {
             let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
             
             let isArray = Array.isArray(type);
-            type = isArray ? type[0] : type;
+            type = isArray ? type[0].type || type[0] : type;
 
             if(type.prototype instanceof Relation) {
                 delete data[key];
@@ -103,7 +104,7 @@ class BaseModel {
             let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
             
             let isArray = Array.isArray(type);
-            type = isArray ? type[0] : type;
+            type = isArray ? type[0].type || type[0] : type;
 
             let data_value = isRelation ? data.$rel && data.$rel[key] : data[key];
             data_value = isArray ? !Array.isArray(data_value) ? [data_value] : data_value || [] : Array.isArray(data_value) ? data_value : [data_value];
@@ -196,7 +197,7 @@ class BaseModel {
 
         let isRelation = this.prototype instanceof Relation;
 
-        const identifier = `ident_${generate('0123456789', 4)}`;
+        const identifier = `ident_${generate('0123456789', 6)}`;
             
         let result = {
             identifier,
@@ -227,6 +228,8 @@ class BaseModel {
             let field = fields[key];
 
             if(field) {
+                field = Array.isArray(field) ? field[0] : field;
+                
                 let { type, required = false, isKey = false, system, set_on } = field;
                 type = type || field;
 
@@ -420,7 +423,7 @@ class BaseModel {
 
             if(leaf.isRelation) {
                 query.relation = leaf.identifier;
-                query.remove = `ident_${generate('0123456789', 4)}`;
+                query.remove = `ident_${generate('0123456789', 6)}`;
 
                 let end = cypher.nodePattern({
                     labels: leaf.end.$labels,
@@ -929,6 +932,45 @@ class BaseModel {
 
         return validated;
     }
+
+    static normalize_schema() {
+        if(this._normalize_schema) {
+            return this._normalize_schema;
+        }
+
+        let schema = new Schema.Entity(this.name, {}, { idAttribute: '_id' });
+        this._normalize_schema = schema;
+
+        Object.entries(this.schema).forEach(entry => {
+            let [key, value] = entry;
+
+            typeof(value) !== 'object' && (value = { type: value });
+
+            Array.isArray(value) && (value = { type: value });
+
+            let { type = String } = value;
+            
+            let isArray = Array.isArray(type);
+            type = isArray ? type[0].type || type[0] : type;
+
+            if(type.prototype instanceof Relation) {
+                let end_type = type.schema.$end.type || type.schema.$end;
+
+                let node = end_type.normalize_schema();
+                let relation = type.normalize_schema();
+
+                node.define({
+                    $rel: relation
+                })
+
+                schema.define({ 
+                    [key]: isArray ? [node] : node
+                });
+            }
+        });
+
+        return schema;
+    }
 }
 
 /* 
@@ -980,7 +1022,7 @@ class Graph extends BaseModel {
                 type: String,
                 required: true,
                 default: (obj) => {
-                    return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 6);
+                    return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 8);
                     //return `ID(${identifier})`;
                 }
             },

@@ -92,6 +92,17 @@ class Anonymous extends Account {
     }
 }
 
+class Club extends Account {
+    static get schema() {
+        let schema = {
+            ...super.schema,
+            $labels: ['Участник', 'Клуб'],
+        }
+
+        return schema;
+    }
+}
+
 class Member extends Account {
     static get schema() {
         let schema = {
@@ -111,9 +122,6 @@ class Member extends Account {
                 type: String,
                 required: true,
                 default: 'users'
-                /* default: (obj) => {
-                    return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
-                } */
             },
             picture: String,
             compressed: String,
@@ -167,10 +175,11 @@ class List extends Node {
 
             members: [
                 {
-                    type: list2member,
+                    type: list2members,
                     required: true
                 }
-            ]
+            ],
+            member: list2member
         }
 
         return schema
@@ -188,6 +197,7 @@ class Wallet extends Node {
             address: String,
             publicKey: String,
             privateKey: String,
+            //member: [wallet2member]
             member: [
                 {
                     type: wallet2member,
@@ -229,7 +239,7 @@ class wallet2member extends Relation {
     }
 }
 
-class list2member extends Relation {
+class list2members extends Relation {
 
     static get schema() {
         let schema = {
@@ -252,6 +262,21 @@ class member2list extends Relation {
             $start: Member,
             $type: 'список',
             $end: List
+        }
+
+        return schema;
+    }
+}
+
+class list2member extends Relation {
+
+    static get schema() {
+        let schema = {
+            ...super.schema,
+            $direction: 'in',
+            $start: List,
+            $type: 'список',
+            $end: Member
         }
 
         return schema;
@@ -329,4 +354,4 @@ class referal extends member2member {
     }
 }
 
-module.exports = { Member, Email, List, RootMember, Anonymous, Browser };
+module.exports = { Club, Member, Email, List, RootMember, Anonymous, Browser };
