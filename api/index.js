@@ -1,14 +1,30 @@
 (async () => {
+    let { Relation } = require('./models/base_model');
     let models = require('./models');
-    let schema = models.Browser.schema;
+    
+    const { schema: Schema, normalize } = require('normalizr');
 
     let found = await models.Email.find({
+        address: 'wonderwoman@atlant.club',
+        //address: ['mychrome51@gmail.com', 'admin@atlant.club'],
+        //address: '~mychrome51.*',
         member: {
-            wallet: true
+            //wallet: true,
+            referer: {
+                email: true,
+                referals: true
+            }
         }
     });
 
-    console.log(found)
+    //found.pin = Date.now();
+
+    //found = models.Email.omitRelations(found);
+
+    //let updated = await models.Email.save(found[0]);
+
+    console.log(found);
+
     //let schema = Member.schema;
     
     /* let some_data = {
@@ -79,17 +95,57 @@
         }
     }
     
-    let validated = Member.validate(some_data, {
+    let validated = models.Member.validate(some_data, {
         use_defaults: true,
-        convert_types: false
+        convert_types: true
+    }); */
+    
+    let schema = new Schema.Entity(models.Email.name, {}, { idAttribute: '_id' });
+    Object.entries(models.Email.schema).forEach(entry => {
+        let [key, value] = entry;
+
+        typeof(value) !== 'object' && (value = { type: value });
+
+        Array.isArray(value) && (value = { type: value });
+
+        let { type = String } = value;
+        
+        let isArray = Array.isArray(type);
+        type = isArray ? type[0] : type;
+
+        if(type.prototype instanceof Relation) {
+            let type_name = type.schema.$end.type ? type.schema.$end.type.name : type.schema.$end.name;
+            let node = new Schema.Entity(type_name, {}, { idAttribute: '_id' });
+            let relation = new Schema.Entity(type.name, {}, { idAttribute: '_id' });
+
+            node.define({
+                $rel: relation
+            })
+
+            schema.define({ 
+                [key]: isArray ? [node] : node
+            });
+        }
+
     });
-    
-    let saved = await Member.save(some_data);
+
+    let _database = new Schema.Entity('database', {
+        data: [schema]
+    }, { idAttribute: 'v' });
+
+    let database = {
+        data: found,
+        v: 1.0
+    }
+
+    let norm = normalize(database, _database);
+
+    //let saved = await Member.save(some_data);
     //let updated = await Member.update(some_data2);
-    let deleted = await Member.delete(some_data2, { keys: 'any' });
-    let found = await Member.find(some_data1);
+    //let deleted = await Member.delete(some_data2, { keys: 'any' });
+    //let found = await Member.find(some_data1);
     
-    console.log(schema); */
+    console.log(norm);
     
 })();
 

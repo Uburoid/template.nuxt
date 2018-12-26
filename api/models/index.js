@@ -294,7 +294,7 @@ class member2member extends Relation {
             ...super.schema,
             $start: Member,
             $end: Member,
-            номер: Number
+            //номер: Number
         }
 
         return schema;
@@ -322,10 +322,7 @@ class referal extends member2member {
         let schema = {
             ...super.schema,
             $type: 'реферал',
-            $end: {
-                type: Member,
-                required: false
-            }
+            $end: Member
         }
 
         return schema;

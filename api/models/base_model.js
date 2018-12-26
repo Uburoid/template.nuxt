@@ -33,13 +33,45 @@ class BaseModel {
         return {}
     }
 
+    static omitRelations(data) {
+        let { $labels, $type, $direction, $start, $end, ...fields } = this.schema;
+
+        let omited = Object.entries(fields).reduce((memo, entry) => {
+            let [key, value] = entry;
+
+            typeof(value) !== 'object' && (value = { type: value });
+            Array.isArray(value) && (value = { type: value });
+
+            let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
+            
+            let isArray = Array.isArray(type);
+            type = isArray ? type[0] : type;
+
+            if(type.prototype instanceof Relation) {
+                delete data[key];
+            }
+            else memo[key] = data[key];
+
+            return memo;
+
+        }, {});
+
+        return omited;
+    }
+
     static validate(data, options = {}) {
         if(!data) return void 0;
 
         /* if(data.$ID && cache[data.$ID]) {
             return {};
         } */
+        
+        /* Object.entries(data).forEach(entry => {
+            let [key, value] = entry;
 
+            key.slice(0, 1) === '$' && value && (data[key] = value);
+        }); */
+        
         options = { use_defaults: true, convert_types: true, ...options };
 
         let isRelation = this.prototype instanceof Relation;
@@ -49,17 +81,23 @@ class BaseModel {
         let validated = Object.entries(fields).reduce((memo, entry) => {
             let [key, value] = entry;
 
-            if(key.slice(0, 1) === '$') {
+            /* if(key.slice(0, 1) === '$') {
                 value = data[key];
                 value && (memo[key] = value);
 
                 return memo;
-            }
+            } */
 
-            if(typeof(value) !== 'object') {
+            /* if(typeof(value) !== 'object') {
                 value = {
                     type: value
                 }
+            } */
+
+            typeof(value) !== 'object' && (value = { type: value });
+            //Array.isArray(value) && (value = { type: value });
+            if(Array.isArray(value)) {
+                value = { type: value };
             }
 
             let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
@@ -82,7 +120,7 @@ class BaseModel {
                     }
     
                     if(!value && _default && (options.use_defaults || system)) {
-                        value = _default(data);
+                        value = (typeof(_default) === 'function') ? _default(data) : _default;
                     }
 
                     if(value && modificators) {
@@ -132,7 +170,13 @@ class BaseModel {
             }
 
             return memo;
-        }, {})
+        }, {});
+
+        Object.entries(data).forEach(entry => {
+            let [key, value] = entry;
+
+            key.slice(0, 1) === '$' && key !== '$rel' && value && (validated[key] = value);
+        });
 
         if(isRelation) {
             validated = { ...$end.validate(data, options), ...validated };
@@ -184,12 +228,12 @@ class BaseModel {
 
             if(field) {
                 let { type, required = false, isKey = false, system, set_on } = field;
+                type = type || field;
 
                 let $required = required;
                 let $collect = Array.isArray(type);
 
                 type = $collect ? type[0] : type;
-                type = type || field;
 
                 if(type.prototype instanceof Relation) {
                     value = Array.isArray(value) ? value : [value];
@@ -442,7 +486,7 @@ class BaseModel {
         let query = traverse(write);
 
         let hasKeys = query.every(row => {
-            return Object.keys(row.params[row.node]).length;
+            return !!Object.keys(row.params[row.node]).length && (row.relation ? !!Object.keys(row.params[row.relation]).length : true);
         });
 
         if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
@@ -554,6 +598,13 @@ class BaseModel {
         return validated;
     }
 ////////////////////////////////////
+    static async findOne(params) {
+        let found = await this.find(params, { mode: 'find' });
+        found && found.length && (found = found[0]);
+
+        return found;
+    }
+
     static async find(params, options = {}) {
         options = { mode: 'find', keys: 'strict', ...options }; //mode: find || delete; keys: soft || strict || any
 
@@ -670,8 +721,11 @@ class BaseModel {
                         
                     let isArray = Array.isArray(value);
         
+                    let operator = '=';
+
                     if(isArray) {
                         value = `[${value.map(value => typeof(value) === 'string' ? `'${value}'` : value).join(',')}]`;
+                        operator = 'IN';
                     }
                     else {
                         let isRegexp = typeof(value) === 'string' && value.slice(0, 1) === '~';
@@ -685,7 +739,8 @@ class BaseModel {
                         typeof(value) === 'string' && (value = `'${value}'`);
                     }
         
-                    return `${identifier}.${key} ${isArray ? 'IN' : '='} ${value}`;
+                    return `${identifier}.${key} ${operator} ${value}`;
+                    //return `${identifier}.${key} ${isArray ? 'IN' : '='} ${value}`;
                 });
                 
                 params.length && memo.push(params.join(' AND '));
@@ -786,8 +841,8 @@ class BaseModel {
         };
 
         const overwriteMerge = (target, source, options) => {
-            let result = source.map(src => {
-                cache[src.$ID] = merge(cache[src.$ID], src);
+            /* let result = source.map(src => {
+                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: overwriteMerge });
 
                 return cache[src.$ID];
             });
@@ -795,7 +850,8 @@ class BaseModel {
             //let result = source.slice(); //source.map(src => cache[src.$ID]);
 
             target = target.map(src => {
-                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: (target, source) => source });
+                //cache[src.$ID] = merge(cache[src.$ID], src);
+                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: overwriteMerge });
 
                 return cache[src.$ID];
             });
@@ -804,13 +860,50 @@ class BaseModel {
                 //src = merge(cache[src.$ID], src);
 
                 src.$ID && !result.find(dst => dst.$ID === src.$ID) && result.push(src);
-            });
+            }); */
+
+            let result = [];
+
+            if(target.length && !source.length) {
+                return target;
+            }
+
+            if(!target.length && source.length) {
+                return source;
+            }
+
+            if(target.length >= source.length) {
+                source.forEach(item => {
+                    let found = target.find(trg => {
+                        if(trg.$ID === item.$ID)
+                            trg = merge(trg, item, { arrayMerge: overwriteMerge });
+
+                        return trg.$ID === item.$ID
+                    });
+
+                    if(!found) {
+                        target.push(item);
+                    }
+                });
+
+                result = target;
+            }
+
+            if(target.length < source.length) {
+                throw new Error('NOT IMPLEMENTED!!!');
+                target.forEach(item => {
+                    !source.find(trg => trg.$ID === item.$ID) && source.push(item);
+                });
+
+                result = source;
+            }
 
             return result;
         };
 
         if(traversed.length) {
             traversed = traversed.reduce((memo, node) => {
+                //memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node) : node;
                 memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node, { arrayMerge: overwriteMerge }) : node;
     
                 return memo;
@@ -836,13 +929,6 @@ class BaseModel {
 
         return validated;
     }
-
-    static async findOne(params) {
-        let validated = this.validate(params, { use_defaults: false, convert_types: false }); //?
-
-        return validated;
-    }
-
 }
 
 /* 
@@ -887,7 +973,7 @@ class Graph extends BaseModel {
     static get schema() {
         return {
             ...super.schema,
-            $ID: String,
+            //$ID: String,
             _id: {
                 //isKey: 'system',
                 isKey: true,
