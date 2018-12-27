@@ -31,13 +31,13 @@
         member: true
     });
 
-    found = await models.Club.find({});
+    found = await models.Club.findOne();
 
     //found.pin = Date.now();
 
     //found = models.Email.omitRelations(found);
 
-    let updated = await models.Club.save(found[0]);
+    let updated = await models.Club.save(found);
 
     console.log(found);
 
@@ -153,7 +153,7 @@
     }, { idAttribute: 'v' });
 
     let database = {
-        data: found,
+        data: Array.isArray(found) ? found : [found],
         v: 1.0
     }
 

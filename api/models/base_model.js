@@ -608,7 +608,7 @@ class BaseModel {
         return found;
     }
 
-    static async find(params, options = {}) {
+    static async find(params = {}, options = {}) {
         options = { mode: 'find', keys: 'strict', ...options }; //mode: find || delete; keys: soft || strict || any
 
         let validated = this.validate(params, { use_defaults: false, convert_types: false });
