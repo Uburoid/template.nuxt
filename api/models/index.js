@@ -198,12 +198,10 @@ class Wallet extends Node {
             publicKey: String,
             privateKey: String,
             //member: [wallet2member]
-            member: [
-                {
-                    type: wallet2member,
-                    required: true
-                }
-            ]
+            member: {
+                type: wallet2member,
+                required: true
+            }
         }
 
         return schema
@@ -331,11 +329,6 @@ class referer extends member2member {
         let schema = {
             ...super.schema,
             $type: 'реферер',
-            $refs: {
-                self: true, // || single || many NOT IMPLEMENTED YET
-                same: 'many', // || many
-            },
-            invited: Number
         }
 
         return schema;
@@ -347,7 +340,6 @@ class referal extends member2member {
         let schema = {
             ...super.schema,
             $type: 'реферал',
-            $end: Member
         }
 
         return schema;

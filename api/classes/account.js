@@ -73,7 +73,11 @@ class Account extends API {
 
     }
 
-    async resetPassword() {
+    async changePassword() {
+
+    }
+
+    async changeEmail() {
 
     }
 }
