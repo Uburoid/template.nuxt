@@ -6,9 +6,19 @@
     let found;
 
     //found = await models.RootMember.find();
-    found = await models.RootList.findOne({
-        member: true,
-        members: true
+    found = await models.Member.find({
+        referals: {
+            $rel: {
+                $length: '*'
+            }
+        },
+        referer: {
+            /* $rel: {
+                $length: '*..1'
+            }, */
+            //$selector: 'OPTIONAL MATCH'
+        },
+        //$selector: 'OPTIONAL MATCH'
     });
 
     found = await models.RootList.save(found);

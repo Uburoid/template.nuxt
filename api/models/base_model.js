@@ -266,6 +266,7 @@ class BaseModel {
             result.start = data.$parent;// || $start.write({});
             result.end = $end.write(data);
             result.required = data.$required;
+            //result.length = data.$length;
         }
         else {
             result.$labels = $labels;
@@ -319,7 +320,13 @@ class BaseModel {
                         default:
                     }
 
-                    params[key] = (system && options.populate_system) ? field.default(value) : value;
+
+                    if(key.slice(0, 1) === '$') {
+                        memo[key] = value;
+                    }
+                    else {
+                        params[key] = (system && options.populate_system) ? field.default(value) : value;
+                    }
 
                     if(isKey === true) {
                         memo.keys[key] = value;
@@ -592,7 +599,7 @@ class BaseModel {
             let query = {
                 cql: '',
                 params: {},
-                selector: 'MATCH',
+                selector: leaf.$selector || 'MATCH',
                 with: []
             }
 
@@ -603,7 +610,7 @@ class BaseModel {
                 query.with = [leaf.identifier, leaf.end.identifier];
 
                 query.relation = leaf.identifier;
-                query.selector = leaf.required ? 'MATCH' : 'OPTIONAL MATCH';
+                query.selector = leaf.end.$selector || (leaf.required ? 'MATCH' : 'OPTIONAL MATCH');
 
                 let relation = cypher.relationshipPattern({
                     direction: leaf.direction,
@@ -618,6 +625,7 @@ class BaseModel {
                     }
                 });
 
+                relation = leaf.$length ? relation.replace(`\`${leaf.type}\``, `\`${leaf.type}\`${leaf.$length}`) : relation;
                 query.cql = `${relation}`;
 
                 query.params[leaf.identifier] = { ...leaf.params };
@@ -1023,7 +1031,8 @@ class Node extends Graph {
     static get schema() {
         return {
             ...super.schema,
-            $labels: [this.constructor.name]
+            $labels: [this.constructor.name],
+            $selector: String
         }
     }
 }
@@ -1034,7 +1043,8 @@ class Relation extends Graph {
             ...super.schema,
             $type: 'relation',
             $start: Node,
-            $end: Node
+            $end: Node,
+            $length: String
         }
     }
 }
