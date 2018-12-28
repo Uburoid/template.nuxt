@@ -136,7 +136,14 @@ class Member extends Account {
                 type: referer,
                 required: true
             },
+
             referals: [referal],
+            /* referals1: [{
+                type: referal,
+                required: true
+            }],
+            referals2: referal, */
+
             email: {
                 type: member2email,
                 required: true
@@ -173,16 +180,29 @@ class List extends Node {
             ...super.schema,
             $labels: ['Список'],
 
+            member: {
+                type: list2member,
+                required: true
+            },
             members: [
                 {
                     type: list2members,
                     required: true
                 }
             ],
-            member: list2member
         }
 
         return schema
+    }
+}
+
+class RootList extends List {
+    static get schema() {
+        
+        return {
+            ...super.schema,
+            $labels: ['Список', 'Корневой список'],
+        }
     }
 }
 
@@ -313,14 +333,11 @@ class member2email extends Relation {
 class member2member extends Relation {
 
     static get schema() {
-        let schema = {
+        return {
             ...super.schema,
             $start: Member,
             $end: Member,
-            //номер: Number
         }
-
-        return schema;
     }
 }
 
@@ -346,4 +363,4 @@ class referal extends member2member {
     }
 }
 
-module.exports = { Club, Member, Email, List, RootMember, Anonymous, Browser };
+module.exports = { Club, Member, Email, List, RootList, RootMember, Anonymous, Browser, referal };

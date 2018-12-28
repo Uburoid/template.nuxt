@@ -5,24 +5,58 @@
     const { schema: Schema, normalize } = require('normalizr');
     let found;
 
+    //found = await models.RootMember.find();
+    found = await models.RootList.findOne({
+        member: true,
+        members: true
+    });
+
+    found = await models.RootList.save(found);
+
+    found.members.sort((a, b) => a.$rel.номер - b.$rel.номер);
+    let new_list = found.members.shift();
+    found.members.push(new_list);
+    
+    let members = found.members.map((member, inx) => {
+        member.$rel.номер = inx + 1;
+
+        return member;
+    });
+
+    let updated = await models.List.save({
+        member: members[0],
+        members
+    });
+
+    let to_delete = {
+        _id: updated._id
+    }
+
+    let deleted = await models.List.delete(to_delete, { keys: 'strict' });
+
+    /* found = await models.referal.find();
+
     found = await models.Email.find({
-        address: 'wonderwoman@atlant.club',
-        //address: ['mychrome51@gmail.com', 'wonderwoman@atlant.club'],
+        //address: 'wonderwoman@atlant.club',
+        address: ['mychrome51@gmail.com', 'wonderwoman@atlant.club'],
         //address: '~mychrome51.*',
         member: {
             
             list: {
                 members: {
+                    $rel: {
+                        номер: [1, 7]
+                    },
                     email: true
                 }
             },
-            /* wallet: {
+            wallet: {
                 member: true
             },
             referer: {
                 email: true,
                 referals: true
-            } */
+            }
         }
     });
 
@@ -37,7 +71,7 @@
 
     //found = models.Email.omitRelations(found);
 
-    let updated = await models.Club.save(found);
+    let updated = await models.Club.save(found); */
 
     console.log(found);
 

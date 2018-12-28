@@ -96,10 +96,7 @@ class BaseModel {
             } */
 
             typeof(value) !== 'object' && (value = { type: value });
-            //Array.isArray(value) && (value = { type: value });
-            if(Array.isArray(value)) {
-                value = { type: value };
-            }
+            Array.isArray(value) && (value = { type: value });
 
             let { type = String, required = false, isKey = false, index = false, default: _default, modificators, system } = value;
             
@@ -112,7 +109,60 @@ class BaseModel {
             let obj = memo;
 
             let values = data_value.reduce((memo, value) => {
+
+                if(!value && _default && (options.use_defaults || system)) {
+                    value = (typeof(_default) === 'function') ? _default(data) : _default;
+                }
+
+                if(!value && isKey && _default && options.use_keys_defaults) {
+                    value = (typeof(_default) === 'function') ? _default(data) : _default;
+                }
+
+                if(value && modificators) {
+                    value = modificators.reduce((memo, modificator) => {
+                        try {
+                            memo = this.modificators[modificator] ? this.modificators[modificator](memo, isRelation ? obj.$rel : obj ) : memo;
+                        }
+                        catch(err) {
+                            throw new Error(`error (${err.message}) occured while applying modificator "${modificator}" on "${this.name}.${key}" in object with _id = "${(isRelation ? obj.$rel : obj)._id}"`)
+                        }
+
+                        return memo;
+                    }, value);
+                }
+
+                if(!value && options.convert_types && required && !_default) {
+                    if(options.use_defaults) throw new Error(`${this.name}.${key} required a value!`);
+                }
+
                 if(type.prototype instanceof Relation) {
+                    let relation_options = options.use_defaults ? { ...options, use_defaults: false, use_keys_defaults: true } : options;
+                    value = type.validate(value, relation_options);
+                }
+                else {
+                    if(value && options.convert_types) {
+                        type === Date && !isNaN(value) && (value = Number(value));
+    
+                        if(type === Array) {
+                            if(!Array.isArray(value)) {
+                                value = isNaN(value) ? value.split(',') : [value];
+                            }
+                        }
+                        else {
+                            if(Array.isArray(value)) {
+                                throw new Error(`${this.constructor.name}.${key} type mismatch, expected not to be an array`)
+                            }
+                            else {
+                                value = new type(value);
+                                value = value.valueOf();
+                            }
+                        }
+                    }
+                }
+    
+                
+                /* if(type.prototype instanceof Relation) {
+                    //if(!value) throw new Error(`${this.name}.${key} required a value!`);
                     value = type.validate(value, options);
                 }
                 else {
@@ -155,7 +205,7 @@ class BaseModel {
                             }
                         }
                     }
-                }
+                } */
     
                 value && memo.push(value);
 
@@ -213,7 +263,7 @@ class BaseModel {
             result.direction = $direction;
             result.select = data.$select;
 
-            result.start = data.$parent;
+            result.start = data.$parent;// || $start.write({});
             result.end = $end.write(data);
             result.required = data.$required;
         }
@@ -295,108 +345,6 @@ class BaseModel {
         options = { keys: 'strict', ...options, mode: 'delete' }; //soft || strict || any
 
         return this.find(params, options);
-
-        /* let validated = this.validate(params, { use_defaults: false, convert_types: false });
-
-        let write = this.write(validated, { populate_system: false });
-
-        const traverse = (leaf, acc) => {
-            acc = acc || [];
-
-            let query = {
-                cql: '',
-                params: {},
-            }
-
-            if(leaf.isRelation) {
-                leaf = leaf.end;
-            }
-
-            query.identifier = leaf.identifier;
-            
-            query.cql = cypher.nodePattern({
-                labels: leaf.$labels,
-                identifier: leaf.identifier,
-                //data: leaf.keys
-            });
-
-            query.params = { ...query.params, ...leaf.params };
-
-            for(let key in leaf.relations) {
-                leaf.relations[key].forEach(relation => traverse(relation, acc));
-            }
-
-            acc.push(query);
-
-            return acc;
-        }
-
-        let query = traverse(write);
-
-        let hasKeys = false;
-
-        switch(options.keys) {
-            case 'strict':
-                hasKeys = query.every(row => {
-                    return Object.keys(row.params || {}).length;
-                });
-                break;
-            case 'soft':
-                hasKeys = query.some(row => {
-                    return Object.keys(row.params || {}).length;
-                });
-                break;
-            case 'any':
-                hasKeys = true
-                break;
-        }
-
-        if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
-
-        let cql = query.reverse().reduce((memo, element) => {
-            let cql = element.cql;
-            
-            let where = Object.entries(element.params).map(entry => {
-                let [key, value] = entry;
-
-                let isArray = Array.isArray(value);
-    
-                if(isArray) {
-                    value = `[${value.map(value => typeof(value) === 'string' ? `'${value}'` : value).join(',')}]`;
-                }
-                else {
-                    let isRegexp = typeof(value) === 'string' && value.slice(0, 1) === '~';
-    
-                    if(isRegexp) {
-                        value = value.slice(1);
-    
-                        operator = '=~';
-                    }
-    
-                    typeof(value) === 'string' && (value = `'${value}'`);
-                }
-    
-                return `${element.identifier}.${key} ${isArray ? 'IN' : '='} ${value}`;
-            });
-
-            //cql = `OPTIONAL MATCH ${cql}\nWHERE ${where.join(' AND ')} WITH accumulator + [${element.identifier} {.*}] AS accumulator`;
-            //cql = `${options.strict ? 'MATCH' : 'OPTIONAL MATCH'} ${cql}\nWHERE ${where.join(' AND ')}\nWITH ${element.identifier}, accumulator + [${element.identifier} {.*}] AS accumulator\nDETACH DELETE ${element.identifier}\nWITH accumulator`;
-            cql = `OPTIONAL MATCH ${cql}\nWHERE ${where.join(' AND ')}\nWITH ${element.identifier}, accumulator + [${element.identifier} {.*}] AS accumulator\nDETACH DELETE ${element.identifier}\nWITH accumulator`;
-
-            memo.push(cql);
-            
-            return memo;
-        }, []);
-
-        cql = `WITH [] AS accumulator\n${cql.join('\n')}\nRETURN accumulator`;
-        //cql = `WITH [] AS accumulator\n${cql.join('\n')}\nUNWIND accumulator AS nodes\nRETURN nodes`;
-
-        let records = await driver.query({ query: cql });
-        let nodes = records.pop();
-        
-        nodes = nodes ? nodes.accumulator.filter(node => node) : [];
-
-        return nodes; */
     }
 
     static async save(data) {
@@ -610,6 +558,29 @@ class BaseModel {
 
     static async find(params = {}, options = {}) {
         options = { mode: 'find', keys: 'strict', ...options }; //mode: find || delete; keys: soft || strict || any
+
+        let isRelation = this.prototype instanceof Relation;
+        if(isRelation) {
+            let start = this.schema.$start.schema;
+            let start_params = Object.entries(start).reduce((memo, entry) => {
+                let [key, value] = entry;
+
+                typeof(value) !== 'object' && (value = { type: value });
+                Array.isArray(value) && (value = value[0]);
+                typeof(value) === 'function'  && (value = { type: value });
+
+                let { type = String } = value;
+                if(type.prototype instanceof Relation && type === this) {
+                    memo[key] = params;
+                }
+
+                return memo;
+            }, {});
+
+            console.log(start_params);
+
+            return this.schema.$start.find(start_params, options);
+        }
 
         let validated = this.validate(params, { use_defaults: false, convert_types: false });
 
@@ -933,13 +904,14 @@ class BaseModel {
         return validated;
     }
 
-    static normalize_schema() {
-        if(this._normalize_schema) {
-            return this._normalize_schema;
+    static normalize_schema(key = 'root') {
+        if(this._normalize_schema && this._normalize_schema[key]) {
+            return this._normalize_schema[key];
         }
 
         let schema = new Schema.Entity(this.name, {}, { idAttribute: '_id' });
-        this._normalize_schema = schema;
+        this._normalize_schema = this._normalize_schema || {};
+        this._normalize_schema[key] = schema;
 
         Object.entries(this.schema).forEach(entry => {
             let [key, value] = entry;
@@ -956,7 +928,7 @@ class BaseModel {
             if(type.prototype instanceof Relation) {
                 let end_type = type.schema.$end.type || type.schema.$end;
 
-                let node = end_type.normalize_schema();
+                let node = end_type.normalize_schema(key);
                 let relation = type.normalize_schema();
 
                 node.define({
@@ -1015,9 +987,7 @@ class Graph extends BaseModel {
     static get schema() {
         return {
             ...super.schema,
-            //$ID: String,
             _id: {
-                //isKey: 'system',
                 isKey: true,
                 type: String,
                 required: true,
