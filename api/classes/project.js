@@ -7,6 +7,16 @@ class Test extends API {
         super(...args);
     }
 
+    async $security(methodName, ...args) {
+        
+        if('get' === methodName) {
+            return true
+        }
+        else {
+            return await super.$security(methodName, ...args);
+        }
+    }
+
     get() {
         return { status: 'ok0' };
     }

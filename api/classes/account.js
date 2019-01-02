@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { API } = require('./base');
 const FormData = require('form-data');
+const { JWT } = require('../jwt');
 
 const { Member, Anonymous, Browser, Email, List, RootMember } = require('../models');
 
@@ -9,11 +10,20 @@ class Account extends API {
         super(...args);
     }
 
+    async $security(methodName, ...args) {
+        
+        if(['changePassword', 'changeEmail'].includes(methodName)) {
+            return await super.$security(methodName, ...args);
+        }
+        else {
+            return true;
+        }
+    }
+
     async signin({ email, password }) {
         debugger
-        let member = new Member();
         
-        let found = await member.findOne({
+        let found = await Member.findOne({
             email: {
                 address: email,
             },
@@ -45,28 +55,26 @@ class Account extends API {
     }
 
     async shadow() {
-        debugger
-        let account = new Anonymous();
-        let browser = new Browser();
+        
+        //let account = new Anonymous();
+        //let browser = new Browser();
 
-        account = await account.save({
+        let account = await Anonymous.save({
             name: 'shadow'
         });
 
-        let browser1 = await browser.save({
-            name: 'Chrome'
-        });
-        debugger
-        browser1 = await browser.save({
-            ...browser1.root,
+        let browser1 = await Browser.save({
+            name: 'Chrome',
             accounts: [
-                account.root
+                account
             ]
-        });
+        });      
+        debugger;
 
-
-        this.res.cookie('shadow', true, { httpOnly: true });
-        return 'ok'
+        //this.res.cookie('$token', token, { httpOnly: true });
+        //this.res.cookie('token', token, { httpOnly: false });
+        
+        return account;
     }
 
     async recoverPassword() {

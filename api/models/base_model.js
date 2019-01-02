@@ -138,9 +138,18 @@ class BaseModel {
                 if(type.prototype instanceof Relation) {
                     let relation_options = options.use_defaults ? { ...options, use_defaults: false, use_keys_defaults: true } : options;
                     value = type.validate(value, relation_options);
+
+                    let converted = Array.isArray(value) ? value[0] : value;
+                    if(value && typeof(value.$aggregation) !== 'undefined') {
+                        options.convert_types && (value = { $aggregation: value.$aggregation });
+                    } 
                 }
                 else {
-                    if(value && options.convert_types) {
+                    /* if(key === '$aggregation') {
+                        value = value || 0;
+                    } */
+
+                    if(typeof(value) !== 'undefined' && options.convert_types) {
                         type === Date && !isNaN(value) && (value = Number(value));
     
                         if(type === Array) {
@@ -160,54 +169,7 @@ class BaseModel {
                     }
                 }
     
-                
-                /* if(type.prototype instanceof Relation) {
-                    //if(!value) throw new Error(`${this.name}.${key} required a value!`);
-                    value = type.validate(value, options);
-                }
-                else {
-                    if(!value && options.convert_types && required && !_default) {
-                        throw new Error(`${this.prototype.name}.${key} required a value!`);
-                    }
-    
-                    if(!value && _default && (options.use_defaults || system)) {
-                        value = (typeof(_default) === 'function') ? _default(data) : _default;
-                    }
-
-                    if(value && modificators) {
-                        value = modificators.reduce((memo, modificator) => {
-                            try {
-                                memo = this.modificators[modificator] ? this.modificators[modificator](memo, isRelation ? obj.$rel : obj ) : memo;
-                            }
-                            catch(err) {
-                                throw new Error(`error (${err.message}) occured while applying modificator "${modificator}" on "${this.name}.${key}" in object with _id = "${(isRelation ? obj.$rel : obj)._id}"`)
-                            }
-    
-                            return memo;
-                        }, value);
-                    }
-
-                    if(value && options.convert_types) {
-                        type === Date && !isNaN(value) && (value = Number(value));
-
-                        if(type === Array) {
-                            if(!Array.isArray(value)) {
-                                value = isNaN(value) ? value.split(',') : [value];
-                            }
-                        }
-                        else {
-                            if(Array.isArray(value)) {
-                                throw new Error(`${this.constructor.name}.${key} type mismatch, expected not to be an array`)
-                            }
-                            else {
-                                value = new type(value);
-                                value = value.valueOf();
-                            }
-                        }
-                    }
-                } */
-    
-                value && memo.push(value);
+                typeof(value) !== 'undefined' && memo.push(value);
 
                 return memo;
             }, []);
@@ -217,7 +179,11 @@ class BaseModel {
                     memo.$rel = memo.$rel || {};
                     memo.$rel[key] = isArray ? values : values.length > 1 ? options.convert_types ? values[0] : values: values[0];
                 }
-                else memo[key] = isArray ? values : values.length > 1 ? options.convert_types ? values[0] : values: values[0];
+                else {
+                    memo[key] = isArray ? values : values.length > 1 ? options.convert_types ? values[0] : values: values[0]
+                    let converted = Array.isArray(memo[key]) && memo[key].length === 1 ? memo[key][0] : memo[key];
+                    options.convert_types && converted && typeof(converted.$aggregation) !== 'undefined' && (memo[key] = converted.$aggregation);
+                };
             }
 
             return memo;
@@ -226,10 +192,15 @@ class BaseModel {
         Object.entries(data).forEach(entry => {
             let [key, value] = entry;
 
-            key.slice(0, 1) === '$' && key !== '$rel' && value && (validated[key] = value);
+            key.slice(0, 1) === '$' && key !== '$rel' && typeof(value) !== 'undefined' && (validated[key] = value);
+
         });
 
         if(isRelation) {
+            /* if(typeof(validated.$aggregation) !== 'undefined') {
+                options.convert_types ? validated = validated.$aggregation : validated = { $aggregation: validated.$aggregation };
+            }
+            else validated = { ...$end.validate(data, options), ...validated }; */
             validated = { ...$end.validate(data, options), ...validated };
         }
 
@@ -607,10 +578,15 @@ class BaseModel {
             //if(!keys.length) throw new Error(`No keys provided for ${leaf.identifier}`);
 
             if(leaf.isRelation) {
-                query.with = [leaf.identifier, leaf.end.identifier];
+                !leaf.end.$aggregation ? query.with = [leaf.identifier, leaf.end.identifier] : query.with = [leaf.end.identifier];
+                if(leaf.end.$aggregation) {
+                    query.aggregation = [`${leaf.end.$aggregation.type}(${leaf.end.identifier}${(!leaf.end.$aggregation.field || leaf.end.$aggregation.field === '*') ? '' : '.' + leaf.end.$aggregation.field}) AS ${leaf.end.identifier}`]
+                };
 
                 query.relation = leaf.identifier;
                 query.selector = leaf.end.$selector || (leaf.required ? 'MATCH' : 'OPTIONAL MATCH');
+                
+                //if(leaf.end.$aggregation)
 
                 let relation = cypher.relationshipPattern({
                     direction: leaf.direction,
@@ -631,7 +607,6 @@ class BaseModel {
                 query.params[leaf.identifier] = { ...leaf.params };
 
                 leaf = leaf.end;
-
             }
             else {
                 query.with = [leaf.identifier];
@@ -693,7 +668,9 @@ class BaseModel {
 
         let cql = query.reverse().reduce((memo, element) => {
             let cql = element.cql;
-            acc_with = [...acc_with, ...element.with];
+            let element_with = element.aggregation || element.with;
+
+            acc_with = [...acc_with, ...element_with];
 
             let where = Object.entries(element.params).reduce((memo, entry) => {
                 let [identifier, params] = entry;
@@ -735,6 +712,8 @@ class BaseModel {
             //cql = `${element.selector} ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
             //cql = `OPTIONAL MATCH ${cql}${where.length ? `\nWHERE ${where.join(' AND ')}` : ''}`;
             //cql = `${element.selector} ${cql}\nWHERE ${where.join(' AND ')}`;
+
+            element.aggregation && acc_with.pop() && (acc_with = [...acc_with, ...element.with]);
 
             memo.push(cql);
             
@@ -797,20 +776,20 @@ class BaseModel {
                 let inx = traversed.push({}) - 1;
 
                 trav(write, traversed[inx], (leaf, to, cb) => {
+                    
                     let relations = leaf.end ? leaf.end.relations : leaf.relations; 
     
                     let value = nodes[leaf.end ? leaf.end.identifier : leaf.identifier];
                     let node = { ...value };
                     leaf.end && (node.$rel = { ...nodes[leaf.identifier] });
 
-                    /* if(cache[node.$ID]) {
-                        node = cache[node.$ID];
-                        //traversed.pop();
-                    }; */
-
-                    //to = cache[node.$ID] || to;
-                    value && Object.assign(to, node); //do assign to save reference!
-
+                    if(typeof(value) === 'object') {
+                        value && Object.assign(to, node); //do assign to save reference!
+                    }
+                    else {
+                        node = { $aggregation: value };
+                        Object.assign(to, node)
+                    }
 
                     (cache[node.$ID] = cache[node.$ID] ? merge(cache[node.$ID], node) : node);
     
@@ -894,7 +873,9 @@ class BaseModel {
 
             traversed = Object.values(traversed);
 
-            validated = traversed.map(node => this.validate(node, { use_defaults: false, convert_types: true }));
+            validated = traversed.map(node => {
+                return this.validate(node, { use_defaults: false, convert_types: true })
+             });
 
             /* validated = validated.map(node => this.validate(node, { use_defaults: false, convert_types: true }));
 
@@ -1032,7 +1013,8 @@ class Node extends Graph {
         return {
             ...super.schema,
             $labels: [this.constructor.name],
-            $selector: String
+            $selector: String,
+            $aggregation: String
         }
     }
 }

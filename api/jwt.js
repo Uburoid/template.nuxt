@@ -48,7 +48,38 @@ const loadDefaultKeyPair = async () => {
     }
 }
 
-const JWT = ({ key, public_key, private_key } = {}) => {
+const JWT = async ({ key = '$', public_key, private_key, getKeys } = {}) => {
+
+    let pair = cache.get(key);
+
+    if(!pair) {
+        if(public_key && private_key) {
+            cache.set(key, { public_key, private_key });
+        }
+        else {
+            if(key === '$') {
+                pair = await loadDefaultKeyPair();
+                
+                public_key = pair.public_key;
+                private_key = pair.private_key;
+            }
+            else {
+                if(getKeys) {
+                    pair = await getKeys();
+
+                    public_key = pair.public_key;
+                    private_key = pair.private_key;
+                }
+                else throw new Error('Keys pair not provided.');
+                
+            }
+        }
+    }
+    else {
+        public_key = pair.public_key;
+        private_key = pair.private_key;
+    };
+
     
     const sign = (payload) => {
         delete payload.iat;
@@ -62,7 +93,6 @@ const JWT = ({ key, public_key, private_key } = {}) => {
 
         try {
             jsonwebtoken.verify(token, public_key);
-
         }
         catch(err) {
             payload.err = err;

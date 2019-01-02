@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-
+const { JWT } = require('../jwt');
 const LRU = require("lru-cache");
 
 const cache = new LRU({
@@ -24,6 +24,24 @@ class Base {
 
                 if(typeof(origMethod) === 'function') {
                     let isPublic = ['$', '_'].includes(propKey.slice(0, 1));
+
+                    return async (...args) => {
+                        try {
+                            //let [] = args
+                            let allow = await self.$security(propKey, ...args);
+
+                            if(!allow) throw new Error(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                            
+                            let response = await origMethod.apply(target, args);
+
+                            return response;
+                        }
+                        catch(err) {
+                            throw err;
+                            return { redirect: '/' }
+                        }
+                    }
+                
                 };
 
                 return origMethod;
@@ -33,7 +51,7 @@ class Base {
         return new Proxy(this, handler);
     }
 
-    $security() {
+    $security(methodName, ...args) {
         return true;
     }
 
@@ -42,11 +60,34 @@ class Base {
     }
 }
 
+//  used to sign/verify JWT
 class API extends Base {
     constructor(...args) {
         super(...args);
 
-        this.token = this.req.cookies['token'];
+    }
+
+    async $security(methodName, ...args) {
+        debugger
+
+        this.token = this.req.cookies['$token'];
+
+        if(!this.token) {
+            const { Account } = require('./account');
+            let account = new Account({ req: this.req, res: this.res });
+
+            this.token = await account.shadow(...args);
+        }
+        else {
+            let jwt = await JWT();
+            let payload = jwt.verify(this.token);
+            this.token = jwt.refresh(payload);
+        }
+
+        this.res.cookie('$token', this.token, { httpOnly: true });
+        this.res.cookie('token', this.token, { httpOnly: false });
+
+        return !!this.token;
     }
 
 }
@@ -55,7 +96,7 @@ class SecuredAPI extends Base {
     constructor(...args) {
         super(...args);
         
-        
+        debugger
         !this.token && this.res.cookie('token', 'jwt', { httpOnly: true });
 
         /* if(!payload) {

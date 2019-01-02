@@ -25,9 +25,9 @@ export const actions = {
         catch(err) {
             console.error(err);
         } */
-        debugger
+        
 
-        let user = !req.headers.cookie && await this.$server.account.shadow();
+        //let user = !req.headers.cookie && await this.$server.account.shadow();
 
         console.log(req)
     }

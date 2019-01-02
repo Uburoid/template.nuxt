@@ -60,7 +60,7 @@ class NeoDriver extends DatabaseDriver {
                             //let identity = value && (neo4j.integer.inSafeRange(value.identity) ? value.identity.toNumber() : value.identity.toString());
                             
                             //value = value ? neo4jIntsToStrings(value.properties || value) : void 0;
-                            if(value) {
+                            if(typeof(value) === 'object' && value !== null) {
                                 let identity = value.identity;
                                 value = value.properties || value;
                                 
@@ -83,6 +83,7 @@ class NeoDriver extends DatabaseDriver {
                                 }
                                 else nodes[key] = value */
                             }
+                            else nodes[key] = value;
                         }
 
                         return nodes;

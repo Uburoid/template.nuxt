@@ -1,4 +1,5 @@
 (async () => {
+    return
     let { Relation } = require('./models/base_model');
     let models = require('./models');
     
@@ -10,20 +11,29 @@
         referals: {
             $rel: {
                 $length: '*'
-            }
+            },
+            email: {
+                verified: false,
+                //$selector: 'OPTIONAL MATCH'
+            },
+            
+            /* $aggregation: {
+                type: 'count',
+                field: 'updated'
+            } */
         },
         referer: {
             /* $rel: {
                 $length: '*..1'
             }, */
-            //$selector: 'OPTIONAL MATCH'
+            $selector: 'OPTIONAL MATCH'
         },
         //$selector: 'OPTIONAL MATCH'
     });
 
-    found = await models.RootList.save(found);
+    //found = await models.RootList.save(found);
 
-    found.members.sort((a, b) => a.$rel.номер - b.$rel.номер);
+    /* found.members.sort((a, b) => a.$rel.номер - b.$rel.номер);
     let new_list = found.members.shift();
     found.members.push(new_list);
     
@@ -42,7 +52,7 @@
         _id: updated._id
     }
 
-    let deleted = await models.List.delete(to_delete, { keys: 'strict' });
+    let deleted = await models.List.delete(to_delete, { keys: 'strict' }); */
 
     /* found = await models.referal.find();
 
@@ -190,7 +200,7 @@
     }); */
 
     //let schema = models.Email.normalize_schema();
-    let schema = models.List.normalize_schema();
+    let schema = models.Member.normalize_schema();
 
     let _database = new Schema.Entity('database', {
         data: [schema]

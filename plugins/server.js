@@ -52,7 +52,7 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
 
 class LocalServer {
     constructor({ context, Types }) {
-        
+
         Object.entries(Types).reduce((memo, entry) => {
             let [key, value] = entry;
 
@@ -62,11 +62,35 @@ class LocalServer {
 
                     let { req, res } = context;
 
+                    /* const express = require('express');
+                    const app = express();
+
+                    Object.setPrototypeOf(req, app.request);
+                    Object.setPrototypeOf(res, app.response);
+
+                    req.res = res;
+                    res.req = req; */      
+
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
-                    res.cookie = (name, val, options) => {
+                    /* res.cookie = (name, val, options) => {
+                        debugger
+                        //let existed_cookies = res.getHeader('set-cookie');
+                        //existed_cookies = existed_cookies ? [existed_cookies, cookie.serialize(name, val, options)].join(',') : cookie.serialize(name, val, options);
                         res.setHeader('set-cookie', cookie.serialize(name, val, options));
-                    }
+                        res.setHeader('set-cookie', cookie.serialize(name, val, options));
+                    } */
+
+                    res.cookie = function (name, value, options) {
+                        let existed_cookies = res.getHeader('set-cookie');
+                        existed_cookies = existed_cookies ? [...existed_cookies] : [];
+
+                        existed_cookies = [...existed_cookies, cookie.serialize(name, String(value), options)];
+
+                        res.setHeader('set-cookie', existed_cookies);
+                    
+                        return this;
+                    };
 
                     return new Type({ req, res });
                 }

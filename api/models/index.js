@@ -41,7 +41,7 @@ class metrics2account extends Relation {
         let schema = {
             ...super.schema,
             $start: Metrics,
-            $type: 'используется',
+            $type: 'связан с',
             $end: Account
         }
 

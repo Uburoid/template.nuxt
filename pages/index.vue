@@ -5,3 +5,12 @@
         </v-flex>
     </v-layout>
 </template>
+
+<script>
+export default {
+    
+    mounted() {
+        console.log(document.cookie);
+    }
+}
+</script>
