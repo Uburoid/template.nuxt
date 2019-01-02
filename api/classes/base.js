@@ -70,19 +70,20 @@ class API extends Base {
     async $security(methodName, ...args) {
         debugger
 
+        let key = '$';
         this.token = this.req.cookies['$token'];
 
         if(!this.token) {
             const { Account } = require('./account');
             let account = new Account({ req: this.req, res: this.res });
 
-            this.token = await account.shadow(...args);
-        }
-        else {
-            let jwt = await JWT();
-            let payload = jwt.verify(this.token);
-            this.token = jwt.refresh(payload);
-        }
+            let account = await account.shadow(...args);
+        };
+
+
+        let jwt = await JWT();
+        let payload = jwt.verify(this.token);
+        this.token = jwt.refresh(payload);
 
         this.res.cookie('$token', this.token, { httpOnly: true });
         this.res.cookie('token', this.token, { httpOnly: false });
