@@ -10,7 +10,7 @@ class Account extends API {
         super(...args);
     }
 
-    async $security(methodName, ...args) {
+    /* async $security(methodName, ...args) {
         
         if(['changePassword', 'changeEmail'].includes(methodName)) {
             return await super.$security(methodName, ...args);
@@ -18,7 +18,7 @@ class Account extends API {
         else {
             return true;
         }
-    }
+    } */
 
     async signin({ email, password }) {
         debugger

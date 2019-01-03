@@ -26,18 +26,23 @@ class Base {
                     let isPublic = ['$', '_'].includes(propKey.slice(0, 1));
 
                     return async (...args) => {
+                        debugger
                         try {
-                            //let [] = args
-                            let allow = await self.$security(propKey, ...args);
+                            let allow = await self.$beforeAction(propKey, ...args);
+                            allow = typeof(allow) === 'undefined' ? true : allow;
 
-                            if(!allow) throw new Error(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                            if(!allow) 
+                                throw new Error(`Access to ${self.constructor.name}.${propKey}() denied.`);
                             
                             let response = await origMethod.apply(target, args);
+
+                            await self.$afterAction(propKey, response, ...args);
 
                             return response;
                         }
                         catch(err) {
-                            throw err;
+                            return await self.$onError(propKey, err, ...args);
+                            //throw err;
                             return { redirect: '/' }
                         }
                     }
@@ -51,8 +56,16 @@ class Base {
         return new Proxy(this, handler);
     }
 
-    $security(methodName, ...args) {
+    $beforeAction(methodName, ...args) {
         return true;
+    }
+
+    $afterAction(methodName, response, ...args) {
+        console.log(`Action ${this.constructor.name}.${methodName}() executed.`);
+    }
+
+    $onError(methodName, err, ...args) {
+        throw err;
     }
 
     get() {
@@ -65,9 +78,10 @@ class API extends Base {
     constructor(...args) {
         super(...args);
 
+        this.payload = {};
     }
 
-    async $security(methodName, ...args) {
+    async $beforeAction(methodName, ...args) {
         debugger
 
         let key = '$';
@@ -77,7 +91,7 @@ class API extends Base {
             const { Account } = require('./account');
             let account = new Account({ req: this.req, res: this.res });
 
-            let account = await account.shadow(...args);
+            account = await account.shadow(...args);
         };
 
 
@@ -91,6 +105,10 @@ class API extends Base {
         return !!this.token;
     }
 
+    $afterAction(methodName, response, ...args) {
+        super.$afterAction(methodName, response, ...args);
+    }
+
 }
 
 class SecuredAPI extends Base {
@@ -98,7 +116,7 @@ class SecuredAPI extends Base {
         super(...args);
         
         debugger
-        !this.token && this.res.cookie('token', 'jwt', { httpOnly: true });
+        //!this.token && this.res.cookie('token', 'jwt', { httpOnly: true });
 
         /* if(!payload) {
             this.token = req.cookies['token'];
