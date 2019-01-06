@@ -343,17 +343,18 @@ router.all(patterns, multipartDetector, async (req, res, next) => {
     catch(err) {
         next(err);
     }
-})
+});
 
 router.use((err, req, res, next) => {
-    let error = {
-        code: err.httpStatusCode || err.code || 400,
+    /* let error = {
+        statusCode: err.httpStatusCode || err.code || 400,
         message: err.message,
         name: err.name,
         stack: err.stack
     };
     
-    res.status(error.code).json(error);
+    res.status(error.statusCode).json(error); */
+    res.status(err.statusCode).json(err);
 });
 
 process.on('unhandledRejection', err => {

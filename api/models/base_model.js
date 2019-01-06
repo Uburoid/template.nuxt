@@ -63,16 +63,6 @@ class BaseModel {
     static validate(data, options = {}) {
         if(!data) return void 0;
 
-        /* if(data.$ID && cache[data.$ID]) {
-            return {};
-        } */
-        
-        /* Object.entries(data).forEach(entry => {
-            let [key, value] = entry;
-
-            key.slice(0, 1) === '$' && value && (data[key] = value);
-        }); */
-        
         options = { use_defaults: true, convert_types: true, ...options };
 
         let isRelation = this.prototype instanceof Relation;
@@ -197,10 +187,6 @@ class BaseModel {
         });
 
         if(isRelation) {
-            /* if(typeof(validated.$aggregation) !== 'undefined') {
-                options.convert_types ? validated = validated.$aggregation : validated = { $aggregation: validated.$aggregation };
-            }
-            else validated = { ...$end.validate(data, options), ...validated }; */
             validated = { ...$end.validate(data, options), ...validated };
         }
 
@@ -417,7 +403,7 @@ class BaseModel {
         let hasKeys = query.every(row => {
             return !!Object.keys(row.params[row.node]).length && (row.relation ? !!Object.keys(row.params[row.relation]).length : true);
         });
-
+        
         if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
         
         
@@ -802,26 +788,6 @@ class BaseModel {
         };
 
         const overwriteMerge = (target, source, options) => {
-            /* let result = source.map(src => {
-                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: overwriteMerge });
-
-                return cache[src.$ID];
-            });
-
-            //let result = source.slice(); //source.map(src => cache[src.$ID]);
-
-            target = target.map(src => {
-                //cache[src.$ID] = merge(cache[src.$ID], src);
-                cache[src.$ID] = merge(cache[src.$ID], src, { arrayMerge: overwriteMerge });
-
-                return cache[src.$ID];
-            });
-            
-            target.forEach(src => {
-                //src = merge(cache[src.$ID], src);
-
-                src.$ID && !result.find(dst => dst.$ID === src.$ID) && result.push(src);
-            }); */
 
             let result = [];
 
@@ -864,7 +830,6 @@ class BaseModel {
 
         if(traversed.length) {
             traversed = traversed.reduce((memo, node) => {
-                //memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node) : node;
                 memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node, { arrayMerge: overwriteMerge }) : node;
     
                 return memo;
@@ -877,16 +842,6 @@ class BaseModel {
                 return this.validate(node, { use_defaults: false, convert_types: true })
              });
 
-            /* validated = validated.map(node => this.validate(node, { use_defaults: false, convert_types: true }));
-
-
-            validated = validated.reduce((memo, node) => {
-                memo[node.$ID] = memo[node.$ID] ? merge(memo[node.$ID], node) : node;
-    
-                return memo;
-            }, {});
-    
-            validated = Object.values(validated); */
         }
         else validated = void 0;
 
@@ -1002,6 +957,14 @@ class Graph extends BaseModel {
                 default: (obj) => {
                     return obj.created || new Date() / 1;
                 }
+            },
+            class: {
+                type: String,
+                //required: true,
+                //system: true,
+                system: true,
+                set_on: 'create',
+                default: () => this.name
             }
         }
     }

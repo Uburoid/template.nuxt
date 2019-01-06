@@ -10,19 +10,9 @@ class Account extends API {
         super(...args);
     }
 
-    /* async $security(methodName, ...args) {
-        
-        if(['changePassword', 'changeEmail'].includes(methodName)) {
-            return await super.$security(methodName, ...args);
-        }
-        else {
-            return true;
-        }
-    } */
-
     async signin({ email, password }) {
         debugger
-        
+
         let found = await Member.findOne({
             email: {
                 address: email,
@@ -33,6 +23,7 @@ class Account extends API {
         let auth = found && await bcrypt.compare(`${email}:${password}`, found.hash);
 
         if(auth) {
+            this.payload = found;
             return found;
         }
         else {
@@ -54,7 +45,7 @@ class Account extends API {
 
     }
 
-    async shadow() {
+    static async shadow() {
         
         //let account = new Anonymous();
         //let browser = new Browser();
@@ -63,18 +54,20 @@ class Account extends API {
             name: 'shadow'
         });
 
-        let browser1 = await Browser.save({
-            name: 'Chrome',
-            accounts: [
-                account
-            ]
-        });      
-        debugger;
-
-        //this.res.cookie('$token', token, { httpOnly: true });
-        //this.res.cookie('token', token, { httpOnly: false });
-        
         return account;
+    }
+
+    static async getKeys(_id) {
+        
+        const { loadDefaultKeyPair } = require('../jwt');
+
+        let member = await Member.findOne({
+            _id,
+            wallet: true
+        });
+        
+        let pair = member ? { private_key: member.wallet.privateKey, public_key: member.wallet.publicKey } : await loadDefaultKeyPair();
+        return pair;
     }
 
     async recoverPassword() {

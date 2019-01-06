@@ -3,11 +3,11 @@
     <drawer :show="drawer" @drawler="drawer = arguments[0]"/>
     
     <v-toolbar fixed app clipped-left clipped-right flat>
-        <nuxt-link to="/">
-            <img class="top-toolbar-logo" src="~assets/default_user.png" height="36">
+        <nuxt-link to="" @click.native="drawer = !drawer">
+            <img class="top-toolbar-logo" src="~assets/2956ab668f2b82c.jpg" height="54">
         </nuxt-link>
 
-        <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+        <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
 
         <v-toolbar-title v-text="title"></v-toolbar-title>
 
@@ -79,7 +79,7 @@
             }
         },
         data: () => ({
-            drawer: true,
+            drawer: false,
             items: [
                 {
                     access: 1000,

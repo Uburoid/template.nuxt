@@ -13,8 +13,9 @@ export default {
         start () {
             this.loadingCount++;
         },
-        finish () {
-            this.loadingCount--;
+        finish (abort) {
+            abort ? this.loadingCount = 0 : this.loadingCount--;
+            this.loadingCount < 0 && (this.loadingCount = 0);
         },
     },
     computed: {

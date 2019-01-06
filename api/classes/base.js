@@ -1,13 +1,14 @@
 const fs = require('fs-extra');
 const { JWT } = require('../jwt');
-const LRU = require("lru-cache");
+const LRU = require('lru-cache');
+const { Metrics } = require('./metrics');
 
 const cache = new LRU({
     maxAge: 86400000 //сутки
 });
 
 class Base {
-    constructor({ req, res }) {
+    constructor({ req, res, error }) {
 
         this.fs = fs;
         //this.jwt = jwt;
@@ -19,6 +20,7 @@ class Base {
         let self = this;
 
         const handler = {
+            //TODO: implement has function to restrict access according to ACL
             get(target, propKey, receiver) {
                 const origMethod = target[propKey];
 
@@ -26,7 +28,7 @@ class Base {
                     let isPublic = ['$', '_'].includes(propKey.slice(0, 1));
 
                     return async (...args) => {
-                        debugger
+                        
                         try {
                             let allow = await self.$beforeAction(propKey, ...args);
                             allow = typeof(allow) === 'undefined' ? true : allow;
@@ -40,10 +42,16 @@ class Base {
 
                             return response;
                         }
-                        catch(err) {
-                            return await self.$onError(propKey, err, ...args);
-                            //throw err;
-                            return { redirect: '/' }
+                        catch(err) {                            
+                            err = self.$onError(propKey, err, ...args);
+
+                            //await self.$afterAction(propKey, err, ...args);
+
+                            if(error) {
+                                error({ ...err });
+                                return { error: err };
+                            }
+                            else throw err;
                         }
                     }
                 
@@ -62,10 +70,20 @@ class Base {
 
     $afterAction(methodName, response, ...args) {
         console.log(`Action ${this.constructor.name}.${methodName}() executed.`);
+
+        Metrics.save(this.req, methodName, this.payload);
     }
 
     $onError(methodName, err, ...args) {
-        throw err;
+        
+        let error = {
+            statusCode: err.httpStatusCode || err.code || 400,
+            message: err.message,
+            name: err.name,
+            stack: err.stack
+        };
+
+        return error;
     }
 
     get() {
@@ -73,40 +91,57 @@ class Base {
     }
 }
 
+
+
 //  used to sign/verify JWT
 class API extends Base {
     constructor(...args) {
         super(...args);
+        
+        const { Account } = require('./account');
+        this.jwt = JWT({ getKeys: Account.getKeys });
 
         this.payload = {};
+
     }
 
     async $beforeAction(methodName, ...args) {
-        debugger
+        let sleep = (ms = 0) => {
+            return new Promise(r => setTimeout(r, ms));
+        }
+        
+        //await sleep(5000);
 
-        let key = '$';
         this.token = this.req.cookies['$token'];
 
         if(!this.token) {
             const { Account } = require('./account');
-            let account = new Account({ req: this.req, res: this.res });
+            let account = await Account.shadow(...args);
 
-            account = await account.shadow(...args);
-        };
+            this.payload = account;
+        }
+        else this.payload = await this.jwt.verify({ token: this.token });
 
+        if(this.payload.err) throw this.payload.err;
 
-        let jwt = await JWT();
-        let payload = jwt.verify(this.token);
-        this.token = jwt.refresh(payload);
-
-        this.res.cookie('$token', this.token, { httpOnly: true });
-        this.res.cookie('token', this.token, { httpOnly: false });
-
-        return !!this.token;
+        return !!this.payload;
     }
 
-    $afterAction(methodName, response, ...args) {
+    async $afterAction(methodName, response, ...args) {
+        
         super.$afterAction(methodName, response, ...args);
+
+        await this.$refreshToken();
+    }
+
+    async $refreshToken() {
+        
+        let { _id, name } = this.payload;
+
+        this.token = await this.jwt.refresh({ payload: { _id, name } });
+        
+        this.res.cookie('$token', this.token, { httpOnly: true });
+        //this.res.cookie('token', this.token, { httpOnly: false });
     }
 
 }

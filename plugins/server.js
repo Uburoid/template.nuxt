@@ -37,11 +37,9 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
             //flags && flags.auto_merge && data[flags.auto_merge] && context.store.commit('SET_ENTITIES', { data: data[flags.auto_merge] });
         }
         catch (err) {
-            debugger
-            if(redirectOnError) {
-                error(err.response.data)
-            }
-            else throw err;
+            error({ ...err });
+
+            return { data: { error: err }};
         }
 
     }
@@ -60,7 +58,7 @@ class LocalServer {
                 get: () => {
                     const Type = Types[key];
 
-                    let { req, res } = context;
+                    let { req, res, error } = context;
 
                     /* const express = require('express');
                     const app = express();
@@ -82,6 +80,7 @@ class LocalServer {
                     } */
 
                     res.cookie = function (name, value, options) {
+                        debugger
                         let existed_cookies = res.getHeader('set-cookie');
                         existed_cookies = existed_cookies ? [...existed_cookies] : [];
 
@@ -92,7 +91,7 @@ class LocalServer {
                         return this;
                     };
 
-                    return new Type({ req, res });
+                    return new Type({ req, res, error });
                 }
             });
         }, {});
@@ -104,6 +103,10 @@ export default async (context, inject) => {
     let server = void 0;
 
     let response = await context.$axios({ url: '/_server_' });//CALL TO LOAD DEFAULT KEYS!
+
+    /* const Server = (new Function(response.data))();
+        
+    server = new Server({ execute, context }); */
 
     if(process.browser) {
 

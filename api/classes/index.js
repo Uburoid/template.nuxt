@@ -24,7 +24,7 @@ function getClassMethodNames(Class, stop = Object.prototype) {
     let proto = Class.prototype;
 
     while (proto && proto !== stop) {
-        Object.getOwnPropertyNames (proto).forEach (name => {
+        Object.getOwnPropertyNames (proto).forEach (name => { //TODO: check access level in class proxy (need token to exists)
             if (name !== 'constructor' && !['_', '$'].includes(name.slice(0, 1))) {
                 if (hasMethod(proto, name)) {
                     array.push (name);

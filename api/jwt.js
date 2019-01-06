@@ -48,50 +48,54 @@ const loadDefaultKeyPair = async () => {
     }
 }
 
-const JWT = async ({ key = '$', public_key, private_key, getKeys } = {}) => {
+const JWT = ({ getKeys, key_property = '_id' } = {}) => {
 
-    let pair = cache.get(key);
+    /* getKeys = getKeys || async function (key) {
+        let pair = cache.get(key);
 
-    if(!pair) {
-        if(public_key && private_key) {
-            cache.set(key, { public_key, private_key });
-        }
-        else {
+        if(!pair) {
             if(key === '$') {
-                pair = await loadDefaultKeyPair();
-                
-                public_key = pair.public_key;
-                private_key = pair.private_key;
+                return await loadDefaultKeyPair();
             }
-            else {
-                if(getKeys) {
-                    pair = await getKeys();
-
-                    public_key = pair.public_key;
-                    private_key = pair.private_key;
-                }
-                else throw new Error('Keys pair not provided.');
-                
-            }
+            else throw new Error('Keys pair not provided.');
         }
-    }
-    else {
-        public_key = pair.public_key;
-        private_key = pair.private_key;
-    };
 
+        return pair;
+    }; */
+
+    let cache_function = async (key) => {
+        
+        let pair = cache.get(key);
+
+        !pair && getKeys && (pair = await getKeys(key));
+        
+        if(!pair) throw new Error('Keys pair not provided.');
+        
+        let defaultKeys = cache.get('$');
+        defaultKeys && defaultKeys.public_key === pair.public_key && (key = '$');
+
+        cache.set(key, pair);
+
+        return pair;
+    }
     
-    const sign = (payload) => {
-        delete payload.iat;
-        delete payload.exp;
+    const sign = async ({ payload }) => {
+        
+        let cache_key = key_property ? payload[key_property] : '$';
 
-        return jsonwebtoken.sign(payload, private_key, { algorithm: 'RS256', expiresIn: process.env.TOKEN_EXPIRATION_TIME || '3600s' });
+        let { private_key } = await cache_function(cache_key);
+
+        return jsonwebtoken.sign(payload, private_key, { algorithm: 'RS256', expiresIn: process.env.TOKEN_EXPIRATION_TIME || '10s' });
     }
 
-    const verify = (token) => {
+    const verify = async ({ token }) => {
         let payload = jsonwebtoken.decode(token) || {};
 
         try {
+            let cache_key = key_property ? payload[key_property] : '$';
+
+            let { public_key } = await cache_function(cache_key);
+
             jsonwebtoken.verify(token, public_key);
         }
         catch(err) {
@@ -101,8 +105,11 @@ const JWT = async ({ key = '$', public_key, private_key, getKeys } = {}) => {
         return payload;
     }
 
-    const refresh = (payload) => {
-        return sign(payload);
+    const refresh = async ({ payload }) => {
+        delete payload.iat;
+        delete payload.exp;
+
+        return await sign({ payload });
     }
 
     const revoke = () => {

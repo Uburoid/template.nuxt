@@ -22,47 +22,6 @@ class Email extends Node {
     }
 }
 
-class Metrics extends Node {
-    static get schema() {
-        let schema = {
-            ...super.schema,
-            $labels: ['Метрика'],
-
-            accounts: [metrics2account]
-        }
-
-        return schema;
-    }
-}
-
-class metrics2account extends Relation {
-
-    static get schema() {
-        let schema = {
-            ...super.schema,
-            $start: Metrics,
-            $type: 'связан с',
-            $end: Account
-        }
-
-        return schema;
-    }
-}
-
-class Browser extends Metrics {
-    static get schema() {
-        let schema = {
-            ...super.schema,
-            $labels: ['Метрика', 'Браузер'],
-            name: String,
-            version: String
-        }
-
-        return schema;
-    }
-}
-
-
 class Account extends Node {
     static get schema() {
         let schema = {
@@ -363,4 +322,4 @@ class referal extends member2member {
     }
 }
 
-module.exports = { Club, Member, Email, List, RootList, RootMember, Anonymous, Browser, referal };
+module.exports = { Account, Club, Member, Email, List, RootList, RootMember, Anonymous };

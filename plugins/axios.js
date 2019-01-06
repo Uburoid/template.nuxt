@@ -7,10 +7,11 @@ const start = () => {
     }
 }
 
-const stop = () => {
+const stop = (abort) => {
+    
     if(process.browser && window.$nuxt) {
         const { $loading } = window.$nuxt.$root;
-        $loading.finish && $loading.finish();
+        $loading.finish && $loading.finish(abort);
     }
 }
 
@@ -35,13 +36,13 @@ export default (context, inject) => {
     });
 
     let onError = (error => {
-
+        
         //error.response && context.error({ statusCode: error.response.status, message: error.response.data });
         //console.error(error);
 
-        stop();
+        stop(true);
         
-        throw error;
+        throw error.response.data;
     });
 
     api.interceptors.request.use(onRequest, onError);
