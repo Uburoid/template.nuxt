@@ -22,9 +22,41 @@ class Email extends Node {
     }
 }
 
+class Role extends Node {
+    static get schema() {
+        return {
+            ...super.schema,
+            $labels: ['Безопасность', 'Роль'],
+            name: {
+                type: String,
+                required: true
+            },
+            level: {
+                type: Number,
+                required: true,
+                default: (obj) => {
+                    return 0
+                }
+            }
+        }
+    }
+}
+
+class account2role extends Relation {
+
+    static get schema() {
+        return {
+            ...super.schema,
+            $start: Account,
+            $type: 'имеет',
+            $end: Role
+        }
+    }
+}
+
 class Account extends Node {
     static get schema() {
-        let schema = {
+        return {
             ...super.schema,
             $labels: ['Участник'],
             name: {
@@ -34,9 +66,11 @@ class Account extends Node {
                     return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ', 10)
                 }
             },
+            role: {
+                type: account2role,
+                required: true
+            }
         }
-
-        return schema;
     }
 }
 
@@ -66,7 +100,7 @@ class Member extends Account {
     static get schema() {
         let schema = {
             ...super.schema,
-            $labels: ['Участник'],
+            $labels: ['Участник', 'Пользователь'],
 
             
             hash: String,
@@ -322,4 +356,4 @@ class referal extends member2member {
     }
 }
 
-module.exports = { Account, Club, Member, Email, List, RootList, RootMember, Anonymous };
+module.exports = { Account, Club, Member, Email, List, RootList, RootMember, Anonymous, Role };

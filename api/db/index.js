@@ -13,7 +13,7 @@ const stringify = (obj_from_json) => {
 }
 
 const neo4j = require('neo4j-driver').v1;
-const driver = neo4j.driver(process.env.NEO_URL, neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true});
+const driver = neo4j.driver(process.env.NEO_URL, neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true}); //WARNING: POSSIBLE NUMBER DATA LOSS!!!
 
 const neo4jIntsToStrings = (json) => {
     if(!json) return void 0;

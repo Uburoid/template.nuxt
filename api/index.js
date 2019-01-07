@@ -6,6 +6,20 @@
     const { schema: Schema, normalize } = require('normalizr');
     let found;
 
+    let role = await models.Role.find({
+        name: 'Пользователь'
+    });
+
+    found = await models.Member.find({
+        role: true
+    });
+    /* for(let m of found) {
+        m.role = role
+        m = await models.Account.save(m);    
+    } */
+
+    console.log(found);
+    return
     //found = await models.RootMember.find();
     found = await models.Member.find({
         referals: {

@@ -63,11 +63,11 @@ const JWT = ({ getKeys, key_property = '_id' } = {}) => {
         return pair;
     }; */
 
-    let cache_function = async (key) => {
+    let cache_function = async (key, payload) => {
         
         let pair = cache.get(key);
 
-        !pair && getKeys && (pair = await getKeys(key));
+        !pair && getKeys && (pair = await getKeys(key, payload));
         
         if(!pair) throw new Error('Keys pair not provided.');
         
@@ -79,22 +79,26 @@ const JWT = ({ getKeys, key_property = '_id' } = {}) => {
         return pair;
     }
     
-    const sign = async ({ payload }) => {
+    const sign = async (payload, options = {}) => {
+        
+        options = { expiresIn: process.env.TOKEN_EXPIRATION_TIME || '10s', ...options, algorithm: 'RS256'};
+
+        if(!options.expiresIn) delete options.expiresIn;
         
         let cache_key = key_property ? payload[key_property] : '$';
 
-        let { private_key } = await cache_function(cache_key);
+        let { private_key } = await cache_function(cache_key, payload);
 
-        return jsonwebtoken.sign(payload, private_key, { algorithm: 'RS256', expiresIn: process.env.TOKEN_EXPIRATION_TIME || '10s' });
+        return jsonwebtoken.sign(payload, private_key, options);
     }
 
-    const verify = async ({ token }) => {
+    const verify = async (token) => {
         let payload = jsonwebtoken.decode(token) || {};
 
         try {
             let cache_key = key_property ? payload[key_property] : '$';
 
-            let { public_key } = await cache_function(cache_key);
+            let { public_key } = await cache_function(cache_key, payload);
 
             jsonwebtoken.verify(token, public_key);
         }
@@ -105,11 +109,11 @@ const JWT = ({ getKeys, key_property = '_id' } = {}) => {
         return payload;
     }
 
-    const refresh = async ({ payload }) => {
+    const refresh = async (payload, options) => {
         delete payload.iat;
         delete payload.exp;
 
-        return await sign({ payload });
+        return await sign(payload, options);
     }
 
     const revoke = () => {

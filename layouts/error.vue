@@ -3,7 +3,7 @@
       v-model="dialog"
       width="500"
     > -->
-    <v-card>
+    <v-card full-width fill-height>
         <v-card-title class="headline">Something went wrong...</v-card-title>
 
         <v-card-text>
@@ -98,7 +98,7 @@ export default {
     methods: {
         close() {
             this.dialog = false;
-            this.$nuxt.nuxt.err = void 0;
+            //this.$nuxt.nuxt.err = void 0;
             this.$router.push('/');
         },
         reload() {
@@ -118,7 +118,7 @@ export default {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    font-family: sans-serif;
+    /* font-family: sans-serif; */
     font-weight: 100 !important;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;

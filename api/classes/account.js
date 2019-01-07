@@ -3,7 +3,7 @@ const { API } = require('./base');
 const FormData = require('form-data');
 const { JWT } = require('../jwt');
 
-const { Member, Anonymous, Browser, Email, List, RootMember } = require('../models');
+const { Member, Anonymous, Role, Browser, Email, List, RootMember } = require('../models');
 
 class Account extends API {
     constructor(...args) {
@@ -17,13 +17,14 @@ class Account extends API {
             email: {
                 address: email,
             },
+            role: true,
             wallet: true
         });
 
         let auth = found && await bcrypt.compare(`${email}:${password}`, found.hash);
 
         if(auth) {
-            this.payload = found;
+            this.payload = { ...found, shadow_id: this.payload.shadow_id || this.payload._id, access_level: found.role.level };
             return found;
         }
         else {
@@ -38,7 +39,22 @@ class Account extends API {
     }
 
     async signout() {
+        debugger
+
+        //let shadow = void 0;
+        let shadow = await Anonymous.findOne({
+            _id: this.payload.shadow_id,
+            role: true
+        });
+
+        if(!shadow) {
+            shadow = await Account.shadow();
+        }
+
+        shadow = { ...shadow, access_level: shadow.role.level };
+        this.payload = shadow;
         
+        return shadow;
     }
 
     async signup() {
@@ -46,22 +62,30 @@ class Account extends API {
     }
 
     static async shadow() {
-        
-        //let account = new Anonymous();
-        //let browser = new Browser();
 
-        let account = await Anonymous.save({
-            name: 'shadow'
+        let role = await Role.findOne({
+            name: 'Аноним'
         });
 
+        !role && (role = await Role.save({
+            name: 'Аноним'
+        }));
+        
+        let account = await Anonymous.save({
+            name: 'shadow',
+            role
+        });
+
+        account = { ...account, access_level: account.role.level };
+        
         return account;
     }
 
-    static async getKeys(_id) {
-        
+    static async getKeys(_id, payload) {
+        //debugger
         const { loadDefaultKeyPair } = require('../jwt');
 
-        let member = await Member.findOne({
+        let member = payload.class !== 'Anonymous' && await Member.findOne({
             _id,
             wallet: true
         });

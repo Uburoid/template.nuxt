@@ -43,9 +43,9 @@ body ::-webkit-scrollbar-track {
     filter: drop-shadow(2px 2px 2px #ccc);
 }
 
-/**:not(i) {*/
-/*font-family: 'Roboto Condensed'!important;*/
-/*}*/
+*:not(i) {
+    font-family: 'Roboto Condensed'!important;
+}
 
 .fas {
     font-family: "Font Awesome 5 Free"!important;

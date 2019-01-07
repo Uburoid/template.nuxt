@@ -14,6 +14,7 @@ const Types = Object.entries(classes).reduce((memo, item) => {
 }, {});
 
 function hasMethod(obj, name) {
+    //const desc = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), name);
     const desc = Object.getOwnPropertyDescriptor(obj, name);
  
     return !!desc && typeof desc.value === 'function';
@@ -21,18 +22,22 @@ function hasMethod(obj, name) {
 
 function getClassMethodNames(Class, stop = Object.prototype) {
     let array = [];
+    //let proto = new Class({});
     let proto = Class.prototype;
 
     while (proto && proto !== stop) {
-        Object.getOwnPropertyNames (proto).forEach (name => { //TODO: check access level in class proxy (need token to exists)
+        Object.getOwnPropertyNames(proto).forEach(name => { //TODO: check access level in class proxy (need token to exists)
             if (name !== 'constructor' && !['_', '$'].includes(name.slice(0, 1))) {
                 if (hasMethod(proto, name)) {
-                    array.push (name);
+                    !array.includes(name) && array.push(name);
                 }
             }
         });
 
         proto = Object.getPrototypeOf(proto);
+        /* proto = Object.getPrototypeOf(proto).__proto__;
+
+        proto && (proto = new proto.constructor({})); */
     }
 
     return array;

@@ -1,5 +1,5 @@
 
-const { Base, API } = require('./base');
+const { API, SecuredAPI } = require('./base');
 const FormData = require('form-data');
 
 class Test extends API {
@@ -7,32 +7,27 @@ class Test extends API {
         super(...args);
     }
 
-    async $security(methodName, ...args) {
-        
-        if('get' === methodName) {
-            return true
-        }
-        else {
-            return await super.$security(methodName, ...args);
-        }
-    }
 
     get() {
-        return { status: 'ok0' };
+        return { status: 'Test' };
     }
 }
 
-class Analytics extends Base {
+class Analytics extends SecuredAPI {
     constructor(...args) {
         super(...args);
     }
 
     get() {
-        return 'get'
+        return 'Analytics - get'
+    }
+
+    set() {
+        return 'Analytics - set'
     }
 }
 
-class Member extends Base {
+class Member extends SecuredAPI {
     constructor(...args) {
         super(...args);
     }

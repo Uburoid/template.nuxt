@@ -26,18 +26,6 @@ class metrics2account extends Relation {
     }
 }
 
-class metrics2metrics extends Relation {
-
-    static get schema() {
-        return {
-            ...super.schema,
-            $start: Metrics,
-            $type: 'связан с',
-            $end: Metrics
-        }
-    }
-}
-
 class IP extends Metrics {
     static get schema() {
         return {
@@ -88,8 +76,32 @@ class Device extends Metrics {
             $labels: ['Метрика', 'Устройство'],
             type: String,
             vendor: device2vendor,
-            os: [metrics2metrics],
-            browser: [metrics2metrics]
+            os: [device2os],
+            browser: [device2browser]
+        }
+    }
+}
+
+class device2os extends Relation {
+
+    static get schema() {
+        return {
+            ...super.schema,
+            $start: Metrics,
+            $type: 'связан с',
+            $end: OS
+        }
+    }
+}
+
+class device2browser extends Relation {
+
+    static get schema() {
+        return {
+            ...super.schema,
+            $start: Metrics,
+            $type: 'связан с',
+            $end: Browser
         }
     }
 }

@@ -43,9 +43,9 @@ class Metrics {
         return ip; */
     }
 
-    static async save(req, methodName, account) {
+    static async save(req, method_name, account) {
         
-
+        //debugger
         let ua = uaParser(req.headers['user-agent']);
 
         
@@ -73,6 +73,11 @@ class Metrics {
                 vendor: 'Vendor'
             }
         }
+
+        /* debugger;
+        let account1 = await Account.findOne({
+            _id: ''
+        }); */
 
         device = await Device.save({ 
             _id: device.model,
@@ -115,7 +120,7 @@ class Metrics {
 
         }) */
         
-        console.log(ua);
+        //console.log(ua);
         return ua;
     }
 }

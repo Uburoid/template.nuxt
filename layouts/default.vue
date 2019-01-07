@@ -54,7 +54,7 @@
     </v-toolbar>
 
     <v-content>
-        <v-container>
+        <v-container fill-height>
             <nuxt keep-alive/>
         </v-container>
     </v-content>
