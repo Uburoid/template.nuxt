@@ -97,6 +97,13 @@
                 },
                 {
                     access: 100,
+                    title: 'Help',
+                    icon: 'far fa-question-circle',
+                    to: '/help',
+                    click: () => ({})
+                },
+                {
+                    access: 100,
                     title: 'Sign out',
                     icon: 'fa-sign-out-alt',
                     to: '/signout',

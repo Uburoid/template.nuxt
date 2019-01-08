@@ -1,7 +1,7 @@
 <template>
     <div>
         <no-ssr>
-            <vue-json-pretty :data="$store.state.account"/>
+            <vue-json-pretty :data="$isServer ? {} : $server.help()"/>
         </no-ssr>
     </div>
 </template>
@@ -19,6 +19,8 @@ export default {
     },
     data: () => ({
     }),
+    computed: {
+    },
     methods: {
     }
 }
