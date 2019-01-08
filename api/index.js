@@ -338,6 +338,13 @@ router.all('/_server_', async (req, res) => {
     res.end(code);
 });
 
+router.all('/rebuild', async (req, res) => {
+    console.log('rebuild hook');
+    console.log(`HOOK DETAILS: ${JSON.stringify(req.body)}`);
+
+    res.send(200);
+});
+
 let patterns = ['/:type\.:action', '/:type'];
 
 router.all(patterns, multipartDetector, async (req, res, next) => {
