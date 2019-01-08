@@ -12,6 +12,5 @@ export default async ({ app, store, route, redirect, req, res }) => {
     //await app.$server.account.changePassword({ }, { cache: true });
     store.commit('SET_TITLE', route.path);
     //store.commit('SET_TITLE', JSON.stringify(account) + '-' + analytics);
-    //store.commit('SET_TITLE', analytics);
-    //console.log(test);
+
 }
