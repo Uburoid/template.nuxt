@@ -340,9 +340,9 @@ router.all('/_server_', async (req, res) => {
 
 router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
-    console.log(`HOOK DETAILS: ${JSON.stringify(req.body)}`);
+    console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
-    res.send(200);
+    res.sendStatus(200);
 });
 
 let patterns = ['/:type\.:action', '/:type'];
