@@ -319,6 +319,8 @@ let multipartDetector = function(req, res, next) {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 const path = require('path');
+const childProcess = require('child_process');
+
 const { Types, code } = require('./classes');
 const { loadDefaultKeyPair } = require('./jwt');
 
