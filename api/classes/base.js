@@ -42,15 +42,17 @@ class Base {
 
                             if(!allow) 
                                 throw new Error(`Access to ${self.constructor.name}.${propKey}() denied.`);
-                            debugger
+                            //debugger
                             let response = await origMethod.apply(target, args);
 
                             await self.$afterAction(propKey, response, ...args);
 
                             return response;
                         }
-                        catch(err) {                            
+                        catch(err) {
+                            //debugger             
                             err = self.$onError(propKey, err, ...args);
+                            console.log(`ERROR: ${JSON.stringify(err, null, 2)}`);
 
                             if(error) {
                                 err.redirect ? redirect(err.redirect) : error({ ...err });
@@ -147,10 +149,11 @@ class API extends Base {
 
     async $refreshToken() {
         //debugger
-        let { _id, name, shadow_id, access_level } = this.payload;
+        let { _id, name, shadow_id, access_level, picture } = this.payload;
+        let payload = { _id, name, shadow_id, access_level, picture, class: this.payload.class };
         
         if(!this.payload.err) {
-            this.token = await this.jwt.refresh({ _id, name, shadow_id, access_level, class: this.payload.class }, { expiresIn: this.payload.class === 'Anonymous' ? 0 : '10s'});
+            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
         }
         
         this.res.cookie('$token', this.token, { httpOnly: true });
@@ -195,8 +198,8 @@ class SecuredAPI extends API {
             if(!this.payload) throw new Error('Payload not defined.');
 
             if(this.payload.err) throw this.payload.err;
-            
-            debugger
+
+            //debugger
             allow = ACL(acl, method_name, this, args);
             allow = allow === 'allow';
         }
@@ -236,7 +239,7 @@ const ACL = (acl, method_name, instance, args) => {
     const deny = () => 'deny';
 
     let [resource] = args;
-    debugger
+    //debugger
     const action = acl.reduce((action, rule) => {
         let class_name = instance.constructor.name.toLowerCase();
         let access_level = instance.payload.access_level;

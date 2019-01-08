@@ -23,6 +23,9 @@ export default (context, inject) => {
 
     let onRequest = (config => {
         process.browser ? console.log(`browser API call: ${config.url}`) : console.log(`server API call: ${config.url}`);
+        //console.log(`current route: ${context.route.path}`);
+                
+        config.from = context.route.path;
 
         start();
         
@@ -32,6 +35,8 @@ export default (context, inject) => {
     let onResponse = (async response => {
         stop();
 
+        context.store.state.network_error.from === response.config.from && context.store.commit('SET_NETWORK_ERROR', {});
+
         return response;
     });
 
@@ -39,8 +44,10 @@ export default (context, inject) => {
         
         //error.response && context.error({ statusCode: error.response.status, message: error.response.data });
         //console.error(error);
-
+        //debugger
         stop(true);
+        
+        error && context.store.commit('SET_NETWORK_ERROR', { from: error.config.from, context: error.response.data });
         
         throw error.response.data;
     });

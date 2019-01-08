@@ -16,7 +16,7 @@
         <v-menu offset-x offset-y>
             <v-btn fab flat small slot="activator">
                 <v-avatar size="36">
-                    <img :alt="profile.name" :src="profile.photo">
+                    <img :alt="profile.name" :src="profile.avatar">
                 </v-avatar>
             </v-btn>
 
@@ -24,7 +24,7 @@
                 <v-list-tile class="ma-2">
                 
                     <v-list-tile-avatar size="36">
-                        <img :src="profile.photo">
+                        <img :src="profile.avatar">
                     </v-list-tile-avatar>
                     
                     <v-list-tile-content>
@@ -54,9 +54,9 @@
     </v-toolbar>
 
     <v-content>
-        <v-container fill-height>
+        
             <nuxt keep-alive/>
-        </v-container>
+        
     </v-content>
 
     
@@ -134,6 +134,11 @@
                 profile: state => state.account.user.profile,
                 ...map_state
             })
+        },
+        methods: {
+            async avatar() {
+                return await this.$server.account.avatar();
+            }
         }
     }
 </script>

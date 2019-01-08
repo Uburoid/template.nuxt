@@ -10,7 +10,7 @@
 export default {
     
     mounted() {
-        console.log(document.cookie);
+        //console.log(document.cookie);
     }
 }
 </script>

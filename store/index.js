@@ -1,8 +1,9 @@
 export const state = () => ({
+    network_error: {},
     account: {
         user: {
             profile: {
-                photo: '/default_user.png',
+                avatar: '/api/account.avatar',
                 name: 'Anonymous'
             },
             email: 'anonymous@example.com'
@@ -13,6 +14,14 @@ export const state = () => ({
 });
 
 export const mutations = {
+    SET_NETWORK_ERROR(state, error) {
+        state.network_error = error;
+    },
+
+    SET_ACCOUNT(state, account) {
+        state.account = account;
+    },
+
     SET_TITLE(state, title) {
         state.title = title;
     }
@@ -31,7 +40,7 @@ export const actions = {
 
         //let user = !req.headers.cookie && await this.$server.account.shadow();
 
-        console.log(req)
+        //console.log(req)
     }
 };
 

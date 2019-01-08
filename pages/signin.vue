@@ -16,7 +16,7 @@ export default {
         'signin-dialog': () => import('@/components/modals/signin')
     },
     asyncData(ctx) {
-        debugger
+        //debugger
             
     },
     data: () => ({
@@ -25,13 +25,16 @@ export default {
     methods: {
         async submit() {
             debugger
-            let member = await this.$server.account.signin({ email: 'mychrome51@gmail.com', password: '123' }, { cache: false });
-            this.$store.commit('SET_TITLE', member.name || member.error);
+            let account = await this.$server.account.signin({ email: 'mychrome51@gmail.com', password: '123' }, { cache: false });
+            this.$store.commit('SET_ACCOUNT', account);
+            console.log(this.$store.state.network_error);
+            this.$router.push(this.$store.state.network_error.from || '/');
+            
         },
         async signout() {
             debugger
-            let member = await this.$server.account.signout({}, { cache: false });
-            this.$store.commit('SET_TITLE', member.name || member.error);
+            let account = await this.$server.account.signout({}, { cache: false });
+            this.$store.commit('SET_ACCOUNT', account);
         }
     }
 }

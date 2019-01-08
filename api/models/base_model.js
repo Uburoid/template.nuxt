@@ -541,7 +541,7 @@ class BaseModel {
                 return memo;
             }, {});
 
-            console.log(start_params);
+            //console.log(start_params);
 
             return this.schema.$start.find(start_params, options);
         }
