@@ -10,7 +10,8 @@ export default async ({ app, store, route, redirect, req, res }) => {
     //let member = await app.$server.account.signin({ email: 'mychrome51@gmail.com', password: '123' }, { cache: false });
     //debugger
     //await app.$server.account.changePassword({ }, { cache: true });
-    store.commit('SET_TITLE', JSON.stringify(account) + '-' + analytics);
+    store.commit('SET_TITLE', route.path);
+    //store.commit('SET_TITLE', JSON.stringify(account) + '-' + analytics);
     //store.commit('SET_TITLE', analytics);
     //console.log(test);
 }
