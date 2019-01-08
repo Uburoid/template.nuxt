@@ -318,7 +318,7 @@ let multipartDetector = function(req, res, next) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
+const path = require('path');
 const { Types, code } = require('./classes');
 const { loadDefaultKeyPair } = require('./jwt');
 
@@ -342,7 +342,15 @@ router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
     console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
-    res.sendStatus(200);
+    let cmd = path.join(process.cwd(), 'deploy.sh');
+
+    childProcess.exec(cmd, function(err, stdout, stderr){
+        if (err) {
+            console.error(`ERROR ON GIT HOOK: ${err}`);
+            return res.send(500);
+        }
+        res.send(200);
+    });
 });
 
 let patterns = ['/:type\.:action', '/:type'];
