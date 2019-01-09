@@ -10,6 +10,9 @@
 //import VueJsonPretty from 'vue-json-pretty'
 
 export default {
+    head: {
+        title: '$server help'
+    },
     components: {
         VueJsonPretty: () => import('vue-json-pretty')
     },
