@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" width="280" height="280" viewBox="0 0 280 280">
+<style type="text/css">
+	.st0{clip-path:url(#XMLID_4_);fill:#236EB1;}
+	.st1{clip-path:url(#XMLID_4_);fill:#f00;}
+	.st2{clip-path:url(#XMLID_4_);fill:#fff;}
+	.st3{fill:#fff;}
+</style>
+<g>
+	<g>
+		<defs>
+			<polygon id="XMLID_11_" points="138.9,12 171,110.9 275,110.9 190.8,172 223,270.9 138.9,209.8 54.8,270.9 86.9,172 2.8,110.9 
+				106.7,110.9 			"/>
+		</defs>
+		<clipPath id="XMLID_3_">
+			<use xlink:href="#XMLID_11_"  style="overflow:visible;"/>
+		</clipPath>
+	</g>
+	<g>
+		<defs>
+			<polygon id="XMLID_10_" points="138.9,12 171,110.9 275,110.9 190.8,172 223,270.9 138.9,209.8 54.8,270.9 86.9,172 2.8,110.9 
+				106.7,110.9 			"/>
+		</defs>
+		<clipPath id="XMLID_4_">
+			<use xlink:href="#XMLID_10_"  style="overflow:visible;"/>
+		</clipPath>
+		<rect x="-11.3" y="154" class="st0" width="300.4" height="121.2"/>
+		<rect x="-11.3" y="7.1" class="st1" width="300.4" height="122.5"/>
+		<rect x="-11.3" y="129.6" class="st2" width="300.4" height="24.4"/>
+	</g>
+	<g>
+		<defs>
+			<polygon id="XMLID_8_" points="138.9,12 171,110.9 275,110.9 190.8,172 223,270.9 138.9,209.8 54.8,270.9 86.9,172 2.8,110.9 
+				106.7,110.9 			"/>
+		</defs>
+		<clipPath id="XMLID_5_">
+			<use xlink:href="#XMLID_8_"  style="overflow:visible;"/>
+		</clipPath>
+	</g>
+</g>
+<polygon class="st3" points="138.9,79.5 97.7,213.9 138.9,181.8 180,213.9 "/>
+</svg>

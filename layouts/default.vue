@@ -4,7 +4,8 @@
     
     <v-toolbar fixed app clipped-left clipped-right flat>
         <nuxt-link to="" @click.native="drawer = !drawer">
-            <img class="top-toolbar-logo" src="~assets/2956ab668f2b82c.jpg" height="54">
+            <!-- <img class="top-toolbar-logo" src="~assets/2956ab668f2b82c.jpg" height="54"> -->
+            <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
         </nuxt-link>
 
         <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
