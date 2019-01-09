@@ -1,10 +1,12 @@
 const account = require('./account');
 const project = require('./project');
+const ui = require('./UI');
 
 let classes = {
     //...base,
     ...account,
-    ...project
+    ...project,
+    ...ui
 }
 
 const Types = Object.entries(classes).reduce((memo, item) => {

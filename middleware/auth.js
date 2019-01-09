@@ -1,6 +1,7 @@
 export default async ({ app, store, route, redirect, req, res }) => {
     //debugger
-    store.commit('SET_TITLE', route.path);
+    let title = await app.$server.ui.pageData({ path: route.path }, { cache: true });
+    store.commit('SET_TITLE', title);
     
     let test = await app.$server.test.get(void 0, { cache: false });
     let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false });

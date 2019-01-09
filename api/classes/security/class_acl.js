@@ -22,6 +22,17 @@ const acl = [
         action: (instance, resource) => {
             return instance.payload._id === resource.owner_id ? 'allow' : 'deny'
         }
+    },
+    {
+        class: 'UI',
+        methods: 'pageData',
+        access_level: 0,
+        action: (instance, resource) => {
+            //debugger
+            let { path } = resource;
+
+            return path !== '/inspire' ? 'allow' : 'deny'
+        }
     }
 ];
 
