@@ -153,7 +153,7 @@ class API extends Base {
         let { _id, name, shadow_id, access_level, picture } = this.payload;
         let payload = { _id, name, shadow_id, access_level, picture, class: this.payload.class };
         
-        if(!this.payload.err) {
+        if(!this.payload.token_err) {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
         }
         
@@ -200,7 +200,7 @@ class SecuredAPI extends API {
         if(allow) {
             if(!this.payload) throw new Error('Payload not defined.');
 
-            if(this.payload.err) throw this.payload.err;
+            if(this.payload.token_err) throw this.payload.token_err;
 
             //debugger
             allow = ACL(class_acl, method_name, this, args);

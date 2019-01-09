@@ -26,12 +26,12 @@ const acl = [
     {
         class: 'UI',
         methods: 'pageData',
-        access_level: 0,
         action: (instance, resource) => {
+            let { access_level } = instance.payload;
             //debugger
             let { path } = resource;
 
-            return path !== '/inspire' ? 'allow' : 'deny'
+            return access_level === 0 ? path !== '/inspire' ? 'allow' : 'deny' : 'allow';
         }
     }
 ];

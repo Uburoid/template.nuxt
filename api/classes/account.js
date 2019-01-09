@@ -113,7 +113,7 @@ class Account extends API {
     }
 
     async signout() {
-        debugger
+        //debugger
 
         //let shadow = void 0;
         let shadow = await Anonymous.findOne({

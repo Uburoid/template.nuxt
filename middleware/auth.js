@@ -1,6 +1,8 @@
 export default async ({ app, store, route, redirect, req, res }) => {
     //debugger
-    let title = await app.$server.ui.pageData({ path: route.path }, { cache: true });
+    let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
+    title.error && (title = 'Ошибка');
+    
     store.commit('SET_TITLE', title);
     
     let test = await app.$server.test.get(void 0, { cache: false });

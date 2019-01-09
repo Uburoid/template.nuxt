@@ -5,7 +5,6 @@
 
         <v-btn @click="show = true"/>
         <v-btn @click="submit">ENTER</v-btn>
-        <v-btn @click="signout">EXIT</v-btn>
     </div>
 </template>
 
@@ -31,11 +30,6 @@ export default {
             this.$router.push(this.$store.state.network_error.from || '/');
             
         },
-        async signout() {
-            debugger
-            let account = await this.$server.account.signout({}, { cache: false });
-            this.$store.commit('SET_ACCOUNT', account);
-        }
     }
 }
 </script>

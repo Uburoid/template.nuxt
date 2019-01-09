@@ -103,7 +103,7 @@ const JWT = ({ getKeys, key_property = '_id' } = {}) => {
             jsonwebtoken.verify(token, public_key);
         }
         catch(err) {
-            payload.err = err;
+            payload.token_err = err;
         };
 
         return payload;
