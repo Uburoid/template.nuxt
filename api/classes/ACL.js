@@ -9,7 +9,6 @@ const ACL = (acl, method_name, instance, args) => {
 
         let use = (rule.class === '*' || rule.class.toLowerCase() === class_name)
             && (Array.isArray(rule.methods) ? rule.methods.includes(method_name) : rule.methods === '*' || rule.methods === method_name);
-            //&& (rule.access_level === 0 || access_level >= rule.access_level);
 
         use && (action = (!rule.access_level || access_level >= rule.access_level) ? rule.action : deny);
 

@@ -3,7 +3,7 @@
       v-model="dialog"
       width="500"
     > -->
-    <v-card full-width fill-height>
+    <v-card v-show="$store.state.show_error" full-width fill-height>
         <v-card-title class="headline">Something went wrong...</v-card-title>
 
         <v-card-text>
@@ -59,7 +59,7 @@
 
 <script>
 export default {
-    //layout: 'clean',
+    layout: 'dialog',
     loading: false,
     props: {
         error: {
@@ -98,6 +98,7 @@ export default {
     methods: {
         close() {
             this.dialog = false;
+            this.$store.commit('SET_SHOW_ERROR', false);
             //this.$nuxt.nuxt.err = void 0;
             this.$router.push('/');
         },

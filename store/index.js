@@ -1,5 +1,6 @@
 export const state = () => ({
     network_error: {},
+    show_error: false,
     account: {
         user: {
             profile: {
@@ -14,6 +15,10 @@ export const state = () => ({
 });
 
 export const mutations = {
+    SET_SHOW_ERROR(state, show_error) {
+        state.show_error = show_error;
+    },
+
     SET_NETWORK_ERROR(state, error) {
         state.network_error = error;
     },

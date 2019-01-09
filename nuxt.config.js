@@ -90,6 +90,13 @@ module.exports = {
     ],
 
     router: {
-        middleware: ['auth']
-    }
+        middleware: ['on-page'],
+        extendRoutes (routes, resolve) {
+            routes.push({
+                name: 'custom',
+                path: '*',
+                component: resolve(__dirname, 'pages/404.vue')
+            });
+        }
+      }
 }
