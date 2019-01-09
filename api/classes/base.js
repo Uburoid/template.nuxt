@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const { JWT } = require('../jwt');
 const LRU = require('lru-cache');
 const { Metrics } = require('./metrics');
+const { ACL } = require('./ACL');
 
 const cache = new LRU({
     maxAge: 86400000 //сутки
@@ -174,6 +175,8 @@ class API extends Base {
 
 }
 
+const class_acl = require('./security/class_acl');
+
 class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
@@ -200,60 +203,12 @@ class SecuredAPI extends API {
             if(this.payload.err) throw this.payload.err;
 
             //debugger
-            allow = ACL(acl, method_name, this, args);
+            allow = ACL(class_acl, method_name, this, args);
             allow = allow === 'allow';
         }
         
         return allow;
     }
-}
-
-const acl = [
-    {
-        class: '*',
-        methods: '*',
-        access_level: 0,
-        action: (instance, resource) => {
-            return 'allow';
-        }
-    },
-    {
-        class: '*',
-        methods: 'set',
-        access_level: 101,
-        action: (instance, resource) => {
-            return 'allow';
-        }
-    },
-    {
-        class: '*',
-        methods: 'set',
-        access_level: 100,
-        action: (instance, resource) => {
-            return instance.payload._id === resource.owner_id ? 'allow' : 'deny'
-        }
-    }
-];
-
-const ACL = (acl, method_name, instance, args) => {
-    const deny = () => 'deny';
-
-    let [resource] = args;
-    //debugger
-    const action = acl.reduce((action, rule) => {
-        let class_name = instance.constructor.name.toLowerCase();
-        let access_level = instance.payload.access_level;
-
-        let use = (rule.class === '*' || rule.class === class_name)
-            && (Array.isArray(rule.methods) ? rule.methods.includes(method_name) : rule.methods === '*' || rule.methods === method_name);
-            //&& (rule.access_level === 0 || access_level >= rule.access_level);
-
-        use && (action = (rule.access_level === 0 || access_level >= rule.access_level) ? rule.action : deny);
-
-        return action;
-    }, void 0);
-
-    return action ? action(instance, resource) : 'deny';
 }
 
 module.exports = { Base, API, SecuredAPI };
