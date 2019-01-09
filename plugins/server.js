@@ -37,6 +37,7 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
             //flags && flags.auto_merge && data[flags.auto_merge] && context.store.commit('SET_ENTITIES', { data: data[flags.auto_merge] });
         }
         catch (err) {
+            throw err;
             //error({ ...err });
             err.redirect ? redirect(err.redirect) : error({ ...err });
 

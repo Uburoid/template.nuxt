@@ -128,6 +128,9 @@
             
             //title: 'Vuetify.js'
         }),
+        created() {
+            
+        },
         computed: {
             account_items() {
                 return this.items.reduce((memo, item) => {
@@ -146,6 +149,12 @@
         methods: {
             async avatar() {
                 return await this.$server.account.avatar();
+            }
+        },
+        watch: {
+            '$store.state.nuxt': function (val) {
+                debugger
+                console.log('ERROR CHANGED');
             }
         }
     }

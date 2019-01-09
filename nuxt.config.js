@@ -53,6 +53,7 @@ module.exports = {
     ** Plugins to load before mounting the App
     */
     plugins: [
+        '@/plugins/error-handler',
         '@/plugins/vuetify',
         '@/plugins/axios',
         '@/plugins/server',
@@ -66,6 +67,7 @@ module.exports = {
     ** Nuxt.js modules
     */
     modules: [
+        //'@/modules/error-handler',
         //'@nuxtjs/localtunnel'
         //'@nuxtjs/separate-env',
         //'cookie-universal-nuxt'

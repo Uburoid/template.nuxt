@@ -1,4 +1,5 @@
 export const state = () => ({
+    nuxt: void 0,
     network_error: {},
     show_error: false,
     account: {
@@ -15,6 +16,10 @@ export const state = () => ({
 });
 
 export const mutations = {
+    SET_NUXT(state, nuxt) {
+        state.nuxt = nuxt;
+    },
+
     SET_SHOW_ERROR(state, show_error) {
         state.show_error = show_error;
     },

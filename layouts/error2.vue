@@ -1,12 +1,9 @@
 <template>
-<v-dialog
-      v-model="$store.state.show_error"
+<!-- <v-dialog
+      v-model="dialog"
       width="500"
-      height="500"
-      hide-overlay
-      persistent
-    >
-    <v-card v-show="true" full-width fill-height>
+    > -->
+    <v-card v-show="$store.state.show_error" full-width fill-height>
         <v-card-title class="headline">Something went wrong...</v-card-title>
 
         <v-card-text>
@@ -42,7 +39,7 @@
         </v-flex>
     </div> -->
 
-</v-dialog>
+<!-- </v-dialog> -->
 
     <!-- <v-content>
       <v-container>
@@ -85,9 +82,6 @@ export default {
         console.log('CREATED error');
         this.dialog = true;
     },
-    mounted() {
-        this.$store.commit('SET_SHOW_ERROR', true);
-    },
     
     computed: {
         err() {
@@ -105,7 +99,7 @@ export default {
         close() {
             this.dialog = false;
             this.$store.commit('SET_SHOW_ERROR', false);
-            this.$nuxt.nuxt.err = void 0;
+            //this.$nuxt.nuxt.err = void 0;
             this.$router.push('/');
         },
         reload() {

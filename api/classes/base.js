@@ -53,6 +53,7 @@ class Base {
                         catch(err) {
                             //debugger             
                             err = self.$onError(propKey, err, ...args);
+                            throw err;
                             console.log(`ERROR: ${JSON.stringify(err, null, 2)}`);
 
                             if(error) {
