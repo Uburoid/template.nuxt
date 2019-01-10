@@ -7,7 +7,7 @@
         v-model="$store.state.error"
         width="500"
         height="500"
-        hide-overlay
+        :hide-overlay="false"
         persistent
     >
         <error/>

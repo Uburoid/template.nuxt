@@ -198,6 +198,7 @@ class SecuredAPI extends API {
             this.res.cookie('$token', '', { expires: new Date() });
             error.redirect = '/signin';
             error.component = 'error';
+            error.server_error = true;
         }
 
         return error;
@@ -209,11 +210,11 @@ class SecuredAPI extends API {
         if(allow) {
             if(!this.payload) throw new Error('Payload not defined.');
 
-            if(this.payload.token_err) throw this.payload.token_err;
-
             //debugger
             allow = ACL(class_acl, method_name, this, args);
             allow = allow === 'allow';
+
+            if(allow && this.payload.token_err) throw this.payload.token_err;
         }
         
         return allow;

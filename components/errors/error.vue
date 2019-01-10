@@ -7,7 +7,10 @@
                 <h1 v-if="err.statusCode === 404">Page not found</h1>
                 <div v-else>
                     <h1>An error occurred</h1>
-                    <h4 v-html="err"></h4>
+                    <!-- <h4 v-html="err"></h4> -->
+                    <no-ssr>
+                        <vue-json-pretty :data="err"/>
+                    </no-ssr>
                 </div>
 
             </v-card-text>
@@ -29,11 +32,14 @@ export default {
             default: null
         }
     },
+    components: {
+        VueJsonPretty: () => import('vue-json-pretty')
+    },
     data: () => ({
     }),
     watch: {
-        '$route': function () {
-            this.$store.commit('SET_ERROR', void 0);
+        '$route.path': function (val) {
+            this.$store.state.error.from !== val && this.$store.commit('SET_ERROR', void 0);
         }
     },
     created() {
