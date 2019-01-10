@@ -23,7 +23,7 @@ export default async ({ app, store, route, redirect, req, res }) => {
         throw title.error;
     } */
 
-    store.state.error && (title = 'Ошибка');
+    store.state.error && typeof(title) !== 'string' && (title = 'Ошибка');
     
     store.commit('SET_TITLE', title);
 
