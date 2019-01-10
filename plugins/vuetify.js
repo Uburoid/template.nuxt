@@ -5,10 +5,10 @@ import 'vuetify/dist/vuetify.min.css';
 
 Vue.use(Vuetify, {
     theme: {
-        primary: '#2644ac',
-        secondary: '#f6b93b',
-        accent: '#d9e3ff',
-        error: '#FF5252',
+        primary: colors.purple,
+        secondary: colors.grey.darken1,
+        accent: colors.shades.black,
+        error: colors.red.accent3,
         info: '#2196F3',
         success: '#4CAF50',
         warning: '#FFC107',

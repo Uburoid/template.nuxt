@@ -1,10 +1,10 @@
 <template>
     <div>
         <signin/>
-        <signin-dialog :show="show"/>
+        <!-- <signin-dialog :show="show"/>
 
         <v-btn @click="show = true"/>
-        <v-btn @click="submit">ENTER</v-btn>
+        <v-btn @click="submit">ENTER</v-btn> -->
     </div>
 </template>
 

@@ -27,6 +27,12 @@ export default async ({ app, store, route, redirect, req, res }) => {
     
     store.commit('SET_TITLE', title);
 
+    /* setTimeout(async () => {
+        let account = await app.$server.account.get(0, { cache: false });
+        store.commit('SET_ACCOUNT', account);
+    }, 200); */
+
     let account = await app.$server.account.get(0, { cache: false });
     store.commit('SET_ACCOUNT', account);
+    //debugger
 }

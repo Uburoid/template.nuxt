@@ -19,7 +19,8 @@ export default {
             debugger
             let account = await this.$server.account.signout({}, { cache: false });
             this.$store.commit('SET_ACCOUNT', account);
-            this.$router.replace(this.$store.state.network_error.from || '/');
+
+            this.$router.push((this.$store.state.error && this.$store.state.error.from) || '/');
         }
     }
 }

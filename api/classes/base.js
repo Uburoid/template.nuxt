@@ -107,8 +107,8 @@ class Base {
             server_error: true
         };
 
-        debugger
-        this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
+        //debugger
+        //this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
 
         return error;
     }
@@ -204,7 +204,7 @@ class SecuredAPI extends API {
             error.redirect = '/signin';
             error.component = 'error';
         }
-
+        //debugger
         return error;
     }
 
