@@ -101,7 +101,8 @@ class Base {
             statusCode: err.httpStatusCode || err.code || 400,
             message: err.message,
             name: err.name,
-            stack: err.stack
+            stack: err.stack,
+            component: 'error-dialog'
         };
 
         return error;
@@ -196,6 +197,7 @@ class SecuredAPI extends API {
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
             error.redirect = '/signin';
+            error.component = 'error';
         }
 
         return error;

@@ -3,8 +3,6 @@ export default async ({ app, store, route, redirect, req, res }) => {
 
     /* let test = await app.$server.test.get(void 0, { cache: false });
     let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false }); */
-    let account = await app.$server.account.get(0, { cache: false });
-    store.commit('SET_ACCOUNT', account);
     //analytics = await app.$server.analytics.set({ owner_id: '2874' }, { cache: false });
     //let hlp = await app.$server.$help();
     //console.log(hlp);
@@ -13,7 +11,12 @@ export default async ({ app, store, route, redirect, req, res }) => {
     //await app.$server.account.changePassword({ }, { cache: true });
     
     //store.commit('SET_TITLE', JSON.stringify(account) + '-' + analytics);
-    store.commit('SET_ERROR', void 0);
+    
+    /* setTimeout(() => {
+        store.commit('SET_ERROR', void 0);
+    }, 500); */
+    
+    //store.commit('SET_ERROR', void 0);
 
     let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
     /* if(title.error) {
@@ -23,5 +26,7 @@ export default async ({ app, store, route, redirect, req, res }) => {
     store.state.error && (title = 'Ошибка');
     
     store.commit('SET_TITLE', title);
-    
+
+    let account = await app.$server.account.get(0, { cache: false });
+    store.commit('SET_ACCOUNT', account);
 }

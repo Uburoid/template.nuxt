@@ -26,9 +26,8 @@ export default {
             debugger
             let account = await this.$server.account.signin({ email: 'mychrome51@gmail.com', password: '123' }, { cache: false });
             this.$store.commit('SET_ACCOUNT', account);
-            console.log(this.$store.state.network_error);
-            this.$router.push(this.$store.state.network_error.from || '/');
-            
+
+            this.$router.push(this.$store.state.error && this.$store.state.error.from || '/');
         },
     }
 }

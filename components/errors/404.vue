@@ -1,10 +1,15 @@
 <template>
+    <!-- <div>
+        {{ $store.state.error }}
+    </div> -->
+
+    
         <v-card v-show="true" full-width fill-height>
             <v-card-title class="headline">Something went wrong...</v-card-title>
 
             <v-card-text>
                 
-                <h1 v-if="err.statusCode === 404">Page not found</h1>
+                <h1 v-if="err.status === 404">Page not found</h1>
                 <div v-else>
                     <h1>An error occurred</h1>
                     <h4 v-html="err"></h4>
@@ -19,6 +24,7 @@
                 <!-- <v-btn flat @click="close">Close</v-btn> -->
             </v-card-actions>
         </v-card>
+
 </template>
 
 
@@ -32,15 +38,14 @@ export default {
     data: () => ({
     }),
     watch: {
-        '$route': function () {
-            this.$store.commit('SET_ERROR', void 0);
-        }
+        
     },
     created() {
         console.log('CREATED error');
     },
     mounted() {
     },
+    
     computed: {
         err() {
             return this.$store.state.error;
@@ -50,12 +55,6 @@ export default {
         close() {
             //this.$nuxt.nuxt.err = void 0;
             this.$router.push('/');
-
-            /* setTimeout(() => {
-                this.$store.commit('SET_ERROR', void 0);
-            }, 500); */
-
-
         },
         /* reload() {
             this.$route.path === '/' ? this.$router.go('/') : this.$router.push('/');

@@ -9,7 +9,11 @@ export default (context, inject) => {
     const $error = (err) => {
         //debugger
         console.log(err);
+        err.component = err.component || 'error';
+        err.from = context.route.path;
+
         context.store.commit('SET_ERROR', err);
+
         if(process.browser && window.$nuxt) {
             const { $loading } = window.$nuxt.$root;
             $loading.fail && $loading.fail();

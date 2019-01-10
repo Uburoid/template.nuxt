@@ -56,7 +56,8 @@
 
     <v-content>
         <!-- {{ !$store.state.error }} -->
-        <error v-if="error"/>
+        <component v-if="error" :is="error.component"/>
+
         <div v-show="!$store.state.error">
             <nuxt keep-alive/>
         </div>
@@ -74,6 +75,7 @@
         components: {
             drawer: () => import('@/components/drawler'),
             error:  () => import('@/components/errors/error'),
+            errorDialog:  () => import('@/components/errors/error-dialog'),
         },
         asyncData() {
 
@@ -152,10 +154,7 @@
             }
         },
         watch: {
-            '$store.state.nuxt': function (val) {
-                debugger
-                console.log('ERROR CHANGED');
-            }
+            
         }
     }
 </script>
