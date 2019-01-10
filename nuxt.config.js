@@ -94,16 +94,11 @@ module.exports = {
     router: {
         middleware: ['on-page'],
         extendRoutes (routes, resolve) {
-            routes.push({
+            /* routes.push({
                 //name: 'custom',
                 path: '*',
-                component: resolve(__dirname, 'pages/404.vue'),
-                /* beforeEnter: (to, from, next) => {
-                    debugger
-                    console.log(to, from, this);
-                    next();
-                } */
-            });
+                component: resolve(__dirname, 'pages/404.vue')
+            }); */
 
             /* debugger
             routes.splice(0, 1);
