@@ -9,7 +9,7 @@ const cache = new LRU({
 });
 
 class Base {
-    constructor({ req, res, error, redirect }) {
+    constructor({ req, res, error, redirect, $error }) {
 
         this.fs = fs;
         //this.jwt = jwt;
@@ -51,9 +51,15 @@ class Base {
                             return response;
                         }
                         catch(err) {
-                            //debugger             
+                            debugger
                             err = self.$onError(propKey, err, ...args);
-                            throw err;
+                            
+                            if($error) {
+                                return $error(err);
+                            }
+                            else throw err;
+
+                            //throw err;
                             console.log(`ERROR: ${JSON.stringify(err, null, 2)}`);
 
                             if(error) {

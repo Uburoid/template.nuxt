@@ -55,8 +55,11 @@
     </v-toolbar>
 
     <v-content>
-        
+        <!-- {{ !$store.state.error }} -->
+        <error v-if="error"/>
+        <div v-show="!$store.state.error">
             <nuxt keep-alive/>
+        </div>
         
     </v-content>
 
@@ -66,18 +69,14 @@
 
 <script>
     import { mapState } from 'vuex';
-    let map_state = {
-        title: state => state.title
-    };
 
     export default {
         components: {
-            drawer: () => import('@/components/drawler')
+            drawer: () => import('@/components/drawler'),
+            error:  () => import('@/components/errors/error'),
         },
         asyncData() {
-            map_state = {
-                title: state => state.title
-            }
+
         },
         data: () => ({
             drawer: false,
@@ -143,7 +142,8 @@
                 account: state => state.account,
                 user: state => state.account.user,
                 profile: state => state.account.user.profile,
-                ...map_state
+                title: state => state.title,
+                error: state => state.error
             })
         },
         methods: {

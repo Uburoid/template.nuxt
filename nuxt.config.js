@@ -95,10 +95,37 @@ module.exports = {
         middleware: ['on-page'],
         extendRoutes (routes, resolve) {
             routes.push({
-                name: 'custom',
+                //name: 'custom',
                 path: '*',
-                component: resolve(__dirname, 'pages/404.vue')
+                component: resolve(__dirname, 'pages/404.vue'),
+                /* beforeEnter: (to, from, next) => {
+                    debugger
+                    console.log(to, from, this);
+                    next();
+                } */
             });
+
+            /* debugger
+            routes.splice(0, 1);
+            routes = routes.map(route => {
+                route.beforeEnter = (to, from, next) => {
+                    debugger
+                    console.log(to, from, this);
+                    next();
+                };
+
+                return route;
+            });
+            routes.push({
+                //name: 'custom',
+                path: '*',
+                component: resolve(__dirname, 'pages/404.vue'),
+                beforeEnter: (to, from, next) => {
+                    debugger
+                    console.log(to, from, this);
+                    next();
+                }
+            }); */
         }
-      }
+    } 
 }

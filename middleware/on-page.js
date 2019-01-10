@@ -1,14 +1,5 @@
 export default async ({ app, store, route, redirect, req, res }) => {
-    //debugger
-    let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
-    /* if(title.error) {
-        throw title.error;
-    } */
-
-    title.error && (title = 'Ошибка');
-    
-    store.commit('SET_TITLE', title);
-    
+    debugger
 
     let test = await app.$server.test.get(void 0, { cache: false });
     let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false });
@@ -22,4 +13,15 @@ export default async ({ app, store, route, redirect, req, res }) => {
     //await app.$server.account.changePassword({ }, { cache: true });
     
     //store.commit('SET_TITLE', JSON.stringify(account) + '-' + analytics);
+    store.commit('SET_ERROR', void 0);
+
+    let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
+    /* if(title.error) {
+        throw title.error;
+    } */
+
+    !title && (title = 'Ошибка');
+    
+    store.commit('SET_TITLE', title);
+    
 }

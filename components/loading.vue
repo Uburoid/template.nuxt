@@ -17,6 +17,11 @@ export default {
             abort ? this.loadingCount = 0 : this.loadingCount--;
             this.loadingCount < 0 && (this.loadingCount = 0);
         },
+        fail() {
+            debugger
+            console.log('fail');
+            this.loadingCount = 0;
+        }
     },
     computed: {
         loading() {

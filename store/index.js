@@ -2,6 +2,7 @@ export const state = () => ({
     nuxt: void 0,
     network_error: {},
     show_error: false,
+    error: void 0,
     account: {
         user: {
             profile: {
@@ -22,6 +23,10 @@ export const mutations = {
 
     SET_SHOW_ERROR(state, show_error) {
         state.show_error = show_error;
+    },
+
+    SET_ERROR(state, error) {
+        state.error = error;
     },
 
     SET_NETWORK_ERROR(state, error) {

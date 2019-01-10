@@ -35,7 +35,7 @@ export default (context, inject) => {
     let onResponse = (async response => {
         stop();
 
-        context.store.state.network_error.from === response.config.from && context.store.commit('SET_NETWORK_ERROR', {});
+        //context.store.state.network_error.from === response.config.from && context.store.commit('SET_NETWORK_ERROR', {});
 
         return response;
     });
@@ -47,7 +47,7 @@ export default (context, inject) => {
         //debugger
         stop(true);
         
-        error && context.store.commit('SET_NETWORK_ERROR', { from: error.config.from, context: error.response.data });
+        //error && context.store.commit('SET_NETWORK_ERROR', { from: error.config.from, context: error.response.data });
         
         throw error.response.data;
     });

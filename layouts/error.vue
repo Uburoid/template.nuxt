@@ -27,21 +27,6 @@
         </v-card-actions>
       </v-card>
 
-    <!-- <div class="__nuxt-error-page1">
-        <v-flex xs12 sm8 md6>
-            <h1 v-if="error.statusCode === 404">Page not found</h1>
-            
-            <div v-else>
-                <h1>An error occurred</h1>
-                <h4 v-html="err"></h4>
-            </div>
-
-            <v-btn flat tag="a" @click.native="reload">Home page</v-btn>
-            <v-btn flat @click="dialog = false">Close</v-btn>
-            
-        </v-flex>
-    </div> -->
-
 </v-dialog>
 
     <!-- <v-content>
