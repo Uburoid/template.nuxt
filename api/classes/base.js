@@ -102,7 +102,8 @@ class Base {
             message: err.message,
             name: err.name,
             stack: err.stack,
-            component: 'error-dialog'
+            component: 'error-dialog',
+            server_error: true
         };
 
         return error;
@@ -198,7 +199,6 @@ class SecuredAPI extends API {
             this.res.cookie('$token', '', { expires: new Date() });
             error.redirect = '/signin';
             error.component = 'error';
-            error.server_error = true;
         }
 
         return error;
