@@ -9,7 +9,7 @@ const cache = new LRU({
 });
 
 class Base {
-    constructor({ req, res, error, redirect, $error }) {
+    constructor({ req, res, error, redirect, $error, route }) {
 
         this.fs = fs;
         //this.jwt = jwt;
@@ -17,6 +17,7 @@ class Base {
 
         this.req = req;
         this.res = res;
+        this.route = route;
 
         let self = this;
 
@@ -105,6 +106,9 @@ class Base {
             component: 'error-dialog',
             server_error: true
         };
+
+        debugger
+        this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
 
         return error;
     }
