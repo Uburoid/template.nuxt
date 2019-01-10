@@ -10,13 +10,14 @@ export default (context, inject) => {
             err.from = context.route.path;
 
             context.store.commit('SET_ERROR', err);
-
-            if(process.browser && window.$nuxt) {
-                const { $loading } = window.$nuxt.$root;
-                $loading.fail && $loading.fail();
-            }
         }
-        return err;
+
+        if(process.browser && window.$nuxt) {
+            const { $loading } = window.$nuxt.$root;
+            $loading.fail && $loading.fail();
+        }
+
+        return context.store.state.error;
     };
 
     context.error = $error;
