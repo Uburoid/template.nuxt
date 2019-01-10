@@ -18,7 +18,7 @@ export default {
             this.loadingCount < 0 && (this.loadingCount = 0);
         },
         fail() {
-            debugger
+            //debugger
             console.log('fail');
             this.loadingCount = 0;
         }

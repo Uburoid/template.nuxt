@@ -51,7 +51,7 @@ class Base {
                             return response;
                         }
                         catch(err) {
-                            debugger
+                            //debugger
                             err = self.$onError(propKey, err, ...args);
                             
                             if($error) {

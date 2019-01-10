@@ -1,8 +1,8 @@
 export default async ({ app, store, route, redirect, req, res }) => {
-    debugger
+    //debugger
 
-    let test = await app.$server.test.get(void 0, { cache: false });
-    let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false });
+    /* let test = await app.$server.test.get(void 0, { cache: false });
+    let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false }); */
     let account = await app.$server.account.get(0, { cache: false });
     store.commit('SET_ACCOUNT', account);
     //analytics = await app.$server.analytics.set({ owner_id: '2874' }, { cache: false });

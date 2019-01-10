@@ -7,7 +7,7 @@ export default (context, inject) => {
     const errorFunction = context.error;
 
     const $error = (err) => {
-        debugger
+        //debugger
         console.log(err);
         context.store.commit('SET_ERROR', err);
         if(process.browser && window.$nuxt) {
