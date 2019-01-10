@@ -10,7 +10,10 @@ export default (context, inject) => {
         debugger
         console.log(err);
         context.store.commit('SET_ERROR', err);
-
+        if(process.browser && window.$nuxt) {
+            const { $loading } = window.$nuxt.$root;
+            $loading.fail && $loading.fail();
+        }
         //console.log(context.route.matched);
 
         //context.route.matched = context.app.router.resolve('/404').route.matched
