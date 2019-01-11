@@ -144,7 +144,7 @@ class API extends Base {
 
         if(!this.token) {
             debugger
-            if(!this.res.locals.payload) {
+            if(!(this.res.locals && this.res.locals.payload)) {
                 const { Account } = require('./account');
                 let account = await Account.shadow(...args);
 
