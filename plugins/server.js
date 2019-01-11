@@ -94,8 +94,8 @@ class LocalServer {
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>REQ:', req_l);
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l); */
 
-                    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
-                    console.log('Local Server IP:', ip);
+                    /* const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+                    console.log('Local Server IP:', ip); */
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 

@@ -143,18 +143,23 @@ class API extends Base {
         this.token = this.req.cookies['$token'];
 
         if(!this.token) {
-            const { Account } = require('./account');
-            let account = await Account.shadow(...args);
+            debugger
+            if(!this.res.locals.payload) {
+                const { Account } = require('./account');
+                let account = await Account.shadow(...args);
 
-            this.payload = account;
+                this.payload = account;
+            }
+            else this.payload = this.res.locals.payload;
         }
         else this.payload = await this.jwt.verify(this.token);
 
-        if(this.res._token_expired) {
+        if(this.res.locals.token_expired) {
             const { Account } = require('./account');
             this.payload = await Account.signout(this.payload);
         }
 
+        this.res.locals.payload = this.payload;
         //if(this.payload.err) throw this.payload.err;
 
         return !!this.payload;
@@ -209,7 +214,7 @@ class SecuredAPI extends API {
 
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
-            this.res._token_expired = true;
+            this.res.locals.token_expired = true;
 
             error.redirect = '/signin';
             error.component = 'error';
