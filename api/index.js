@@ -250,6 +250,9 @@ router.use(express.json());
 router.use(cookieParser());
 
 router.use((req, res, next) => {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+    console.log('Express Server IP:', ip);
+
     Object.setPrototypeOf(req, app.request);
     Object.setPrototypeOf(res, app.response);
 
@@ -360,8 +363,6 @@ router.all('/rebuild', async (req, res) => {
 let patterns = ['/:type\.:action', '/:type'];
 
 router.all(patterns, multipartDetector, async (req, res, next) => {
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
-    console.log('Express Server IP:', ip);
 
     let { type, action = 'get' } = req.params;
 
