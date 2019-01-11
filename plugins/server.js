@@ -55,6 +55,7 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
 
 class LocalServer {
     constructor({ context, Types }) {
+        
 
         Object.entries(Types).reduce((memo, entry) => {
             let [key, value] = entry;
@@ -64,6 +65,9 @@ class LocalServer {
                     const Type = Types[key];
 
                     let { req, res } = context;    
+                    
+                    const ip = req.connection.remoteAddress || req.socket.remoteAddress;
+                    console.log('IP:', ip);
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
