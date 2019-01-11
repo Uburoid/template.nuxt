@@ -159,7 +159,7 @@ class API extends Base {
             this.payload = await Account.signout(this.payload);
         }
 
-        this.res.locals.payload = this.payload;
+        this.res.locals && (this.res.locals.payload = this.payload);
         //if(this.payload.err) throw this.payload.err;
 
         return !!this.payload;
