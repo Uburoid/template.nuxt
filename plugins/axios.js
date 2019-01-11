@@ -36,6 +36,11 @@ export default (context, inject) => {
         stop();
 
         //context.store.state.network_error.from === response.config.from && context.store.commit('SET_NETWORK_ERROR', {});
+        /* if(response.data.error) {
+            stop(true);
+            //throw response.data.error;
+            response.data = { ...context.$error(response.data.error) };
+        } */
 
         return response;
     });

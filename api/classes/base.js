@@ -52,13 +52,14 @@ class Base {
                             return response;
                         }
                         catch(err) {
-                            //debugger
+                            debugger
                             err = self.$onError(propKey, err, ...args);
                             
                             if($error) {
                                 return $error(err);
                             }
                             else throw err;
+                        
 
                             //throw err;
                             console.log(`ERROR: ${JSON.stringify(err, null, 2)}`);
