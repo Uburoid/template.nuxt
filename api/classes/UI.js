@@ -7,12 +7,12 @@ class UI extends SecuredAPI {
     }
 
     pageData({ path }) {
-        debugger
+        //debugger
         //console.log('REQUEST:', this.req.headers['x-forwarded-for'], this.req.client.remoteAddress, this.res.connection.remoteAddress, this.res.socket._sockname);
 
         path = path === '/' ? 'Welcome to us' : path.slice(1);
 
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        const ip = this.req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
         path += ` - ${ip}`;
         //path += ` - ${this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress}`
