@@ -9,6 +9,8 @@ class UI extends SecuredAPI {
     pageData({ path }) {
         path = path === '/' ? 'Welcome' : path.slice(1);
 
+        path += ` - ${this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress}`
+
         return path;
     }
 

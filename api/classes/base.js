@@ -52,7 +52,7 @@ class Base {
                             return response;
                         }
                         catch(err) {
-                            debugger
+                            //debugger
                             err = self.$onError(propKey, err, ...args);
                             
                             if($error) {
@@ -172,7 +172,7 @@ class API extends Base {
 
             this.res.cookie('$token', this.token, { httpOnly: true });
         }
-        
+
         //this.res.cookie('$token', this.token, { httpOnly: true });
         //this.res.cookie('token', this.token, { httpOnly: false });
     }
