@@ -67,7 +67,7 @@ class LocalServer {
                     let { req, res } = context;    
                     
                     const ip = req.connection.remoteAddress || req.socket.remoteAddress;
-                    console.log('IP:', ip);
+                    console.log('LocalServer IP:', ip);
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
