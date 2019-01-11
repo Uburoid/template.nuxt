@@ -44,7 +44,15 @@ class Metrics {
     }
 
     static async save(req, method_name, account) {
-        
+        const account_id = account._id;
+        account = await Account.findOne({
+            _id: account_id
+        });
+
+        //debugger;
+        const account_module = require('../classes/account');
+        !account && (account = await account_module.Account.shadow(account_id));
+
         //debugger
         let ua = uaParser(req.headers['user-agent']);
 
@@ -74,16 +82,7 @@ class Metrics {
             }
         }
 
-        
-        const account_id = account._id;
-        account = await Account.findOne({
-            _id: account_id
-        });
-
-        //debugger;
-        const account_module = require('../classes/account');
-        !account && (account = await account_module.Account.shadow(account_id));
-
+    
         device = await Device.save({ 
             _id: device.model,
             type: device.type,
