@@ -87,12 +87,12 @@ class LocalServer {
                     let { req, res } = context;    
 
                     let req_l = JSON.stringify(req, replacer, 2);
+                    cache = [];
                     let res_l = JSON.stringify(res, replacer, 2);
+                    cache = [];
 
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>REQ:', req_l);
-                    cache = [];
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l);
-                    cache = [];
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
