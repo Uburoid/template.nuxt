@@ -53,6 +53,26 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
 
 } 
 
+let cache = [];
+const replacer = function(key, value) {
+    if (typeof value === 'object' && value !== null) {
+        if (cache.indexOf(value) !== -1) {
+            // Duplicate reference found
+            try {
+                // If this value does not reference a parent it can be deduped
+                return JSON.parse(JSON.stringify(value));
+            } catch (error) {
+                // discard key if value cannot be deduped
+                return;
+            }
+        }
+        // Store value in our collection
+        cache.push(value);
+    }
+    return value;
+};
+
+
 class LocalServer {
     constructor({ context, Types }) {
         
@@ -65,9 +85,14 @@ class LocalServer {
                     const Type = Types[key];
 
                     let { req, res } = context;    
-                    
-                    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
-                    console.log('LocalServer IP:', ip);
+
+                    let req_l = JSON.stringify(req, replacer, 2);
+                    let res_l = JSON.stringify(res, replacer, 2);
+
+                    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>REQ:', req_l);
+                    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l);
+
+                    cache = [];
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
