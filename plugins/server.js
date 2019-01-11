@@ -90,8 +90,8 @@ class LocalServer {
                     let res_l = JSON.stringify(res, replacer, 2);
 
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>REQ:', req_l);
+                    cache = [];
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l);
-
                     cache = [];
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
