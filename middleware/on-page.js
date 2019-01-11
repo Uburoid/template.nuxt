@@ -1,4 +1,5 @@
-export default async ({ app, store, route, redirect, req, res }) => {
+export default async (context) => {
+    let { app, store, route, redirect, req, res } = context;
     //debugger
 
     /* let test = await app.$server.test.get(void 0, { cache: false });

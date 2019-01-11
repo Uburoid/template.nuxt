@@ -76,7 +76,8 @@ const replacer = function(key, value) {
 class LocalServer {
     constructor({ context, Types }) {
         
-
+        this.isServer = true;
+        
         Object.entries(Types).reduce((memo, entry) => {
             let [key, value] = entry;
 

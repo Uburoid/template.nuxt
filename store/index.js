@@ -1,5 +1,5 @@
 export const state = () => ({
-
+    page_with_error: void 0,
     error: void 0,
     account: {
         user: {
@@ -18,6 +18,10 @@ export const mutations = {
 
     SET_ERROR(state, error) {
         state.error = error;
+    },
+
+    SET_PAGE_WITH_ERROR(state, page) {
+        state.page_with_error = page;
     },
 
     SET_ACCOUNT(state, account) {
