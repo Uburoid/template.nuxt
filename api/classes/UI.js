@@ -8,6 +8,8 @@ class UI extends SecuredAPI {
     }
 
     pageData({ path }) {
+        console.log('REQUEST:', this.req);
+
         path = path === '/' ? 'Welcome' : path.slice(1);
 
         const ip = get_ip(this.req);// this.req.headers['x-forwarded-for'] || (this.req.connection.socket ? this.req.connection.socket.remoteAddress : null) || this.req.socket.remoteAddress || this.req.connection.remoteAddress;

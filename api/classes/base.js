@@ -150,6 +150,11 @@ class API extends Base {
         }
         else this.payload = await this.jwt.verify(this.token);
 
+        if(this.res._token_expired) {
+            const { Account } = require('./account');
+            this.payload = await Account.signout(this.payload);
+        }
+
         //if(this.payload.err) throw this.payload.err;
 
         return !!this.payload;
@@ -204,6 +209,8 @@ class SecuredAPI extends API {
 
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
+            this.res._token_expired = true;
+
             error.redirect = '/signin';
             error.component = 'error';
         }

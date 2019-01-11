@@ -115,9 +115,17 @@ class Account extends API {
     async signout() {
         //debugger
 
+        this.payload = await Account.signout(this.payload);
+
+        return this.get();
+    }
+
+    static async signout(payload) {
+        //debugger
+
         //let shadow = void 0;
         let shadow = await Anonymous.findOne({
-            _id: this.payload.shadow_id,
+            _id: payload.shadow_id,
             role: true
         });
 
@@ -126,9 +134,7 @@ class Account extends API {
         }
 
         shadow = { ...shadow, access_level: shadow.role.level };
-        this.payload = shadow;
-        
-        return this.get();
+        return shadow;        
     }
 
     async signup() {
@@ -136,7 +142,7 @@ class Account extends API {
     }
 
     static async shadow() {
-
+        debugger
         let role = await Role.findOne({
             name: 'Аноним'
         });
