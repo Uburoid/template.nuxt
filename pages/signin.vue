@@ -15,20 +15,12 @@ export default {
         'signin-dialog': () => import('@/components/modals/signin')
     },
     asyncData(ctx) {
-        //debugger
-            
     },
     data: () => ({
         show: false
     }),
     methods: {
-        async submit() {
-            debugger
-            let account = await this.$server.account.signin({ email: 'mychrome51@gmail.com', password: '123' }, { cache: false });
-            this.$store.commit('SET_ACCOUNT', account);
-
-            this.$router.push(this.$store.state.page_with_error || '/');
-        },
+        
     }
 }
 </script>

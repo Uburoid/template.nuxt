@@ -56,7 +56,7 @@ export default {
             let account = await this.$server.account.signin({ email, password }, { cache: false });
             this.$store.commit('SET_ACCOUNT', account);
 
-            this.$router.push((this.$store.state.error && this.$store.state.error.from) || '/');
+            this.$router.push(this.$store.state.page_with_error || '/');
         }
     }
 }
