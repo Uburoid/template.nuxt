@@ -23,7 +23,6 @@
     "dotenv": "^6.2.0",
     "form-data": "^2.3.3",
     "fs-extra": "^7.0.1",
-    "ipware": "^1.0.0",
     "json-dry": "^1.0.9",
     "jsonwebtoken": "^8.4.0",
     "lru-cache": "^5.1.1",
