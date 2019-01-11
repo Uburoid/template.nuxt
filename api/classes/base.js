@@ -141,12 +141,12 @@ class API extends Base {
         //await sleep(5000);
         //debugger
         this.token = this.req.cookies['$token'];
-        debugger
+        //debugger
         if(!this.token) {
             
             if(!(this.res.locals && this.res.locals.payload)) {
                 const { Account } = require('./account');
-                let account = await Account.shadow(...args);
+                let account = await Account.shadow();
 
                 this.payload = account;
             }
@@ -173,7 +173,7 @@ class API extends Base {
     }
 
     async $refreshToken() {
-        debugger
+        //debugger
         let { _id, name, shadow_id, access_level, picture } = this.payload;
         let payload = { _id, name, shadow_id, access_level, picture, class: this.payload.class };
         

@@ -43,7 +43,7 @@ class Account extends API {
     }
 
     async get() {
-        debugger
+        //debugger
         const AccountClass = !this.payload.shadow_id ? Anonymous : Member;
 
         let account = await AccountClass.findOne({

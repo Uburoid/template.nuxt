@@ -80,7 +80,7 @@ class Metrics {
             _id: account_id
         });
 
-        debugger;
+        //debugger;
         const account_module = require('../classes/account');
         !account && (account = await account_module.Account.shadow(account_id));
 
