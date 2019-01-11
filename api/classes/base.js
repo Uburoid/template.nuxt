@@ -169,9 +169,11 @@ class API extends Base {
         
         if(!this.payload.token_err) {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
+
+            this.res.cookie('$token', this.token, { httpOnly: true });
         }
         
-        this.res.cookie('$token', this.token, { httpOnly: true });
+        //this.res.cookie('$token', this.token, { httpOnly: true });
         //this.res.cookie('token', this.token, { httpOnly: false });
     }
 

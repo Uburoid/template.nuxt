@@ -27,7 +27,10 @@ export default async ({ app, store, route, redirect, req, res }) => {
     
     store.commit('SET_TITLE', title);
 
-    if(store.state.error) {
+    let account = await app.$server.account.get(0, { cache: false });
+    store.commit('SET_ACCOUNT', account);
+
+    /* if(store.state.error) {
         setTimeout(async () => { //to remove token on error, but can't set headers after sent
             let account = await app.$server.account.get(0, { cache: false });
             store.commit('SET_ACCOUNT', account);
@@ -36,7 +39,8 @@ export default async ({ app, store, route, redirect, req, res }) => {
     else {
         let account = await app.$server.account.get(0, { cache: false });
         store.commit('SET_ACCOUNT', account);
-    }
+    } */
+    
     /* let sleep = (ms = 0) => {
         return new Promise(r => setTimeout(r, ms));
     }
