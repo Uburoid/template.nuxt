@@ -86,13 +86,16 @@ class LocalServer {
 
                     let { req, res } = context;    
 
-                    let req_l = JSON.stringify(req, replacer, 2);
+                    /* let req_l = JSON.stringify(req, replacer, 2);
                     cache = [];
                     let res_l = JSON.stringify(res, replacer, 2);
                     cache = [];
 
                     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>REQ:', req_l);
-                    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l);
+                    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>RES:', res_l); */
+
+                    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+                    console.log('Local Server IP:', ip);
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
