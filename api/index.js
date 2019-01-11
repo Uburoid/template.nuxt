@@ -390,6 +390,7 @@ router.use((err, req, res, next) => {
     };
     
     res.status(error.statusCode).json(error); */
+    console.log(err);
     res.status(err.statusCode).json(err);
 });
 
