@@ -66,7 +66,7 @@ class LocalServer {
 
                     let { req, res } = context;    
                     
-                    const ip = this.req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+                    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
                     console.log('LocalServer IP:', ip);
 
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
