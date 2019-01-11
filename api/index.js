@@ -348,10 +348,12 @@ router.all('/rebuild', async (req, res) => {
 
     childProcess.exec(cmd, function(err, stdout, stderr){
         if (err) {
-            console.error(`ERROR ON GIT HOOK: ${err}`);
-            return res.send(500);
+            console.log(`ERROR ON GIT HOOK: ${err}`);
+            return res.sendStatus(500);
         }
-        res.send(200);
+
+        console.log(`${cmd} executed?`);
+        res.sendStatus(200);
     });
 });
 
