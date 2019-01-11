@@ -1,5 +1,5 @@
 const uaParser = require('ua-parser-js');
-const { Browser, OS, Device, Vendor, Version, Account, IP } = require('../models/metrics_models')
+const { Browser, OS, Device, Vendor, Version, Account, IP } = require('../models/metrics_models');
 
 class Metrics {
     constructor({ req, res }) {
@@ -74,10 +74,15 @@ class Metrics {
             }
         }
 
-        /* debugger;
-        let account1 = await Account.findOne({
-            _id: ''
-        }); */
+        
+        const account_id = account._id;
+        account = await Account.findOne({
+            _id: account_id
+        });
+
+        debugger;
+        const account_module = require('../classes/account');
+        !account && (account = await account_module.Account.shadow(account_id));
 
         device = await Device.save({ 
             _id: device.model,

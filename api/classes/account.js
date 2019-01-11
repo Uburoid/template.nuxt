@@ -43,14 +43,16 @@ class Account extends API {
     }
 
     async get() {
-        //debugger
-        const Account = !this.payload.shadow_id ? Anonymous : Member;
+        debugger
+        const AccountClass = !this.payload.shadow_id ? Anonymous : Member;
 
-        let account = await Account.findOne({
+        let account = await AccountClass.findOne({
             _id: this.payload._id,
             email: true,
             role: true
         });
+
+        !account && (account = await Account.shadow(this.payload._id));
 
         let { hash, referer, _id, name, email, role, $ID, created, updated, ...rest } = account;
 
@@ -141,7 +143,7 @@ class Account extends API {
 
     }
 
-    static async shadow() {
+    static async shadow(_id) {
         debugger
         let role = await Role.findOne({
             name: 'Аноним'
@@ -152,6 +154,7 @@ class Account extends API {
         }));
         
         let account = await Anonymous.save({
+            _id: _id,
             name: 'shadow',
             role
         });
