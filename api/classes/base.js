@@ -8,6 +8,14 @@ const cache = new LRU({
     maxAge: 86400000 //сутки
 });
 
+class AccessDenied extends Error {
+    constructor(message) {
+        super(message);
+
+        this.code = 403;
+    }
+}
+
 class Base {
     constructor({ req, res, error, redirect, $error, route }) {
 
@@ -43,7 +51,7 @@ class Base {
                             allow = typeof(allow) === 'undefined' ? true : allow;
 
                             if(!allow) 
-                                throw new Error(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                                throw new AccessDenied(`Access to ${self.constructor.name}.${propKey}() denied.`);
                             //debugger
                             let response = await origMethod.apply(target, args);
 
@@ -105,10 +113,11 @@ class Base {
             name: err.name,
             stack: err.stack,
             component: 'error-dialog',
-            server_error: true
+            server_error: true,
+            display: err.display
         };
 
-        //debugger
+        ///debugger
         //this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
 
         return error;
@@ -213,6 +222,7 @@ class SecuredAPI extends API {
         let error = super.$onError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
+
             this.res.cookie('$token', '', { expires: new Date() });
             this.res.locals && (this.res.locals.token_expired = true);
 
@@ -233,7 +243,8 @@ class SecuredAPI extends API {
             allow = ACL(class_acl, method_name, this, args);
             allow = allow === 'allow';
 
-            if(allow && this.payload.token_err) throw this.payload.token_err;
+            if(this.payload.token_err) 
+                throw this.payload.token_err;
         }
         
         return allow;

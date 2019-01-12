@@ -11,7 +11,10 @@ export const state = () => ({
         },
         access: 0
     },
-    title: 'init'
+    title: 'init',
+    settings: {
+        drawer: false
+    }
 });
 
 export const mutations = {
@@ -30,8 +33,20 @@ export const mutations = {
 
     SET_TITLE(state, title) {
         state.title = title;
+    },
+
+    SET_SETTINGS(state, settings) {
+        
+        settings = { ...state.settings, ...settings };
+        state.settings = settings;
+
+        process.browser && localStorage && localStorage.setItem('settings', JSON.stringify(state.settings));
     }
 };
+
+export const getters = {
+    
+}
 
 export const actions = {
     async nuxtServerInit (context, { req }) {

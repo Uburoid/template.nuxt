@@ -26,6 +26,7 @@ const acl = [
     {
         class: 'UI',
         methods: 'pageData',
+        //auth: true,
         action: (instance, resource) => {
             let { access_level } = instance.payload;
             //debugger

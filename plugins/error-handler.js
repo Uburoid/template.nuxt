@@ -5,7 +5,10 @@ export default (context, inject) => {
     const errorFunction = context.error;
 
     const $error = (err) => {
-        if(!context.store.state.error || err.server_error) {
+        //debugger
+        err.display = typeof(err.display) === 'undefined' ? true : err.display;
+
+        if(!context.store.state.error || (context.store.state.error && !context.store.state.error.display) || err.server_error) {
             err.component = err.component || 'error';
             err.from = context.route.path;
 

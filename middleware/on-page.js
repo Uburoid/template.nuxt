@@ -2,6 +2,7 @@ export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
     //debugger
 
+
     /* let test = await app.$server.test.get(void 0, { cache: false });
     let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false }); */
     //analytics = await app.$server.analytics.set({ owner_id: '2874' }, { cache: false });

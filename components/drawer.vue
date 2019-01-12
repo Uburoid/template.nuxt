@@ -4,6 +4,8 @@
         v-model="visible"
         fixed
         app
+        
+        disable-resize-watcher
     >
         <v-list>
             <v-list-tile
@@ -44,7 +46,8 @@ export default {
                 return this.show;
             },
             set(val) {
-                this.$emit('drawler', val);
+                
+                typeof(this.show) !== 'undefined' && val !== this.show && this.$emit('drawer', val);
             }
         }
     }

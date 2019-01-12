@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <drawer :show="drawer" @drawler="drawer = arguments[0]"/>
+    <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/>
     
     <v-toolbar fixed app clipped-left clipped-right flat>
-        <nuxt-link to="" @click.native="drawer = !drawer">
+        <nuxt-link to="" @click.native="$store.commit('SET_SETTINGS', { drawer: !settings.drawer })">
             <!-- <img class="top-toolbar-logo" src="~assets/2956ab668f2b82c.jpg" height="54"> -->
             <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
         </nuxt-link>
@@ -58,7 +58,7 @@
         <!-- {{ !$store.state.error }} -->
         <component v-if="error" :is="error.component"/>
 
-        <div v-show="!$store.state.error">
+        <div v-show="!error">
             <nuxt keep-alive/>
         </div>
         
@@ -69,68 +69,76 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex';
+    import { mapState, mapGetters } from 'vuex';
 
     export default {
         components: {
-            drawer: () => import('@/components/drawler'),
+            drawer: () => import('@/components/drawer'),
             error:  () => import('@/components/errors/error'),
             errorDialog:  () => import('@/components/errors/error-dialog'),
         },
-        asyncData() {
-
+        asyncData(ctx) {
+            debugger
         },
-        data: () => ({
-            drawer: false,
-            items: [
-                {
-                    access: 1000,
-                    title: 'Users',
-                    icon: 'fa-users',
-                    to: '/account',
-                    click: () => ({})
-                },
-                {
-                    access: 100,
-                    title: 'Account',
-                    icon: 'fa-user',
-                    to: '/account',
-                    click: () => ({})
-                },
-                {
-                    access: 100,
-                    title: 'Help',
-                    icon: 'far fa-question-circle',
-                    to: '/help',
-                    click: () => ({})
-                },
-                {
-                    access: 100,
-                    title: 'Sign out',
-                    icon: 'fa-sign-out-alt',
-                    to: '/signout',
-                    click: () => ({})
-                },
-                {
-                    access: 0,
-                    title: 'Sign in',
-                    icon: 'fa-sign-in-alt',
-                    to: '/signin',
-                    click: () => ({})
-                },
-                {
-                    access: 0,
-                    title: 'Sign up',
-                    icon: 'fa-user-plus',
-                    to: '/signup',
-                    click: () => ({})
-                }
-            ]
-            
-            //title: 'Vuetify.js'
-        }),
+        data: (vm) => {
+
+            return {
+                items: [
+                    {
+                        access: 1000,
+                        title: 'Users',
+                        icon: 'fa-users',
+                        to: '/account',
+                        click: () => ({})
+                    },
+                    {
+                        access: 100,
+                        title: 'Account',
+                        icon: 'fa-user',
+                        to: '/account',
+                        click: () => ({})
+                    },
+                    {
+                        access: 100,
+                        title: 'Help',
+                        icon: 'far fa-question-circle',
+                        to: '/help',
+                        click: () => ({})
+                    },
+                    {
+                        access: 100,
+                        title: 'Sign out',
+                        icon: 'fa-sign-out-alt',
+                        to: '/signout',
+                        click: () => ({})
+                    },
+                    {
+                        access: 0,
+                        title: 'Sign in',
+                        icon: 'fa-sign-in-alt',
+                        to: '/signin',
+                        click: () => ({})
+                    },
+                    {
+                        access: 0,
+                        title: 'Sign up',
+                        icon: 'fa-user-plus',
+                        to: '/signup',
+                        click: () => ({})
+                    }
+                ]
+                
+                //title: 'Vuetify.js'
+            };
+        },
         created() {
             
+            if(process.browser) {
+                let settings = localStorage.getItem('settings');
+                settings = settings ? JSON.parse(settings) : {};
+                
+                this.$store.commit('SET_SETTINGS', settings);
+            }
         },
         computed: {
             account_items() {
@@ -140,18 +148,32 @@
                     return memo;
                 }, []);
             },
+            /* settings() {
+                debugger
+                if(process.browser && localStorage) {
+                    let settings = localStorage.getItem('settings');
+                    settings = settings ? JSON.parse(settings) : this.$store.state.settings;
+        
+                    return settings;
+                }
+        
+                return this.$store.state.settings;
+            }, */
+            ...mapGetters([
+                'settings'
+            ]),
             ...mapState({
                 account: state => state.account,
                 user: state => state.account.user,
                 profile: state => state.account.user.profile,
                 title: state => state.title,
-                error: state => state.error
+                error: state => {
+                    return state.error && state.error.display && state.error;
+                },
+                settings: state => state.settings
             })
         },
         methods: {
-            async avatar() {
-                return await this.$server.account.avatar();
-            }
         },
         watch: {
             
