@@ -214,7 +214,7 @@ class SecuredAPI extends API {
 
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
-            this.res.locals.token_expired = true;
+            this.res.locals && (this.res.locals.token_expired = true);
 
             error.redirect = '/signin';
             error.component = 'error';
