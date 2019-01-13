@@ -347,7 +347,7 @@ router.all('/_server_', async (req, res) => {
 
 router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
-    //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
+    console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
     try {
         let cd = shell.cd(process.cwd());
@@ -362,11 +362,15 @@ router.all('/rebuild', async (req, res) => {
         let pull = shell.exec('git pull');
         console.log(`pull: ${pull}`);
 
-        let install = shell.exec('npm install');
-        console.log(`install: ${install}`);
+        if(req.body.commits.modified.includes('package.json')) {
+            console.log(`npm operations strarting...`);
 
-        let update = shell.exec('npm update');
-        console.log(`update: ${update}`);
+            let install = shell.exec('npm install');
+            console.log(`install: ${install}`);
+    
+            let update = shell.exec('npm update');
+            console.log(`update: ${update}`);
+        }
 
         let restart = shell.exec('pm2 restart all');
         console.log(`restart: ${restart}`);
