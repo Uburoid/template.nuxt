@@ -362,7 +362,11 @@ router.all('/rebuild', async (req, res) => {
         let pull = shell.exec('git pull');
         console.log(`pull: ${pull}`);
 
-        if(req.body.commits.modified.includes('package.json')) {
+        let npm = req.body.commits.some(commit => {
+            return commit.modified.includes('package.json');
+        });
+
+        if(npm) {
             console.log(`npm operations strarting...`);
 
             let install = shell.exec('npm install');
