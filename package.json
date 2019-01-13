@@ -32,6 +32,7 @@
     "neo4j-driver": "^1.7.2",
     "normalizr": "^3.3.0",
     "nuxt": "^2.2.0",
+    "shelljs": "^0.8.3",
     "ua-parser-js": "^0.7.19",
     "uglify-js": "^3.4.9",
     "vue-json-pretty": "^1.4.1",

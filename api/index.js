@@ -323,6 +323,7 @@ let multipartDetector = function(req, res, next) {
 ///////////////////////////////////////////////////////////////////////////////////////
 const path = require('path');
 const childProcess = require('child_process');
+const shell = require('shelljs');
 
 const { Types, code } = require('./classes');
 const { loadDefaultKeyPair } = require('./jwt');
@@ -347,7 +348,30 @@ router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
     console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
-    let cmd = path.join(process.cwd(), 'deploy.sh');
+    try {
+        let cd = shell.cd(process.cwd());
+        console.log(`cd: ${cd}`);
+
+        let stop = shell.exec('pm2 stop all');
+        console.log(`stop: ${stop}`);
+
+        let pull = shell.exec('git pull');
+        console.log(`pull: ${pull}`);
+
+        let install = shell.exec('npm install');
+        console.log(`install: ${install}`);
+
+        let update = shell.exec('npm update');
+        console.log(`update: ${update}`);
+
+        let start = shell.exec('pm2 start all');
+        console.log(`start: ${start}`);
+    }
+    catch(err) {
+        console.log(`ERROR: ${err}`);
+    }
+
+    /* let cmd = path.join(process.cwd(), 'deploy.sh');
 
     childProcess.exec(cmd, function(err, stdout, stderr){
         if (err) {
@@ -357,7 +381,7 @@ router.all('/rebuild', async (req, res) => {
 
         console.log(`${cmd} executed?`);
         res.sendStatus(200);
-    });
+    }); */
 });
 
 let patterns = ['/:type\.:action', '/:type'];

@@ -35,7 +35,7 @@ const acl = [
             return access_level === 0 ? path !== '/inspire' ? 'allow' : 'deny' : 'allow';
         }
     },
-    {
+    /* {
         class: 'UI',
         methods: 'pageData',
         auth: true,
@@ -46,7 +46,7 @@ const acl = [
 
             return path === '/inspire';
         }
-    }
+    } */
 ];
 
 module.exports = acl;
