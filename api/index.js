@@ -347,7 +347,7 @@ router.all('/_server_', async (req, res) => {
 
 router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
-    console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
+    //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
     try {
         let cd = shell.cd(process.cwd());
