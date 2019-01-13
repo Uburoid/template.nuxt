@@ -352,8 +352,8 @@ router.all('/rebuild', async (req, res) => {
         let cd = shell.cd(process.cwd());
         console.log(`cd: ${cd}`);
 
-        let stop = shell.exec('pm2 stop all');
-        console.log(`stop: ${stop}`);
+        //let stop = shell.exec('pm2 stop all');
+        //console.log(`stop: ${stop}`);
 
         let stash = shell.exec('git stash');
         console.log(`pull: ${stash}`);
@@ -367,8 +367,8 @@ router.all('/rebuild', async (req, res) => {
         let update = shell.exec('npm update');
         console.log(`update: ${update}`);
 
-        let start = shell.exec('pm2 start all');
-        console.log(`start: ${start}`);
+        let restart = shell.exec('pm2 restart all');
+        console.log(`restart: ${restart}`);
     }
     catch(err) {
         console.log(`ERROR: ${err}`);
