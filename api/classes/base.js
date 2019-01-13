@@ -156,8 +156,10 @@ class API extends Base {
             //debugger
             if(!(this.res.locals && this.res.locals.payload)) {
                 //this.res.locals.payload = {};
+                const shadow_id = this.req.cookies['$shadow'];
+                debugger
                 const { Account } = require('./account');
-                let account = await Account.shadow();
+                let account = await Account.shadow(shadow_id);
 
                 this.payload = account;
             }
@@ -226,6 +228,8 @@ class SecuredAPI extends API {
 
         if(error.statusCode === 401) {
             debugger
+            this.payload && this.payload.shadow_id && this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
+            
             this.res.cookie('$token', '', { expires: new Date() });
             this.res.locals && (this.res.locals.token_expired = true);
 
