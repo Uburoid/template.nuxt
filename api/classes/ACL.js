@@ -1,3 +1,36 @@
+const casbin = require('casbin');
+
+const model = `
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act, eft
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow)) && !some(where (p.eft == deny))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`;
+
+const policy = `
+p, alice, data1, read, allow
+p, bob, data2, write, allow
+p, data2_admin, data2, read, allow
+p, data2_admin, data2, write, allow
+p, alice, data2, write, deny
+
+g, alice, data2_admin
+`;
+
+const ACL1 = async () => {
+    const enforcer = await casbin.newEnforcer(model, policy);
+}
+
 const ACL = (acl, method_name, instance, args) => {
     const default_rule = {
         auth: false,
@@ -21,9 +54,15 @@ const ACL = (acl, method_name, instance, args) => {
     let result = 'deny';
 
     if(rule) {
-        result = rule.action(instance, resource);
+        debugger
+        result = rule.action(instance, resource, rule);
         //debugger
-        result === 'allow' && !rule.auth && instance.payload.token_err && (instance.payload.token_err.display = false);
+        if(result === 'allow') {
+            debugger
+            rule.auth && instance.payload.token_err && (instance.payload.token_err.redirect = false);
+            rule.auth && instance.payload.token_err && (instance.payload.token_err.display = false);
+        }
+        //result === 'allow' && rule.auth && instance.payload.token_err && (instance.payload.token_err.display = false);
     }
 
     return result;

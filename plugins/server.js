@@ -103,9 +103,15 @@ class LocalServer {
                     req.cookies = cookie.parse(req.headers.cookie || '') || {};
 
                     res.cookie = function (name, value, options) {
-                        
+                        //debugger
                         let existed_cookies = res.getHeader('set-cookie');
                         existed_cookies = existed_cookies ? [...existed_cookies] : [];
+
+                        existed_cookies = existed_cookies.filter(cookie => {
+                            let [key] = cookie.split('=');
+
+                            return key !== name;
+                        })
 
                         existed_cookies = [...existed_cookies, cookie.serialize(name, String(value), options)];
 

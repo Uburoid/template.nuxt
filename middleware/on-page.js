@@ -2,6 +2,13 @@ export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
     //debugger
 
+    let clear_error = false;
+    if(store.state.error && store.state.error.from !== route.path) {
+        clear_error = true;
+        store.commit('SET_ERROR', void 0);
+        //this.$store.commit('SET_PAGE_WITH_ERROR', this.$store.state.error.from);
+    }
+
 
     /* let test = await app.$server.test.get(void 0, { cache: false });
     let analytics = await app.$server.analytics.get({ owner_id: '2874' }, { cache: false }); */
@@ -19,14 +26,17 @@ export default async (context) => {
     }, 500); */
     
     //store.commit('SET_ERROR', void 0);
-
     let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
 
     store.state.error && typeof(title) !== 'string' && (title = 'Ошибка');
     
     store.commit('SET_TITLE', title);
 
-    let account = await app.$server.account.get(0, { cache: false });
-    //console.log('account', account);
-    store.commit('SET_ACCOUNT', account);
+    if(!store.state.error || (store.state.error && !store.state.error.redirect)) {
+        let account = await app.$server.account.get(0, { cache: false });
+        //console.log('account', account);
+        store.commit('SET_ACCOUNT', account);    
+    }    
+    
+    //clear_error && store.commit('SET_ERROR', void 0);
 }

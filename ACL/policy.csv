@@ -1,0 +1,11 @@
+p, alice, data1, not_expired, read, allow
+p, bob, data2, not_expired, write, allow
+p, data2_admin, data2, not_expired, read, allow
+p, data2_admin, data2, not_expired, write, allow
+p, alice, data2, write, not_expired, deny
+p, *, *, *, not_expired, allow
+
+g, alice, data2_admin
+
+g2, expired
+g2, not_expired

@@ -138,6 +138,21 @@
                 settings = settings ? JSON.parse(settings) : {};
                 
                 this.$store.commit('SET_SETTINGS', settings);
+
+                //debugger
+                /* const cookie = document.cookie && document.cookie.split(',').reduce((memo, cookie) => {
+                    let [key, value] = cookie.split('=');
+                    memo[key] = decodeURIComponent(value);
+
+                    return memo;
+                }, {}); */
+                
+
+                const page_with_error = this.getCookie('page-with-error');
+
+                page_with_error && this.$store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+
+                this.deleteCookie('page-with-error');
             }
         },
         computed: {
@@ -174,6 +189,47 @@
             })
         },
         methods: {
+            getCookie(name) {
+                var matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
+
+                return matches ? decodeURIComponent(matches[1]) : void 0;
+            },
+            setCookie(name, value, options) {
+                options = options || {};
+
+                let expires = options.expires;
+
+                if (typeof expires == "number" && expires) {
+                    let d = new Date();
+
+                    d.setTime(d.getTime() + expires * 1000);
+                    expires = options.expires = d;
+                }
+                if (expires && expires.toUTCString) {
+                    options.expires = expires.toUTCString();
+                }
+
+                value = encodeURIComponent(value);
+
+                let updatedCookie = name + "=" + value;
+
+                for(let propName in options) {
+                    updatedCookie += "; " + propName;
+
+                    let propValue = options[propName];
+
+                    if (propValue !== true) {
+                        updatedCookie += "=" + propValue;
+                    }
+                }
+
+                document.cookie = updatedCookie;
+            },
+            deleteCookie(name) {
+                this.setCookie(name, "", {
+                    expires: -1
+                });
+            }
         },
         watch: {
             

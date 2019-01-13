@@ -114,7 +114,8 @@ class Base {
             stack: err.stack,
             component: 'error-dialog',
             server_error: true,
-            display: err.display
+            display: err.display,
+            redirect: err.redirect
         };
 
         ///debugger
@@ -138,7 +139,7 @@ class API extends Base {
         const { Account } = require('./account');
         this.jwt = JWT({ getKeys: Account.getKeys });
 
-        this.payload = {};
+        this.payload = void 0;
 
     }
 
@@ -152,8 +153,9 @@ class API extends Base {
         this.token = this.req.cookies['$token'];
         //debugger
         if(!this.token) {
-            
+            //debugger
             if(!(this.res.locals && this.res.locals.payload)) {
+                //this.res.locals.payload = {};
                 const { Account } = require('./account');
                 let account = await Account.shadow();
 
@@ -190,6 +192,7 @@ class API extends Base {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
 
             this.res.cookie('$token', this.token, { httpOnly: true });
+            //this.res.cookie('page-with-error', '', { expires: new Date() });
         }
 
         //this.res.cookie('$token', this.token, { httpOnly: true });
@@ -222,11 +225,11 @@ class SecuredAPI extends API {
         let error = super.$onError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
-
+            debugger
             this.res.cookie('$token', '', { expires: new Date() });
             this.res.locals && (this.res.locals.token_expired = true);
 
-            error.redirect = '/signin';
+            error.redirect = typeof(error.redirect) === 'undefined' ? '/signin' : error.redirect;
             error.component = 'error';
         }
         //debugger

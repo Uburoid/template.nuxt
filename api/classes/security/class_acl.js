@@ -34,6 +34,18 @@ const acl = [
 
             return access_level === 0 ? path !== '/inspire' ? 'allow' : 'deny' : 'allow';
         }
+    },
+    {
+        class: 'UI',
+        methods: 'pageData',
+        auth: true,
+        action: (instance, resource) => {
+            let { access_level } = instance.payload;
+            //debugger
+            let { path } = resource;
+
+            return path === '/inspire';
+        }
     }
 ];
 

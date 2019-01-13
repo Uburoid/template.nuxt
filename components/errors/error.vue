@@ -38,12 +38,12 @@ export default {
     data: () => ({
     }),
     watch: {
-        '$route.path': function (val) {
+        /* '$route.path': function (val) {
             if(this.$store.state.error.from !== val) {
                 this.$store.commit('SET_PAGE_WITH_ERROR', this.$store.state.error.from);
                 this.$store.commit('SET_ERROR', void 0);
             }
-        }
+        } */
     },
     created() {
         console.log('CREATED error');
