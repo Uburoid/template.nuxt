@@ -355,6 +355,9 @@ router.all('/rebuild', async (req, res) => {
         let stop = shell.exec('pm2 stop all');
         console.log(`stop: ${stop}`);
 
+        let stash = shell.exec('git stash');
+        console.log(`pull: ${stash}`);
+
         let pull = shell.exec('git pull');
         console.log(`pull: ${pull}`);
 
