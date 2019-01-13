@@ -1,7 +1,7 @@
 const { driver } = require('../db');
 const { schema: Schema, normalize } = require('normalizr');
 
-const arraySort = require('array-sort'); //mistical Array.sort error
+//const arraySort = require('array-sort'); //mistical Array.sort error
 
 const intersect = require('../intersect');
 
