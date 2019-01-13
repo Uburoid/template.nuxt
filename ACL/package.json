@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "casbin": "^2.0.0"
+    "casbin": "^2.0.0",
+    "cloudrail-si": "^2.21.12"
   }
 }
