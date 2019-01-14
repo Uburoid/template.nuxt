@@ -16,6 +16,7 @@
     "bcryptjs": "^2.4.3",
     "busboy": "^0.2.14",
     "casbin": "^2.0.0",
+    "cloudrail-si": "^2.21.12",
     "cookie-parser": "^1.4.3",
     "crypto2": "^2.0.0",
     "decypher": "^0.13.0",

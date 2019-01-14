@@ -53,8 +53,8 @@ export default (context, inject) => {
         stop(true);
         
         //error && context.store.commit('SET_NETWORK_ERROR', { from: error.config.from, context: error.response.data });
-        
-        throw error.response.data;
+        //debugger
+        throw error.response ? error.response.data : error;
     });
 
     api.interceptors.request.use(onRequest, onError);

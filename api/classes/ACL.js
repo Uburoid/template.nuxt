@@ -54,11 +54,11 @@ const ACL = (acl, method_name, instance, args) => {
     let result = 'deny';
 
     if(rule) {
-        debugger
+        //debugger
         result = rule.action(instance, resource, rule);
         //debugger
         if(result === 'allow') {
-            debugger
+            //debugger
             rule.auth && instance.payload.token_err && (instance.payload.token_err.redirect = false);
             rule.auth && instance.payload.token_err && (instance.payload.token_err.display = false);
         }
