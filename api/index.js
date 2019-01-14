@@ -345,6 +345,12 @@ router.all('/_server_', async (req, res) => {
     res.end(code);
 });
 
+router.all('/reciever', async (req, res) => {
+    console.log('request reciever');
+
+    res.sendStatus(200);
+});
+
 router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
     console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
@@ -378,6 +384,8 @@ router.all('/rebuild', async (req, res) => {
 
         let restart = shell.exec('pm2 restart all');
         console.log(`restart: ${restart}`);
+
+        res.sendStatus(200);
     }
     catch(err) {
         console.log(`ERROR: ${err}`);

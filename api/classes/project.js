@@ -31,13 +31,13 @@ class Messenging extends API {
         const telegram = new this.cloudrail.services.Telegram(
             null,
             "738767838:AAGisCF0eTHfZ-SJiwUvoyB1mWFYesP0geM",
-            "[Webhook URL]"
+            "https://node.ap51.tech/reciever"
         );
 
         const viber = new this.cloudrail.services.Viber(
             null,
             "49122a367a27d505-c0559a5494e9a742-246451fd3f9f5a3c",
-            "[Webhook URL]",
+            "https://node.ap51.tech/reciever",
             "BestNovostroy"
         );
 
