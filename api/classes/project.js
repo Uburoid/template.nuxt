@@ -13,7 +13,7 @@ class Test extends API {
     }
 }
 
-class Messenging extends API {
+class Messaging extends API {
     constructor(...args) {
         super(...args);
         //debugger
@@ -24,7 +24,7 @@ class Messenging extends API {
 
     async send({ messenger, text, reciever }) {
         //let selection = 'viber';
-        debugger
+        //debugger
 
         let service = void 0;
 
@@ -47,7 +47,7 @@ class Messenging extends API {
             case "viber": service = viber; break;
         }
 
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             service.sendMessage(
                 reciever || "79009395505",
                 text || "It's so easy to send message via CloudRail",
@@ -86,4 +86,4 @@ class Member extends SecuredAPI {
     }
 }
 
-module.exports = { Member, Analytics, Test, Messenging };
+module.exports = { Member, Analytics, Test, Messaging };

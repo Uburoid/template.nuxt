@@ -36,7 +36,7 @@ export default {
             { icon: 'apps', title: 'Welcome', to: '/' },
             { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
             { icon: 'fa-error', title: 'NOT FOUND', to: '/not-found' },
-            { icon: 'fa-phone', title: 'Messenging', to: '/messenging' },
+            { icon: 'fa-phone', title: 'Messaging', to: '/messaging' },
         ]
     }),
     methods: {

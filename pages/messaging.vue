@@ -63,7 +63,7 @@ export default {
             debugger
             let { reciever, messenger, text } = this;
 
-            this.result = await this.$server.messenging.send({ reciever, messenger, text }, { cache: false });
+            this.result = await this.$server.messaging.send({ reciever, messenger, text }, { cache: false });
         }
     }
 }

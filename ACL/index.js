@@ -11,7 +11,94 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
 
 
 (async () => {
-    let selection = 'viber';
+    const request = {
+        role: 'Аноним',
+        class: "UI", 
+        methods: ['pageData'],
+        resource: {
+            path: '/inspire'
+        },
+        token: 'invalid'
+    }
+
+    let model = {
+        role: RegExp,
+        class: RegExp,
+        methods: [RegExp],
+        resource: Object,
+        token: RegExp
+    }
+
+    let matcher = [
+        {
+            columns: ['role', 'class', 'token'],
+            match: (policy, value) => policy.test(value)
+        },
+        {
+            columns: ['methods'],
+            match: (policy, value) => {
+                values = Array.isArray(value) ? value : [value];
+
+                return values.every(value => policy.test(value));
+            }
+        },
+        {
+            columns: ['resource'],
+            match: (policy, value) => {
+                return Object.entries(policy).reduce((memo, entry) => {
+                    let [key, value] = entry;
+
+                    memo.push(value[key] ? value[key] === policy[key] : false);
+
+                    return memo;
+                },[]).every(value => value);
+            }
+        }
+    ]
+
+    let policy = [
+        {
+            effect: 'allow',
+            role: /.+/,
+            class: /.+/,
+            methods: [/.+/],
+            resource: {
+                path: '/inspire'
+            },
+            token: /.+/
+        },
+        {
+            effect: 'deny',
+            role: /Аноним/,
+            class: /.+/,
+            methods: [/pageData/],
+            resource: {
+                path: '/inspire'
+            },
+            token: /.+/
+        },
+        {
+            effect: 'deny',
+            role: /Аноним/,
+            class: /Account/, // /.+/
+            methods: [/signout/],
+            token: /.+/
+        },
+        {
+            effect: 'deny',
+            role: /.+/,
+            class: /.+/,
+            methods: [/.*/],
+            resource: {
+                path: '/inspire'
+            },
+            token: /invalid/
+        },
+    ];
+
+
+    
+    /* let selection = 'viber';
 
     const telegram = new cloudrail.services.Telegram(
         null,
@@ -39,7 +126,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
             // Check for potential error and use the result
             console.log(error, result)
         }
-    );
+    ); */
 
     /* let token_err = {};
 
