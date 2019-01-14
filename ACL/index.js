@@ -1,4 +1,5 @@
 const casbin = require('casbin');
+const flatten = require('flat');
 
 const ACL = async () => {
     const enforcer = await casbin.newEnforcer('./model.conf', './policy.csv');
@@ -11,15 +12,6 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
 
 
 (async () => {
-    const request = {
-        role: 'Аноним',
-        class: "UI", 
-        methods: ['pageData'],
-        resource: {
-            path: '/inspire'
-        },
-        token: 'invalid'
-    }
 
     let model = {
         role: RegExp,
@@ -29,26 +21,187 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         token: RegExp
     }
 
+    let roles = {
+        name: 'virtual',
+        children: [
+            {
+                name: 'Аноним',
+                children: [
+                ]
+            },
+            {
+                name: 'Пользователь',
+                children: [
+                    {
+                        name: 'Администратор',
+                        children: [
+                            {
+                                name: 'root'
+                            }
+                        ]
+                    },
+                    {
+                        name: 'Автор',
+                    },
+                    {
+                        name: 'Партнер',
+                        children: [
+                            {
+                                name: 'Основатель'
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    roles = [
+        {
+            name: 'Аноним',
+            children: [
+            ]
+        },
+        {
+            name: 'Пользователь',
+            children: [
+                {
+                    name: 'Администратор',
+                    children: [
+                        {
+                            name: 'root'
+                        }
+                    ]
+                },
+                {
+                    name: 'Автор',
+                },
+                {
+                    name: 'Партнер',
+                    children: [
+                        {
+                            name: 'Основатель'
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+        
+
+    let policy = [
+        {
+            permission: 'allow',
+            role: '*',
+            class: '*',
+            methods: '*',
+            resource: {
+                path: '/inspire'
+            },
+            token: '*'
+        },
+        {
+            permission: 'deny',
+            role: /Аноним/,
+            class: '*',
+            methods: [/pageData/],
+            resource: {
+                path: '/inspire'
+            },
+            token: '*'
+        },
+        {
+            permission: 'allow',
+            role: /Пользователь/,
+            class: '*',
+            methods: [/pageData/],
+            resource: {
+                path: '/inspire'
+            },
+            token: '*'
+        },
+        {
+            permission: 'deny',
+            role: /Аноним/,
+            class: /Account/, // /.+/
+            methods: [/signout/],
+            token: '*'
+        },
+        {
+            permission: 'deny',
+            role: '*',
+            class: '*',
+            methods: ['*'],
+            resource: {
+                path: '/inspire'
+            },
+            token: /invalid/
+        },
+    ]
+
+    const getRegExp = (value) => {
+        if(value instanceof RegExp) {
+            return value;
+        }
+        else if(value === '*') {
+            return /.*/;
+        }
+
+        return value;
+    }
+
     let matcher = [
         {
-            columns: ['role', 'class', 'token'],
-            match: (policy, value) => policy.test(value)
+            columns: ['role'],
+            match: (policy, role) => {
+                let flatten_roles = flatten(roles);
+                let entries = Object.entries(flatten_roles);
+                
+                let hierarchy = [];
+
+                let [role_key] = entries.find(([key, value]) => value === role) || [];
+                
+                if(role_key) {
+                    let tail = role_key.split('.').slice(-1).pop();
+    
+                    hierarchy = entries.reduce((memo, [key, value]) => {
+                        role_key.startsWith(key.replace(tail, '')) && memo.push(value);
+
+                        return memo;
+                    }, []);
+                }
+                
+                policy = Array.isArray(policy) ? policy : [policy];
+
+                let result = policy.some(policy => hierarchy.some(role => getRegExp(policy).test(role)));
+
+                return result
+                //hierarchy.includes(value);
+            }
+        },
+        {
+            columns: ['class', 'token'],
+            match: (policy, value) => getRegExp(policy).test(value)
         },
         {
             columns: ['methods'],
             match: (policy, value) => {
                 values = Array.isArray(value) ? value : [value];
+                policy = Array.isArray(policy) ? policy : [policy];
 
-                return values.every(value => policy.test(value));
+                return values.every(value => policy.every(policy => getRegExp(policy).test(value)));
             }
         },
         {
             columns: ['resource'],
             match: (policy, value) => {
-                return Object.entries(policy).reduce((memo, entry) => {
+                flatten_policy = flatten(policy);
+                flatten_value = flatten(value);
+
+                return Object.entries(flatten_policy).reduce((memo, entry) => {
                     let [key, value] = entry;
 
-                    memo.push(value[key] ? value[key] === policy[key] : false);
+                    memo.push(flatten_value[key] ? getRegExp(value).test ? getRegExp(value).test(flatten_value[key]) : value === flatten_value[key] : false);
 
                     return memo;
                 },[]).every(value => value);
@@ -56,45 +209,57 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         }
     ]
 
-    let policy = [
-        {
-            effect: 'allow',
-            role: /.+/,
-            class: /.+/,
-            methods: [/.+/],
-            resource: {
-                path: '/inspire'
-            },
-            token: /.+/
+    const enforce = (request, model, policy, options) => {
+        options = { strict: true, ...options };
+
+        request = policy.reduce((memo, policy) => {
+            //memo[key] = request[key];
+
+            let permission = options.strict ? 'deny' : 'allow';
+            Object.keys(model).some(key => {
+                matcher.some(item => {
+                    let includes = item.columns.includes(key);
+                    permission = includes ? policy[key] ? item.match(policy[key], request[key]) && policy.permission : 'allow' : permission;
+
+                    return includes;
+                });
+
+                return !permission;
+            });
+
+            permission && memo.push(permission);
+
+            return memo;
+        }, []);
+        
+        let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');
+
+        return result;
+    }
+
+    const request = {
+        role: 'root',
+        class: "UI", 
+        methods: ['pageData'],
+        resource: {
+            path: '/inspire'
         },
-        {
-            effect: 'deny',
-            role: /Аноним/,
-            class: /.+/,
-            methods: [/pageData/],
-            resource: {
-                path: '/inspire'
-            },
-            token: /.+/
+        token: 'invalid'
+    }
+    /* const request = {
+        role: 'Пользователь',
+        class: "UI", 
+        methods: ['pageData'],
+        resource: {
+            path: '/'
         },
-        {
-            effect: 'deny',
-            role: /Аноним/,
-            class: /Account/, // /.+/
-            methods: [/signout/],
-            token: /.+/
-        },
-        {
-            effect: 'deny',
-            role: /.+/,
-            class: /.+/,
-            methods: [/.*/],
-            resource: {
-                path: '/inspire'
-            },
-            token: /invalid/
-        },
-    ];
+        token: 'invalid'
+    } */
+
+    let allow = enforce(request, model, policy, { strict: true });
+    console.log(allow);
+
+    
 
 
     

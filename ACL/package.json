@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "casbin": "^2.0.0",
-    "cloudrail-si": "^2.21.12"
+    "cloudrail-si": "^2.21.12",
+    "flat": "^4.1.0"
   }
 }
