@@ -1,7 +1,7 @@
 allow,*,*,$data._id,{path:'/inspire', owner: { _id: '$data._id' }},*
-#allow,*,*,*,{path:'!/inspire'},*
-#deny,Аноним,*,pageData,{path:'!/inspire'},*
+--allow,*,*,*,{path:'!/inspire'},*
+--deny,Аноним,*,pageData,{path:'!/inspire'},*
 deny,*,*,pageData,{path:'!/inspire'},invalid, !10
 allow,Пользователь,*,pageData,{path:'!/inspire'},*, !10
-#deny,Аноним,Account,signout,,*
-#deny,*,*,*,{path:'!/inspire'},invalid
+--deny,Аноним,Account,signout,,*
+--deny,*,*,*,{path:'!/inspire'},invalid
