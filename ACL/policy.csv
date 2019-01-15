@@ -1,10 +1,7 @@
-p, allow, show, .+, .+, Аноним, .+, .+
-p, allow, hide, .+, .+, Аноним, /inspire, .+
-p, allow, show, .+, .+, Пользователь, .+, .+
-p, allow, show, .+, .+, Пользователь, /inspire, invalid
-
-g, Аноним, Role
-g, Пользователь, Role
-g, Администратор, Пользователь
-g, Автор, Пользователь
-g, Партнер, Пользователь
+allow,*,*,$data._id,{path:'/inspire', owner: { _id: '$data._id' }},*
+#allow,*,*,*,{path:'!/inspire'},*
+#deny,Аноним,*,pageData,{path:'!/inspire'},*
+deny,*,*,pageData,{path:'!/inspire'},invalid, !10
+allow,Пользователь,*,pageData,{path:'!/inspire'},*, !10
+#deny,Аноним,Account,signout,,*
+#deny,*,*,*,{path:'!/inspire'},invalid

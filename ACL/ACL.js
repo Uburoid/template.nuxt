@@ -1,9 +1,13 @@
 const json5 = require('json5');
+const fs = require('fs-extra');
 const flatten = require('flat');
 const unflatten = flatten.unflatten;
 
 class ACL {
     constructor({ model, policy, roles }, matchers) {
+        
+        model = fs.pathExistsSync(model) ? fs.readFileSync(model, { encoding: 'utf-8' }) : model;
+        policy = fs.pathExistsSync(policy) ? fs.readFileSync(policy, { encoding: 'utf-8' }) : policy;
 
         matchers = matchers ? typeof(matchers) !== 'object' ? typeof(matchers) === 'function' ? { matchers } : {} : matchers : {};
         ACL.$matchers = { ...ACL.matchers, ...matchers };
@@ -19,14 +23,33 @@ class ACL {
         //this.options = { ...strict: true, ...options };
     }
 
-    enforce(request, options) {
+    enforce({ request, options, data = {} }) {
         let { model, policy, options: default_options } = this;
         options = options ? { ...default_options, ...options } : default_options;
+        data = flatten(data);
+        
+
 
         request = policy.reduce((memo, policy) => {
+            let flatten_policy = flatten(policy);
+
+            flatten_policy = Object.entries(flatten_policy).reduce((memo, [key, value]) => {
+                if(value.constructor.name === 'String' && value.startsWith('$data.')) {
+                    value = value.replace('$data.', '');
+
+                    value = data[value];
+                }
+
+                memo[key] = value;
+                return memo;
+            }, {})
+
+            policy = unflatten(flatten_policy);
+
             let permission = false;
 
             permission = Object.entries(request).every(([key, value]) => {
+
                 return model[key] && model[key](policy[key], value) ? true : false;
             });
 
@@ -63,7 +86,10 @@ class ACL {
 
     static parseRegExp(value) {
         if(value.constructor.name === 'String') {
-            if(value.slice(0, 1) === '!') {
+            if(value.startsWith('$data')) {
+                return value;
+            }
+            else if(value.slice(0, 1) === '!') {
                 return value.slice(1);
             }
             else if(value === '*') {
@@ -109,7 +135,7 @@ class ACL {
             let objects = [];
             objects = ACL.detectJSONs(value, objects);
 
-            objects.length && objects.forEach((json, inx) => value = value.replace(json, `$${inx}`));
+            objects.length && objects.forEach((json, inx) => value = value.replace(json, `~${inx}`));
 
             let [permission, ...rest] = value.split(',');
 
@@ -118,7 +144,7 @@ class ACL {
             rest.forEach((pattern, inx) => {
                 pattern = pattern.trim();
                 
-                if(pattern.slice(0, 1) === '$') {
+                if(pattern.slice(0, 1) === '~') {
                     pattern = json5.parse(objects[pattern.slice(1)]);
 
                     let flatten_pattern = flatten(pattern);
@@ -129,6 +155,8 @@ class ACL {
 
                         return memo;
                     }, {});
+
+                    pattern = unflatten(pattern);
 
                 }
                 else pattern = ACL.parseRegExp(pattern);

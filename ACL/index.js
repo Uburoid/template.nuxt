@@ -33,17 +33,20 @@ const { ACL } = require('./ACL');
         }
     ]
         
-    const model = 'role = roleMatcher, class = regExpMatcher, methods = regExpMatcher, resource = resourceMatcher, token = regExpMatcher, ip = ipMatcher, $options={strict: true, priority: false}';
+    const model = './model.conf';
+    //const model = 'role = roleMatcher, class = regExpMatcher, methods = regExpMatcher, resource = resourceMatcher, token = regExpMatcher, ip = ipMatcher, $options={strict: true, priority: false}';
 
-    const policy = `
-    #allow,*,*,*,{path:'/inspire', owner: { _id: 100 }},*
+    const policy = './policy.csv';
+    
+    /* const policy = `
+    allow,*,*,$data._id,{path:'/inspire', owner: { _id: '$data._id' }},*
     #allow,*,*,*,{path:'!/inspire'},*
     #deny,Аноним,*,pageData,{path:'!/inspire'},*
     deny,*,*,pageData,{path:'!/inspire'},invalid, !10
     allow,Пользователь,*,pageData,{path:'!/inspire'},*, !10
     #deny,Аноним,Account,signout,,*
     #deny,*,*,*,{path:'!/inspire'},invalid
-    `;
+    `; */
 
     const ipMatcher = (policy, value) => {
         return +policy === value
@@ -52,17 +55,23 @@ const { ACL } = require('./ACL');
     let acl = new ACL({ model, policy, roles }, { ipMatcher });
 
     let access_granted = acl.enforce({
-        role: 'Администратор',
-        class: "UI", 
-        methods: 'pageData',
-        //methods: ['pageData'],
-        resource: {
-            path: '/inspire',
-            //owner: { _id: 100 }
+        request: {
+            role: 'Администратор',
+            class: "UI", 
+            methods: 'pageData',
+            //methods: ['pageData'],
+            resource: {
+                path: '/inspire',
+                //owner: { _id: 100 }
+            },
+            token: 'invalid',
+            ip: 10
         },
-        token: 'invalid',
-        ip: 10
-    }, {strict: true, priority: true});
+        options: {strict: true, priority: true},
+        data: {
+            _id: 100
+        }
+    });
 
     console.log(access_granted);
 })();
