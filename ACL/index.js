@@ -1,7 +1,8 @@
 const casbin = require('casbin');
 const flatten = require('flat');
+const { ACL } = require('./ACL');
 
-const ACL = async () => {
+const ACL1 = async () => {
     const enforcer = await casbin.newEnforcer('./model.conf', './policy.csv');
 
     return enforcer
@@ -13,7 +14,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
 
 (async () => {
 
-    let model = {
+    let model1 = {
         role: RegExp,
         class: RegExp,
         methods: [RegExp],
@@ -21,42 +22,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         token: RegExp
     }
 
-    let roles = {
-        name: 'virtual',
-        children: [
-            {
-                name: 'Аноним',
-                children: [
-                ]
-            },
-            {
-                name: 'Пользователь',
-                children: [
-                    {
-                        name: 'Администратор',
-                        children: [
-                            {
-                                name: 'root'
-                            }
-                        ]
-                    },
-                    {
-                        name: 'Автор',
-                    },
-                    {
-                        name: 'Партнер',
-                        children: [
-                            {
-                                name: 'Основатель'
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-
-    roles = [
+    let roles = [
         {
             name: 'Аноним',
             children: [
@@ -88,15 +54,45 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         }
     ]
         
+    //const model = 'role = roleMatcher, class = regExpMatcher,methods=arrayRegExpMatcher,resource=resourceMatcher,token=regExpMatcher,$options={strict:true}';
 
-    let policy = [
+    let model = {
+        role: {
+            type: RegExp
+        },
+        class: {
+            type: RegExp
+        },
+        methods: {
+            type: [RegExp]
+        },
+        resource: {
+            type: Object
+        },
+        token: {
+            type: RegExp
+        }
+    }
+
+    const policy = `
+    allow,*,*,*,{path:'/inspire$', owner: 100},*
+    deny,Аноним,*,pageData,{path:'/inspire$'},*
+    allow,Пользователь,*,pageData,{path:'/inspire$'},*
+    deny,Аноним,Account,signout,,*
+    deny,*,*,*,{path:'/inspire$'},invalid
+    `;
+
+    let acl = new ACL({ model, policy, roles });
+    console.log(acl)
+
+    let policy1 = [
         {
             permission: 'allow',
             role: '*',
             class: '*',
             methods: '*',
             resource: {
-                path: '/inspire'
+                path: '/inspire$'
             },
             token: '*'
         },
@@ -106,11 +102,11 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
             class: '*',
             methods: [/pageData/],
             resource: {
-                path: '/inspire'
+                path: '/inspire$'
             },
             token: '*'
         },
-        {
+        /* {
             permission: 'allow',
             role: /Пользователь/,
             class: '*',
@@ -119,7 +115,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
                 path: '/inspire'
             },
             token: '*'
-        },
+        }, */
         {
             permission: 'deny',
             role: /Аноним/,
@@ -131,9 +127,9 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
             permission: 'deny',
             role: '*',
             class: '*',
-            methods: ['*'],
+            methods: 'pageData$',
             resource: {
-                path: '/inspire'
+                path: '/inspire$|/home$'
             },
             token: /invalid/
         },
@@ -145,6 +141,9 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         }
         else if(value === '*') {
             return /.*/;
+        }
+        else if(value.constructor.name === 'String') {
+            return new RegExp(value);
         }
 
         return value;
@@ -200,8 +199,9 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
 
                 return Object.entries(flatten_policy).reduce((memo, entry) => {
                     let [key, value] = entry;
+                    let regExp = getRegExp(value);
 
-                    memo.push(flatten_value[key] ? getRegExp(value).test ? getRegExp(value).test(flatten_value[key]) : value === flatten_value[key] : false);
+                    memo.push(flatten_value[key] ? regExp.test ? regExp.test(flatten_value[key]) : value === flatten_value[key] : false);
 
                     return memo;
                 },[]).every(value => value);
@@ -238,7 +238,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
     }
 
     const request = {
-        role: 'root',
+        role: 'Аноним',
         class: "UI", 
         methods: ['pageData'],
         resource: {
@@ -247,7 +247,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         token: 'invalid'
     }
     /* const request = {
-        role: 'Пользователь',
+        role: 'Пользователь|Аноним',
         class: "UI", 
         methods: ['pageData'],
         resource: {
@@ -262,7 +262,7 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
     
 
 
-    
+
     /* let selection = 'viber';
 
     const telegram = new cloudrail.services.Telegram(
