@@ -1,57 +1,175 @@
-const json = require('json5');
+const json5 = require('json5');
+const flatten = require('flat');
+const unflatten = flatten.unflatten;
 
 class ACL {
-    constructor({ model, policy, roles }) {
+    constructor({ model, policy, roles }, matchers) {
+
+        matchers = matchers ? typeof(matchers) !== 'object' ? typeof(matchers) === 'function' ? { matchers } : {} : matchers : {};
+        ACL.$matchers = { ...ACL.matchers, ...matchers };
         //super();
 
-        const { model: parsed_model, options } = ACL.parseModel(model);
+        const { model: parsed_model, options, order } = ACL.parseModel(model);
         this.model = parsed_model;
         this.options = options;
 
-        this.policy = ACL.parsePolicy(policy);;
-        this.roles = roles;
+        this.policy = ACL.parsePolicy(policy, order);;
+        ACL.roles = roles;
 
         //this.options = { ...strict: true, ...options };
     }
 
-    parseRegExp(value) {
-        if(value.slice(0, 1) === '!') {
-            return value.slice(1);
+    enforce(request, options) {
+        let { model, policy, options: default_options } = this;
+        options = options ? { ...default_options, ...options } : default_options;
+
+        request = policy.reduce((memo, policy) => {
+            let permission = false;
+
+            permission = Object.entries(request).every(([key, value]) => {
+                return model[key] && model[key](policy[key], value) ? true : false;
+            });
+
+            permission && memo.push(policy.permission);
+
+            return memo;
+        }, []);
+        
+        let result = !!!request.length;
+
+        if(!result) {
+            let last = request[request.length - 1];
+
+            if(options.strict) {
+                if(options.priority) {
+                    result = last === 'allow' && !request.some(permission => permission === 'deny');
+                }
+                else result = request.every(permission => permission === 'allow');
+            }
+            else {
+                if(options.priority) {
+                    result = last === 'allow';
+                }
+                else {
+                    result = request.some(permission => permission === 'allow');
+                }
+            }
         }
-        else if(value === '*') {
-            return /.*/;
-        }
-        else return new RegExp(value);
+
+        //let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');
+
+        return result;
     }
 
-    static parsePolicy(policy) {
-        let jsonRegExp = /\{(?:[^{}]|(?R))*\}/g;
+    static parseRegExp(value) {
+        if(value.constructor.name === 'String') {
+            if(value.slice(0, 1) === '!') {
+                return value.slice(1);
+            }
+            else if(value === '*') {
+                return /.*/;
+            }
+            else return new RegExp(value);
+        }
+        else return value;
+    }
 
-        return 1;
+    static detectJSONs(value, jsons) {
+        let start = value.indexOf('{');
+        let counter = 0;
+        let counter_l = 0;
+        let counter_r = 0;
+
+        let json = '';
+
+        if(~start) {
+
+            do {
+                let char = value[start + counter++];
+                json += char;
+
+                char === '{' && counter_l++;
+                char === '}' && counter_r++;
+            } while(counter_l !== counter_r);
+            
+            jsons.push(json);
+            value = value.replace(json, '');
+
+            jsons = ACL.detectJSONs(value, jsons);
+        }
+        return jsons;
+    }
+
+    static parsePolicy(policy, model) {
+        let prepared = policy.split('\n').reduce((memo, line) => line.trim() ? memo.push(line.trim()) && memo : memo, []);
+
+        policy = prepared.reduce((memo, value) => {
+            if(value.slice(0, 1) === '#') return memo; //is comment
+
+            let objects = [];
+            objects = ACL.detectJSONs(value, objects);
+
+            objects.length && objects.forEach((json, inx) => value = value.replace(json, `$${inx}`));
+
+            let [permission, ...rest] = value.split(',');
+
+            let policy = { permission };
+
+            rest.forEach((pattern, inx) => {
+                pattern = pattern.trim();
+                
+                if(pattern.slice(0, 1) === '$') {
+                    pattern = json5.parse(objects[pattern.slice(1)]);
+
+                    let flatten_pattern = flatten(pattern);
+
+                    pattern = Object.entries(flatten_pattern).reduce((memo, [key, value]) => {
+                        value = ACL.parseRegExp(value);
+                        memo[key] = value;
+
+                        return memo;
+                    }, {});
+
+                }
+                else pattern = ACL.parseRegExp(pattern);
+
+                policy[model[inx]] = pattern;
+            });
+
+            memo.push(policy);
+            return memo;
+        }, []);
+
+        return policy;
     }
 
     static parseModel(model) {
+        let objects = ACL.detectJSONs(model, []);
+        objects.length && objects.forEach((json, inx) => model = model.replace(json, `$${inx}`));
+
         const prepared = model.split(',');
         model = {};
-        let options = { strict: true };
         
-        prepared.reduce((memo, pattern) => {
+        const result = prepared.reduce((memo, pattern) => {
             let [key, value] = pattern.split('=');
             key = key.trim();
             value = value.trim();
 
             if(key === '$options') {
-                options = { ...options, ...json.parse(value) }
+                memo.options = { ...memo.options, ...json5.parse(objects[value.slice(1)]) }
             }
             else {
-                memo[key] = ACL.matchers[value];
+                memo.model[key] = ACL.$matchers[value];
+                memo.order.push(key);
             }
 
             return memo;
-        }, model);
+        }, { model, order: [], options: { strict: true, priority: false } });
 
-        return { model, options };
+        return result;
     }
+
+    
 
     static get matchers() {
         return {
@@ -73,30 +191,26 @@ class ACL {
                             return memo;
                         }, []);
                     }
-                    
-                    policy = Array.isArray(policy) ? policy : [policy];
             
-                    let result = policy.some(policy => hierarchy.some(role => getRegExp(policy).test(role)));
+                    let result = hierarchy.some(role => policy.test ? policy.test(role) : policy === role);
             
                     return result
                 }
                 else return true;
             },
-            regExpMatcher: (policy, value) => getRegExp(policy).test(value),
-            arrayRegExpMatcher: (policy, value) => {
-                values = Array.isArray(value) ? value : [value];
-                policy = Array.isArray(policy) ? policy : [policy];
+            regExpMatcher: (policy, value) => {
+                let values = Array.isArray(value) ? value : [value];
         
-                return values.every(value => policy.every(policy => getRegExp(policy).test(value)));
+                return values.every(value => policy.test ? policy.test(value) : policy === value);
             },
             resourceMatcher: (policy, value) => {
-                flatten_policy = flatten(policy);
-                flatten_value = flatten(value);
+                let flatten_policy = flatten(policy);
+                let flatten_value = flatten(value);
         
                 return Object.entries(flatten_policy).reduce((memo, entry) => {
-                    let [key, value] = entry;
+                    let [key, policy] = entry;
         
-                    memo.push(flatten_value[key] ? getRegExp(value).test ? getRegExp(value).test(flatten_value[key]) : value === flatten_value[key] : false);
+                    memo.push(flatten_value[key] ? policy.test ? policy.test(flatten_value[key]) : policy === flatten_value[key] : false);
         
                     return memo;
                 },[]).every(value => value);

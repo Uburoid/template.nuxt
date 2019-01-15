@@ -1,27 +1,6 @@
-const casbin = require('casbin');
-const flatten = require('flat');
 const { ACL } = require('./ACL');
 
-const ACL1 = async () => {
-    const enforcer = await casbin.newEnforcer('./model.conf', './policy.csv');
-
-    return enforcer
-}
-
-const cloudrail = require("cloudrail-si");
-cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
-
-
 (async () => {
-
-    let model1 = {
-        role: RegExp,
-        class: RegExp,
-        methods: [RegExp],
-        resource: Object,
-        token: RegExp
-    }
-
     let roles = [
         {
             name: 'Аноним',
@@ -54,267 +33,38 @@ cloudrail.Settings.setKey("5c3a4d4c21b62e5228bbd27a");
         }
     ]
         
-    //const model = 'role = roleMatcher, class = regExpMatcher,methods=arrayRegExpMatcher,resource=resourceMatcher,token=regExpMatcher,$options={strict:true}';
-
-    let model = {
-        role: {
-            type: RegExp
-        },
-        class: {
-            type: RegExp
-        },
-        methods: {
-            type: [RegExp]
-        },
-        resource: {
-            type: Object
-        },
-        token: {
-            type: RegExp
-        }
-    }
+    const model = 'role = roleMatcher, class = regExpMatcher, methods = regExpMatcher, resource = resourceMatcher, token = regExpMatcher, ip = ipMatcher, $options={strict: true, priority: false}';
 
     const policy = `
-    allow,*,*,*,{path:'/inspire$', owner: 100},*
-    deny,Аноним,*,pageData,{path:'/inspire$'},*
-    allow,Пользователь,*,pageData,{path:'/inspire$'},*
-    deny,Аноним,Account,signout,,*
-    deny,*,*,*,{path:'/inspire$'},invalid
+    #allow,*,*,*,{path:'/inspire', owner: { _id: 100 }},*
+    #allow,*,*,*,{path:'!/inspire'},*
+    #deny,Аноним,*,pageData,{path:'!/inspire'},*
+    deny,*,*,pageData,{path:'!/inspire'},invalid, !10
+    allow,Пользователь,*,pageData,{path:'!/inspire'},*, !10
+    #deny,Аноним,Account,signout,,*
+    #deny,*,*,*,{path:'!/inspire'},invalid
     `;
 
-    let acl = new ACL({ model, policy, roles });
-    console.log(acl)
-
-    let policy1 = [
-        {
-            permission: 'allow',
-            role: '*',
-            class: '*',
-            methods: '*',
-            resource: {
-                path: '/inspire$'
-            },
-            token: '*'
-        },
-        {
-            permission: 'deny',
-            role: /Аноним/,
-            class: '*',
-            methods: [/pageData/],
-            resource: {
-                path: '/inspire$'
-            },
-            token: '*'
-        },
-        /* {
-            permission: 'allow',
-            role: /Пользователь/,
-            class: '*',
-            methods: [/pageData/],
-            resource: {
-                path: '/inspire'
-            },
-            token: '*'
-        }, */
-        {
-            permission: 'deny',
-            role: /Аноним/,
-            class: /Account/, // /.+/
-            methods: [/signout/],
-            token: '*'
-        },
-        {
-            permission: 'deny',
-            role: '*',
-            class: '*',
-            methods: 'pageData$',
-            resource: {
-                path: '/inspire$|/home$'
-            },
-            token: /invalid/
-        },
-    ]
-
-    const getRegExp = (value) => {
-        if(value instanceof RegExp) {
-            return value;
-        }
-        else if(value === '*') {
-            return /.*/;
-        }
-        else if(value.constructor.name === 'String') {
-            return new RegExp(value);
-        }
-
-        return value;
+    const ipMatcher = (policy, value) => {
+        return +policy === value
     }
 
-    let matcher = [
-        {
-            columns: ['role'],
-            match: (policy, role) => {
-                let flatten_roles = flatten(roles);
-                let entries = Object.entries(flatten_roles);
-                
-                let hierarchy = [];
+    let acl = new ACL({ model, policy, roles }, { ipMatcher });
 
-                let [role_key] = entries.find(([key, value]) => value === role) || [];
-                
-                if(role_key) {
-                    let tail = role_key.split('.').slice(-1).pop();
-    
-                    hierarchy = entries.reduce((memo, [key, value]) => {
-                        role_key.startsWith(key.replace(tail, '')) && memo.push(value);
-
-                        return memo;
-                    }, []);
-                }
-                
-                policy = Array.isArray(policy) ? policy : [policy];
-
-                let result = policy.some(policy => hierarchy.some(role => getRegExp(policy).test(role)));
-
-                return result
-                //hierarchy.includes(value);
-            }
-        },
-        {
-            columns: ['class', 'token'],
-            match: (policy, value) => getRegExp(policy).test(value)
-        },
-        {
-            columns: ['methods'],
-            match: (policy, value) => {
-                values = Array.isArray(value) ? value : [value];
-                policy = Array.isArray(policy) ? policy : [policy];
-
-                return values.every(value => policy.every(policy => getRegExp(policy).test(value)));
-            }
-        },
-        {
-            columns: ['resource'],
-            match: (policy, value) => {
-                flatten_policy = flatten(policy);
-                flatten_value = flatten(value);
-
-                return Object.entries(flatten_policy).reduce((memo, entry) => {
-                    let [key, value] = entry;
-                    let regExp = getRegExp(value);
-
-                    memo.push(flatten_value[key] ? regExp.test ? regExp.test(flatten_value[key]) : value === flatten_value[key] : false);
-
-                    return memo;
-                },[]).every(value => value);
-            }
-        }
-    ]
-
-    const enforce = (request, model, policy, options) => {
-        options = { strict: true, ...options };
-
-        request = policy.reduce((memo, policy) => {
-            //memo[key] = request[key];
-
-            let permission = options.strict ? 'deny' : 'allow';
-            Object.keys(model).some(key => {
-                matcher.some(item => {
-                    let includes = item.columns.includes(key);
-                    permission = includes ? policy[key] ? item.match(policy[key], request[key]) && policy.permission : 'allow' : permission;
-
-                    return includes;
-                });
-
-                return !permission;
-            });
-
-            permission && memo.push(permission);
-
-            return memo;
-        }, []);
-        
-        let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');
-
-        return result;
-    }
-
-    const request = {
-        role: 'Аноним',
+    let access_granted = acl.enforce({
+        role: 'Администратор',
         class: "UI", 
-        methods: ['pageData'],
+        methods: 'pageData',
+        //methods: ['pageData'],
         resource: {
-            path: '/inspire'
+            path: '/inspire',
+            //owner: { _id: 100 }
         },
-        token: 'invalid'
-    }
-    /* const request = {
-        role: 'Пользователь|Аноним',
-        class: "UI", 
-        methods: ['pageData'],
-        resource: {
-            path: '/'
-        },
-        token: 'invalid'
-    } */
+        token: 'invalid',
+        ip: 10
+    }, {strict: true, priority: true});
 
-    let allow = enforce(request, model, policy, { strict: true });
-    console.log(allow);
-
-    
-
-
-
-    /* let selection = 'viber';
-
-    const telegram = new cloudrail.services.Telegram(
-        null,
-        "738767838:AAGisCF0eTHfZ-SJiwUvoyB1mWFYesP0geM",
-        "[Webhook URL]"
-    );
-
-    const viber = new cloudrail.services.Viber(
-        null,
-        "49122a367a27d505-c0559a5494e9a742-246451fd3f9f5a3c",
-        "[Webhook URL]",
-        "BestNovostroy"
-    );
-
-    // 'selection' is a String representing e.g. a user's service choice
-    switch(selection) {
-        case "telegram": service = telegram; break;
-        case "viber": service = viber; break;
-    }
-
-    service.sendMessage(
-        "79009395505",
-        "It's so easy to send message via CloudRail",
-        (error, result) => {
-            // Check for potential error and use the result
-            console.log(error, result)
-        }
-    ); */
-
-    /* let token_err = {};
-
-    let domain = token_err ? 'expired' : 'not_expired';
-    
-    const request = {
-        action: "show", // the user that wants to access a resource.
-        class: "UI", // the resource that is going to be accessed.
-        method: 'pageData',
-        role: 'Аноним',
-        resource: '/inspire',
-        token: 'invalid'
-    }
-
-    const e = await ACL();
-
-    let perms = e.getPermissionsForUser('Аноним');
-    let perms1 = e.getPermissionsForUser('Пользователь');
-
-    console.log(perms, perms1);
-
-    e.enforce(request.action, request.class, request.method, request.role, request.resource, 'valid') ? console.log('ALLOWED') : console.log('DENIED');
-    e.enforce(request.action, request.class, request.method, request.role, request.resource, 'invalid') ? console.log('ALLOWED') : console.log('DENIED'); */
+    console.log(access_granted);
 })();
 
 //49122a367a27d505-c0559a5494e9a742-246451fd3f9f5a3c
