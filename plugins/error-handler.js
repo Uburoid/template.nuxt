@@ -4,8 +4,8 @@ export default (context, inject) => {
     const errorFunction = context.error;
 
     const $error = (err) => {
-        //debugger
-        err.display = typeof(err.display) === 'undefined' ? true : err.redirect ? err.display = false : err.display;
+        debugger
+        err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
 
         if(!context.store.state.error || (context.store.state.error && !context.store.state.error.display) || err.server_error) {
             err.component = err.component || 'error';
