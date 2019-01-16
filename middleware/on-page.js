@@ -5,7 +5,7 @@ export default async (context) => {
     let clear_error = false;
     if(store.state.error && store.state.error.from !== route.path) {
         clear_error = true;
-        //store.commit('SET_ERROR', void 0);
+        store.commit('SET_ERROR', { ...store.state.error, clear: true });
         //this.$store.commit('SET_PAGE_WITH_ERROR', this.$store.state.error.from);
     }
 
@@ -38,5 +38,6 @@ export default async (context) => {
         store.commit('SET_ACCOUNT', account);    
     }    
     
-    clear_error && store.commit('SET_ERROR', void 0);
+    store.state.error && store.state.error.clear && store.commit('SET_ERROR', void 0);
+    //clear_error && store.commit('SET_ERROR', void 0);
 }
