@@ -61,13 +61,13 @@ const { ACL } = require('./ACL');
             methods: 'pageData',
             //methods: ['pageData'],
             resource: {
-                path: '/inspire',
+                path: '/home',
                 //owner: { _id: 100 }
             },
             token: 'invalid',
             ip: 10
         },
-        options: {strict: true, priority: true},
+        options: { strict: true, priority: false },
         data: {
             _id: 100
         }

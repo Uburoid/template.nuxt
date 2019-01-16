@@ -2,7 +2,48 @@ const fs = require('fs-extra');
 const { JWT } = require('../jwt');
 const LRU = require('lru-cache');
 const { Metrics } = require('./metrics');
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+let roles = [
+    {
+        name: 'Аноним',
+        children: [
+        ]
+    },
+    {
+        name: 'Пользователь',
+        children: [
+            {
+                name: 'Администратор',
+                children: [
+                    {
+                        name: 'root'
+                    }
+                ]
+            },
+            {
+                name: 'Автор',
+            },
+            {
+                name: 'Партнер',
+                children: [
+                    {
+                        name: 'Основатель'
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+const model = './security/model.conf';
+const policy = './security/policy.csv';
+
 const { ACL } = require('./ACL');
+
+const acl = new ACL({ model, policy, roles });
+/////////////////////////////////////////////////////////////////////////////////////
 
 const cache = new LRU({
     maxAge: 86400000 //сутки
@@ -48,10 +89,15 @@ class Base {
                         
                         try {
                             let allow = await self.$beforeAction(propKey, ...args);
-                            allow = typeof(allow) === 'undefined' ? true : allow;
+                            //allow = typeof(allow) === 'undefined' ? true : allow;
 
-                            if(!allow) 
-                                throw new AccessDenied(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                            if(!allow) {
+                                if(self.payload.token_err) {
+                                    throw self.payload.token_err;
+                                }
+                                else throw new AccessDenied(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                            }
+
                             //debugger
                             let response = await origMethod.apply(target, args);
 
@@ -187,8 +233,8 @@ class API extends Base {
 
     async $refreshToken() {
         //debugger
-        let { _id, name, shadow_id, access_level, picture } = this.payload;
-        let payload = { _id, name, shadow_id, access_level, picture, class: this.payload.class };
+        let { _id, name, shadow_id, role, picture } = this.payload;
+        let payload = { _id, name, shadow_id, role, picture, class: this.payload.class };
         
         if(!this.payload.token_err) {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
@@ -244,14 +290,34 @@ class SecuredAPI extends API {
         let allow = await super.$beforeAction(method_name, ...args);
         
         if(allow) {
+            debugger
             if(!this.payload) throw new Error('Payload not defined.');
 
-            //debugger
-            allow = ACL(class_acl, method_name, this, args);
-            allow = allow === 'allow';
+            let [resource] = args;
 
-            if(this.payload.token_err) 
+            allow = acl.enforce({
+                request: {
+                    role: this.payload.role,
+                    class: this.constructor.name, 
+                    methods: method_name,
+                    resource,
+                    token: this.payload.token_err ? 'invalid' : 'valid'
+                },
+                options: { strict: true, priority: false },
+                data: {
+                    _id: 100
+                }
+            });
+
+            /* allow = ACL(class_acl, method_name, this, args);
+            allow = allow === 'allow'; */
+
+            if(allow && this.payload.token_err) {
+                this.payload.token_err.redirect = '';
+                this.payload.token_err.display = false;
                 throw this.payload.token_err;
+            }
+                
         }
         
         return allow;

@@ -81,9 +81,12 @@ module.exports = {
         ** You can extend webpack config here
         */
         //vendor: ['axios', 'vuetify'], //depricated
-
+        
         extend (config, { isDev, isClient }) {
+            //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
+            
+            config.node = { __dirname: true };
         }
     },
 

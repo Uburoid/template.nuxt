@@ -50,7 +50,8 @@ class ACL {
 
             permission = Object.entries(request).every(([key, value]) => {
 
-                return model[key] && model[key](policy[key], value) ? true : false;
+                return model[key] ? !!model[key](policy[key], value) : true;
+                //return model[key] && model[key](policy[key], value) ? true : false;
             });
 
             permission && memo.push(policy.permission);
@@ -89,7 +90,7 @@ class ACL {
             if(value.startsWith('$data')) {
                 return value;
             }
-            else if(value.slice(0, 1) === '!') {
+            else if(value.slice(0, 1) === '=') {
                 return value.slice(1);
             }
             else if(value === '*') {
@@ -179,6 +180,10 @@ class ACL {
         model = {};
         
         const result = prepared.reduce((memo, pattern) => {
+            pattern = pattern.trim();
+
+            if(pattern.slice(0, 2) === '--') return memo;
+
             let [key, value] = pattern.split('=');
             key = key.trim();
             value = value.trim();

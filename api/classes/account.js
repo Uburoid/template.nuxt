@@ -100,7 +100,7 @@ class Account extends API {
         let auth = found && await bcrypt.compare(`${email}:${password}`, found.hash);
 
         if(auth) {
-            this.payload = { ...found, shadow_id: this.payload.shadow_id || this.payload._id, access_level: found.role.level };
+            this.payload = { ...found, shadow_id: this.payload.shadow_id || this.payload._id, role: found.role.name };
             return this.get();
         }
         else {
@@ -135,7 +135,7 @@ class Account extends API {
             shadow = await Account.shadow();
         }
 
-        shadow = { ...shadow, access_level: shadow.role.level };
+        shadow = { ...shadow, role: shadow.role.name };
         return shadow;        
     }
 
@@ -159,7 +159,7 @@ class Account extends API {
             role
         });
 
-        account = { ...account, access_level: account.role.level };
+        account = { ...account, role: account.role.name };
         
         return account;
     }

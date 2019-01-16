@@ -36,7 +36,9 @@
     "ua-parser-js": "^0.7.19",
     "uglify-js": "^3.4.9",
     "vue-json-pretty": "^1.4.1",
-    "vuetify": "^1.4.1"
+    "vuetify": "^1.4.1",
+    "flat": "^4.1.0",
+    "json5": "^2.1.0"
   },
   "devDependencies": {}
 }

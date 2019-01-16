@@ -1,12 +1,11 @@
 --allow, *, *, $data._id, { path: '/inspire', owner: { _id: '$data._id' }}, *
 
-allow, *, *, *, *, valid
-deny, *, *, *, *, invalid
-
---deny,Аноним,*,pageData,{path:'=/inspire'},*
+--allow, *, *, *, *, valid
+--deny, *, *, *, *, invalid
 
 deny, Аноним, *, pageData, {path:'=/inspire'}, *
---deny, Пользователь, *, pageData, {path:'=/inspire'}, invalid
+deny, Пользователь, *, pageData, { path: '=/inspire' }, invalid
+allow, Пользователь, *, pageData, { path: '=/inspire' }, valid
 
 --deny,Аноним,Account,signout,,*
 
