@@ -7,7 +7,7 @@ export default (context, inject) => {
         debugger
         err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
 
-        if(!context.store.state.error || (context.store.state.error && !context.store.state.error.display) || err.server_error) {
+        if(!context.store.state.error) { //|| (context.store.state.error && !context.store.state.error.display) || err.server_error) {
             err.component = err.component || 'error';
             err.from = context.route.path;
 

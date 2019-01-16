@@ -98,7 +98,7 @@ class Account extends API {
         });
 
         let auth = found && await bcrypt.compare(`${email}:${password}`, found.hash);
-
+        //throw new Error('Завершите регистрацию');
         if(auth) {
             this.payload = { ...found, shadow_id: this.payload.shadow_id || this.payload._id, role: found.role.name };
             return this.get();

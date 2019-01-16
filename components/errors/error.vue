@@ -36,6 +36,7 @@ export default {
         VueJsonPretty: () => import('vue-json-pretty')
     },
     data: () => ({
+        _err: void 0
     }),
     watch: {
         /* '$route.path': function (val) {
@@ -52,7 +53,8 @@ export default {
     },
     computed: {
         err() {
-            return this.$store.state.error;
+            this._err = this._err || { ...this.$store.state.error };
+            return this._err;
         }
     },
     methods: {

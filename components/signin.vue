@@ -52,11 +52,16 @@ export default {
         async submit() {
             debugger
             let { email, password } = this;
+            
+            this.$store.commit('SET_ERROR', { display: true, component: 'error', message: 'asdadsasd'});
 
             let account = await this.$server.account.signin({ email, password }, { cache: false });
-            this.$store.commit('SET_ACCOUNT', account);
 
-            this.$router.push(this.$store.state.page_with_error || '/');
+            if(!this.$store.state.error) {
+                this.$store.commit('SET_ACCOUNT', account);
+
+                this.$router.push(this.$store.state.page_with_error || '/');
+            }
         }
     }
 }

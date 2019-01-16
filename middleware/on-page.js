@@ -1,7 +1,7 @@
 export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
     //debugger
-
+    //store.commit('SET_ERROR', { ...store.state.error, clear: true });
     let clear_error = false;
     if(store.state.error && store.state.error.from !== route.path) {
         clear_error = true;
@@ -38,6 +38,6 @@ export default async (context) => {
         store.commit('SET_ACCOUNT', account);    
     }    
     
-    store.state.error && store.state.error.clear && store.commit('SET_ERROR', void 0);
+    store.state.error && store.state.error.clear && setTimeout(() => store.commit('SET_ERROR', void 0), 100); //maybe not the best way though
     //clear_error && store.commit('SET_ERROR', void 0);
 }
