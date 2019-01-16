@@ -57,7 +57,6 @@ class ACL {
             permission = Object.entries(request).every(([key, value]) => {
 
                 return model[key] ? !!model[key](policy[key], value) : true;
-                //return model[key] && model[key](policy[key], value) ? true : false;
             });
 
             permission && memo.push(policy.permission);

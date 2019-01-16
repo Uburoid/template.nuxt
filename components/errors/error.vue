@@ -53,6 +53,7 @@ export default {
     },
     computed: {
         err() {
+            return this.$store.state.error;
             this._err = this._err || { ...this.$store.state.error };
             return this._err;
         }
@@ -60,7 +61,7 @@ export default {
     methods: {
         close() {
             //this.$nuxt.nuxt.err = void 0;
-            this.$router.push('/');
+            this.$route.path === '/' ? this.$store.commit('SET_ERROR', void 0) : this.$router.push('/');
 
             /* setTimeout(() => {
                 this.$store.commit('SET_ERROR', void 0);

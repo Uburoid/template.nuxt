@@ -53,7 +53,7 @@ export default {
             debugger
             let { email, password } = this;
             
-            this.$store.commit('SET_ERROR', { display: true, component: 'error', message: 'asdadsasd'});
+            //this.$store.commit('SET_ERROR', { display: true, component: 'error', message: 'asdadsasd'});
 
             let account = await this.$server.account.signin({ email, password }, { cache: false });
 
