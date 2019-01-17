@@ -37,7 +37,20 @@ class Role extends Node {
                 default: (obj) => {
                     return 0
                 }
-            }
+            },
+            inherits: role2role
+        }
+    }
+}
+
+class role2role extends Relation {
+
+    static get schema() {
+        return {
+            ...super.schema,
+            $start: Role,
+            $type: 'наследует',
+            $end: Role
         }
     }
 }
@@ -58,7 +71,7 @@ class Account extends Node {
     static get schema() {
         return {
             ...super.schema,
-            $labels: ['Участник'],
+            $labels: ['Учетная запись'],
             name: {
                 type: String,
                 required: true,
@@ -78,7 +91,7 @@ class Anonymous extends Account {
     static get schema() {
         let schema = {
             ...super.schema,
-            $labels: ['Участник', 'Аноним'],
+            $labels: ['Учетная запись', 'Аноним'],
         }
 
         return schema;
@@ -89,7 +102,7 @@ class Club extends Account {
     static get schema() {
         let schema = {
             ...super.schema,
-            $labels: ['Участник', 'Клуб'],
+            $labels: ['Учетная запись', 'Клуб'],
         }
 
         return schema;
@@ -100,7 +113,7 @@ class Member extends Account {
     static get schema() {
         let schema = {
             ...super.schema,
-            $labels: ['Участник', 'Пользователь'],
+            $labels: ['Учетная запись', 'Пользователь'],
 
             
             hash: String,
@@ -157,10 +170,16 @@ class Member extends Account {
 
 class RootMember extends Member {
     static get schema() {
+        let super_schema = super.schema;
+        
+        delete super_schema.referer;
+        delete super_schema.list;
+        
+        super_schema.wallet.required = false;
         
         return {
-            ...super.schema,
-            $labels: ['Основатель', 'Участник']
+            ...super_schema,
+            $labels: ['Основатель', 'Учетная запись', 'Пользователь']
 
         }
     }

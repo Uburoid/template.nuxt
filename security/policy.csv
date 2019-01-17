@@ -4,8 +4,8 @@
 --deny, *, *, *, *, invalid
 
 deny, Аноним, *, pageData, {path:'=/inspire'}, *
-deny, Пользователь, *, pageData, { path: '=/inspire' }, invalid
-allow, Пользователь, *, pageData, { path: '=/inspire' }, valid
+deny, Пользователи, *, pageData, { path: '=/inspire' }, invalid
+allow, Пользователи, *, pageData, { path: '=/inspire' }, valid
 
 --deny,Аноним,Account,signout,,*
 

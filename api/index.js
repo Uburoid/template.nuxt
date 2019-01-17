@@ -1,6 +1,158 @@
-const { driver } = require('./db');
+import { resolve, reject } from 'q';
+
 (async () => {
+    return
+    /* const neo4j = require('neo4j-driver').v1;
+    const driver = neo4j.driver('bolt://206.81.24.70:7687', neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true}); //WARNING: POSSIBLE NUMBER DATA LOSS!!!
+
+    const fs = require('fs-extra');
+    const path = require('path');
+    const json5 = require('json5');
+
+    const backup = path.join(process.cwd(), 'backup') + '/';
+    const driver1 = neo4j.driver('bolt://104.248.92.115:7687', neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true}); //WARNING: POSSIBLE NUMBER DATA LOSS!!!
+ */
+    /* let nodes = fs.readFileSync(backup + 'nodes.json', { encoding: 'utf-8' });
+    nodes = JSON.parse(nodes);
+
+    nodes = nodes.reduce((memo, node) => {
+        let { labels, ...rest } = node.n;
+        labels = labels.map(label => '`' + label + '`');
+
+        if(labels.length) {
+            let cql = `MERGE (n${rest.sys_id}:${labels.join(':')} {sys_id: ${rest.sys_id}}) SET n${rest.sys_id} = $n${rest.sys_id}`;
+            memo.params['n' + rest.sys_id] = rest;
+            memo.cql.push(cql);
+        }
+
+        return memo;
+    }, { cql: [], params: {}});
+
+    let cql = nodes.cql.join('\n');
+
+    let session = driver1.session();
+        session
+            .run(cql, nodes.params)
+            .then(result => {
+                result.records = result.records.map(record => {
+                    let nodes = {};
+
+                        for(let key of record.keys) {
+                            let value = record.get(key);
+                            nodes[key] = { ...value };
+                        }
+
+                        return nodes;
+                });
+
+                console.log(result.records);
+                session.close();
+            });
+
+    console.log(nodes); */
+
+    /* let nodes = fs.readFileSync(backup + 'relations.json', { encoding: 'utf-8' });
+    nodes = JSON.parse(nodes);
+
+    let b = 1
+    nodes = nodes.reduce((memo, node, inx) => {
+
+        let batch = 'b' + (inx % 50 === 0 ? b++ : b);
+        let { type, ...rest } = node.r;
+
+        if(type) {
+            type = '`' + type + '`';
+
+            let cql = `MATCH (a${node.a.sys_id} {sys_id:${node.a.sys_id}})\nMATCH (b${node.b.sys_id} {sys_id:${node.b.sys_id}})\nMERGE (a${node.a.sys_id})-[r${rest.sys_id}:${type}]->(b${node.b.sys_id}) SET r${rest.sys_id} = $r${rest.sys_id}\nWITH {} AS a`;
+            memo.params['r' + rest.sys_id] = rest;
+            memo.cql[batch] = memo.cql[batch] || [];
+            memo.cql[batch].push(cql);
+        }
+
+        return memo;
+    }, { cql: {}, params: {}});
+
+    for(let key in nodes.cql) {
+        let cql = nodes.cql[key];
+
+        cql = cql.join('\n') + '\nRETURN *';
+
+        await new Promise((resolve, reject) => {
+            let session = driver1.session();
+            session
+                .run(cql, nodes.params)
+                .then(result => {
+                    result.records = result.records.map(record => {
+                        let nodes = {};
     
+                            for(let key of record.keys) {
+                                let value = record.get(key);
+                                nodes[key] = { ...value };
+                            }
+    
+                            return nodes;
+                    });
+    
+                    resolve(result.records);
+                    session.close();
+                })
+                .catch(err => {
+                    console.log(err);
+                    reject(err);
+                }
+                );
+        });
+
+    } */
+    
+
+    /* let session = driver.session();
+    session
+        .run('MATCH (n) WHERE NOT "Metrics" IN LABELS(n) RETURN n {.*, sys_id: ID(n), labels: LABELS(n)}')
+        .then(result => {
+            result.records = result.records.map(record => {
+                let nodes = {};
+
+                    for(let key of record.keys) {
+                        let value = record.get(key);
+                        nodes[key] = { ...value };
+                    }
+
+                    return nodes;
+            });
+
+            fs.writeFileSync(backup + 'nodes.json', JSON.stringify(result.records), { encoding: 'utf-8' });
+
+            console.log(result.records);
+            session.close();
+        });
+
+        session = driver.session();
+        session
+            .run(`MATCH (a) WHERE NOT 'Metrics' IN LABELS(a)
+                    MATCH (b) WHERE NOT 'Metrics' IN LABELS(b)
+                    MATCH (a)-[r]->(b) 
+                    RETURN a {sys_id: ID(a)},
+                    r {.*, sys_id: ID(r), type: TYPE(r)},
+                    b {sys_id: ID(b)}`)
+            .then(result => {
+                result.records = result.records.map(record => {
+                    let nodes = {};
+    
+                        for(let key of record.keys) {
+                            let value = record.get(key);
+                            nodes[key] = { ...value };
+                        }
+    
+                        return nodes;
+                });
+    
+                fs.writeFileSync(backup + 'relations.json', JSON.stringify(result.records), { encoding: 'utf-8' });
+    
+                console.log(result.records);
+                session.close();
+            }) */
+
     //driver.query
     return
     let { Relation } = require('./models/base_model');
