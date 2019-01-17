@@ -12,23 +12,6 @@ class Account extends API {
         super(...args);
     }
 
-    /* async _avatar(params, { res }) {
-        console.log(params);
-
-        const path = require('path');
-        let default_ava = path.join(process.cwd(), 'uploads', 'default', 'ava.png');
-        let ava = path.join(process.cwd(), 'uploads', 'ava.jpg');
-
-        !this.fs.pathExistsSync(ava) && (ava = default_ava);
-
-        //res.locals.sendAsFile = this.fs.pathExistsSync(ava);
-        
-        return {
-            $sendAsFile: this.fs.pathExistsSync(ava),
-            file: ava
-        };
-    } */
-
     async avatar() {
         //debugger
         let uploads = path.join(process.cwd(), 'uploads');
@@ -89,80 +72,6 @@ class Account extends API {
 
     async signin({ email, password }) {
         debugger
-
-        /* let anon = await Role.findOne({
-            name: 'Аноним'
-        });
-
-        !anon && (anon = await Role.save({
-            name: 'Аноним'
-        }));
-
-        let user = await Role.findOne({
-            name: 'Пользователи'
-        });
-
-        !user && (user = await Role.save({
-            name: 'Пользователи'
-        }));
-
-        let user1 = await Role.findOne({
-            name: 'Администраторы',
-        });
-
-        !user1 && (user1 = await Role.save({
-            name: 'Администраторы',
-            inherits: user
-        }));
-
-        user1 = await Role.findOne({
-            name: 'Партнеры',
-        });
-
-        !user1 && (user1 = await Role.save({
-            name: 'Партнеры',
-            inherits: user
-        }));
-
-        user1 = await Role.findOne({
-            name: 'Участники',
-        });
-
-        !user1 && (user1 = await Role.save({
-            name: 'Участники',
-            inherits: user
-        }));
-*/
-/* let user1 = await Role.findOne({
-    name: 'Участники',
-});
-        let users = await models.Account.find({
-            //email: true
-        });
-        for(let user of users) {
-            user = await models.Account.save({
-                ...user,
-                role: user1
-            });
-
-            console.log(user);
-        }  */
-
-        /* let user1 = await Role.findOne({
-            name: 'Администраторы',
-        });
-
-        let admin = await Member.findOne({
-            email: {
-                address: 'admin@atlant.club',
-            },
-            //role: true
-        });
-        
-        admin = await RootMember.save({
-            ...admin,
-            role: user1
-        }) */
 
         let found = await Member.findOne({
             email: {

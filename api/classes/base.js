@@ -5,7 +5,13 @@ const { Metrics } = require('./metrics');
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-let roles = [
+const { Role } = require('../models');
+
+let roles = Role.find({
+    inherits: true
+});
+
+/* let roles = [
     {
         name: 'Аноним',
         children: [
@@ -35,14 +41,14 @@ let roles = [
             }
         ]
     }
-]
+] */
 
 const model = './security/model.conf';
 const policy = './security/policy.csv';
 
 const { ACL } = require('./ACL');
 
-const acl = new ACL({ model, policy, roles });
+//const acl = new ACL({ model, policy, roles });
 /////////////////////////////////////////////////////////////////////////////////////
 
 const cache = new LRU({
@@ -294,7 +300,10 @@ class SecuredAPI extends API {
             if(!this.payload) throw new Error('Payload not defined.');
 
             let [resource] = args;
+            
+            roles = await roles;
 
+            const acl = new ACL({ model, policy, roles });
             allow = acl.enforce({
                 request: {
                     role: this.payload.role,
