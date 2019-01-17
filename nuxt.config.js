@@ -81,14 +81,30 @@ module.exports = {
         ** You can extend webpack config here
         */
         //vendor: ['axios', 'vuetify'], //depricated
-        
+        analyze: false,
         extend (config, { isDev, isClient }) {
             //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
             
             config.node = { __dirname: true };
-        }
+        },
+        optimization: {
+            splitChunks: {
+                chunks: 'all',
+                automaticNameDelimiter: '.',
+                name: true,
+                cacheGroups: {},
+                minSize: 50000,
+                maxSize: 50000
+            }
+          },
+          maxChunkSize: 50000,
+          minimize: true,
+          parallel: true,
+
     },
+    
+    extractCSS: true,
 
     serverMiddleware: [
         '~/api'
