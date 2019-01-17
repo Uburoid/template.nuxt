@@ -102,3 +102,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+#csv
+*.csv

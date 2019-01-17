@@ -1,4 +1,7 @@
+const { driver } = require('./db');
 (async () => {
+    
+    //driver.query
     return
     let { Relation } = require('./models/base_model');
     let models = require('./models');
