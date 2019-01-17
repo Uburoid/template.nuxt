@@ -150,7 +150,7 @@
 
                 const page_with_error = this.getCookie('page-with-error');
 
-                page_with_error && this.$store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+                page_with_error && this.$store.commit('SET_PAGE_WITH_ERROR', JSON.parse(page_with_error));
 
                 this.deleteCookie('page-with-error');
             }

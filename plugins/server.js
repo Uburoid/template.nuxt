@@ -39,7 +39,8 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         catch (err) {
             err.component = err.component || 'error-dialog';
 
-            return { data: { ...$error(err) }};
+            err = $error(err);
+            return err ? { data: { ...err }} : { data: void 0 };
             throw err;
             //error({ ...err });
             err.redirect ? redirect(err.redirect) : error({ ...err });

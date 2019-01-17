@@ -38,6 +38,13 @@ export default async (context) => {
         store.commit('SET_ACCOUNT', account);    
     }    
     
-    store.state.error && store.state.error.clear && setTimeout(() => store.commit('SET_ERROR', void 0), 100); //maybe not the best way though
+    if(store.state.error && store.state.error.clear) {
+        
+        setTimeout(() => store.commit('SET_ERROR', void 0), 100); //maybe not the best way though
+    }
+    else {
+        //store.state.error && store.state.page_with_error !== route.path && store.commit('SET_PAGE_WITH_ERROR', void 0);
+        store.state.page_with_error && route.path !== store.state.page_with_error.from && route.path !== store.state.page_with_error.to && store.commit('SET_PAGE_WITH_ERROR', void 0);
+    }
     //clear_error && store.commit('SET_ERROR', void 0);
 }

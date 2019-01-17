@@ -9,19 +9,38 @@ const { Role } = require('../models');
 
 let roles = Role.find({
     inherits: true
+}).then(res => {
+
+    roles = res.reduce((memo, role) => {
+
+        if(role.inherits) {
+            let parent = res.find(record => role.inherits._id === record._id);
+
+            if(parent) {
+                parent.children = parent.children || [];
+                parent.children.push(role);
+            }
+        }
+        else {
+            memo.push(role);
+        }
+
+        return memo;
+    }, []);
+
 });
 
-/* let roles = [
+let roles1 = [
     {
         name: 'Аноним',
         children: [
         ]
     },
     {
-        name: 'Пользователь',
+        name: 'Пользователи',
         children: [
             {
-                name: 'Администратор',
+                name: 'Администраторы',
                 children: [
                     {
                         name: 'root'
@@ -29,10 +48,10 @@ let roles = Role.find({
                 ]
             },
             {
-                name: 'Автор',
+                name: 'Участники',
             },
             {
-                name: 'Партнер',
+                name: 'Партнеры',
                 children: [
                     {
                         name: 'Основатель'
@@ -41,7 +60,7 @@ let roles = Role.find({
             }
         ]
     }
-] */
+]
 
 const model = './security/model.conf';
 const policy = './security/policy.csv';
@@ -209,7 +228,7 @@ class API extends Base {
             if(!(this.res.locals && this.res.locals.payload)) {
                 //this.res.locals.payload = {};
                 const shadow_id = this.req.cookies['$shadow'];
-                debugger
+                //debugger
                 const { Account } = require('./account');
                 let account = await Account.shadow(shadow_id);
 
@@ -304,6 +323,7 @@ class SecuredAPI extends API {
             roles = await roles;
 
             const acl = new ACL({ model, policy, roles });
+
             allow = acl.enforce({
                 request: {
                     role: this.payload.role,
