@@ -27,8 +27,9 @@ export default async (context) => {
     
     //store.commit('SET_ERROR', void 0);
     let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
-    title = title || 'Ошибка';
     
+    title = title || 'Ошибка';
+
     store.state.error && typeof(title) !== 'string' && (title = 'Ошибка');
     
     store.commit('SET_TITLE', title);
