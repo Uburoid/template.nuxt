@@ -33,11 +33,11 @@ export default async (context) => {
     
     store.commit('SET_TITLE', title);
 
-    if(!store.state.error || (store.state.error && store.state.error.redirect)) {
+    //if(!store.state.error || (store.state.error && store.state.error.display)) {
         let account = await app.$server.account.get(0, { cache: false });
         //console.log('account', account);
         store.commit('SET_ACCOUNT', account);    
-    }    
+    //}    
     
     if(store.state.error && store.state.error.clear) {
         

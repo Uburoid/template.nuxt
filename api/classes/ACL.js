@@ -212,7 +212,7 @@ class ACL {
     static get matchers() {
         return {
             roleMatcher: (policy, role) => {
-                if(this.roles) {
+                if(ACL.roles) {
                     let flatten_roles = flatten(this.roles);
                     let entries = Object.entries(flatten_roles);
                     

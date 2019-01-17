@@ -32,7 +32,7 @@ export default (context, inject) => {
             else context.redirect(err.redirect);
         }
 
-        return context.store.state.error;
+        return err;
     };
 
     context.error = $error;
