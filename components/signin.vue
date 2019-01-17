@@ -35,7 +35,7 @@
             <v-card-actions>
                 <v-btn color="unimportant" flat @click.native="false">Восстановить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn dark color="secondary" @click.native="submit">Войти</v-btn>
+                <v-btn color="secondary" @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
         </v-card>

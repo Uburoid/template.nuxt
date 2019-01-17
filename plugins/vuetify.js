@@ -5,9 +5,9 @@ import 'vuetify/dist/vuetify.min.css';
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.purple,
-        secondary: colors.grey.darken1,
-        accent: colors.shades.black,
+        primary: colors.indigo,
+        secondary: colors.green.darken1,
+        accent: colors.deepOrange,
         error: colors.red.accent3,
         info: '#2196F3',
         success: '#4CAF50',
