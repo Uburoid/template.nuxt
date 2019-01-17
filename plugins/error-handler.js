@@ -11,7 +11,8 @@ export default (context, inject) => {
             err.component = err.component || 'error';
             err.from = context.route.path;
 
-            err.display && context.store.commit('SET_ERROR', err);
+           // err.display && context.store.commit('SET_ERROR', err);
+           context.store.commit('SET_ERROR', err);
         }
 
         if(process.browser && window.$nuxt) {
