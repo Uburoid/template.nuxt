@@ -537,6 +537,9 @@ router.all('/rebuild', async (req, res) => {
             console.log(`update: ${update}`);
         }
 
+        let update = shell.exec('npm run build');
+        console.log(`update: ${update}`);
+
         let restart = shell.exec('pm2 restart all');
         console.log(`restart: ${restart}`);
 
