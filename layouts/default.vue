@@ -150,11 +150,11 @@
                 }, {}); */
                 
 
-                const page_with_error = this.getCookie('page-with-error');
+                /* const page_with_error = this.getCookie('page-with-error');
 
                 page_with_error && this.$store.commit('SET_PAGE_WITH_ERROR', JSON.parse(page_with_error));
 
-                this.deleteCookie('page-with-error');
+                this.deleteCookie('page-with-error'); */
             }
         },
         computed: {

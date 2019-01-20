@@ -61,6 +61,14 @@ Vue.mixin({
 })
 
 export default (context, inject) => {
+    debugger
+    const page_with_error = context.app.$cookies.get('page-with-error');
+
+    page_with_error && context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+
+    context.app.$cookies.remove('page-with-error');
+    //this.deleteCookie('page-with-error');
+
 
     Vue.config.errorHandler = (err, vm, info) => {
         debugger
@@ -85,9 +93,9 @@ export default (context, inject) => {
         debugger
         
         if(err.code === 0) return;
-        
+
         if(!context.store.state.error || (context.store.state.error && context.store.state.error.clear)) {
-            err.redirect = err.redirect || (err.statusCode === 404 && '/404');
+            //err.redirect = err.redirect || (err.statusCode === 404 && '/404');
             err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
             err.from = context.route.path;
                 //err.from = context.route.path;
