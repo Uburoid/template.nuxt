@@ -4,7 +4,7 @@ require('dotenv').config({
 
 module.exports = {
     //mode: 'spa',
-    modern: 'server',
+    //modern: 'server',
     /* vue: {
         config: {
             errorHandler: (err, vm, info) => {
