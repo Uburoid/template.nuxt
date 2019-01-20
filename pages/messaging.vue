@@ -46,7 +46,7 @@
                 <v-btn dark color="secondary" @click.native="submit">Отправить</v-btn>
             </v-card-actions>
 
-            {{ result }}
+            <!-- {{ result }} -->
 
         </v-card>
     </v-layout>
