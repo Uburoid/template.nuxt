@@ -34,7 +34,10 @@ class ACL {
         options = options ? { ...default_options, ...options } : default_options;
         data = flatten(data);
         
-
+        debugger
+        let trace = [];
+        let origin = { ...flatten(request) };
+        origin = unflatten(origin);
 
         request = policy.reduce((memo, policy) => {
             let flatten_policy = flatten(policy);
@@ -60,29 +63,31 @@ class ACL {
             });
 
             permission && memo.push(policy.permission);
+            permission && trace.push(policy);
 
             return memo;
         }, []);
         
-        let result = !!!request.length;
+        let result = !!request.length;
 
-        if(!result) {
+        if(result) {
+
             let last = request[request.length - 1];
 
-            if(options.strict) {
-                if(options.priority) {
-                    result = last === 'allow' && !request.some(permission => permission === 'deny');
-                }
-                else result = request.every(permission => permission === 'allow');
+            if(options.priority) {
+                result = last === 'allow'// && !request.some(permission => permission === 'deny');
             }
             else {
-                if(options.priority) {
-                    result = last === 'allow';
+                if(options.strict) {
+                    result = request.every(permission => permission === 'allow');
                 }
                 else {
                     result = request.some(permission => permission === 'allow');
                 }
             }
+        }
+        else {
+            result = !options.strict;
         }
 
         //let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');

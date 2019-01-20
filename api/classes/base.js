@@ -132,13 +132,13 @@ class Base {
                         }
                         catch(err) {
                             debugger
-                            err = self.$onError(propKey, err, ...args);
+                            err = self.$prepareError(propKey, err, ...args);
 
                             if(error) error(err); else throw err;
                             return
                             throw err;
                             //debugger
-                            err = self.$onError(propKey, err, ...args);
+                            err = self.$prepareError(propKey, err, ...args);
                             
                             if($error) {
                                 return $error(err);
@@ -176,7 +176,7 @@ class Base {
         Metrics.save(this.req, method_name, this.payload);
     }
 
-    $onError(method_name, err, ...args) {
+    $prepareError(method_name, err, ...args) {
         
         switch(err.name) {
             case 'TokenExpiredError':
@@ -279,9 +279,9 @@ class API extends Base {
         //this.res.cookie('token', this.token, { httpOnly: false });
     }
 
-    /* $onError(method_name, err, ...args) {
+    /* $prepareError(method_name, err, ...args) {
         
-        let error = super.$onError(method_name, err, ...args);
+        let error = super.$prepareError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
@@ -300,9 +300,9 @@ class SecuredAPI extends API {
         super(...args);
     }
 
-    $onError(method_name, err, ...args) {
+    $prepareError(method_name, err, ...args) {
         
-        let error = super.$onError(method_name, err, ...args);
+        let error = super.$prepareError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
             debugger
@@ -340,7 +340,7 @@ class SecuredAPI extends API {
                     resource,
                     token: this.payload.token_err ? 'invalid' : 'valid'
                 },
-                options: { strict: true, priority: false },
+                options: { strict: true, priority: true },
                 data: {
                     _id: 100
                 }

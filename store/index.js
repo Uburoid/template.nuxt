@@ -2,6 +2,7 @@
 export const state = () => ({
     page_with_error: void 0,
     error: void 0,
+    last_route: void 0,
     account: {
         user: {
             profile: {
@@ -19,6 +20,11 @@ export const state = () => ({
 });
 
 export const mutations = {
+
+    SET_LAST_ROUTE(state, route) {
+        debugger
+        state.last_route = state.last_route ? route : '/';
+    },
 
     SET_ERROR(state, error) {
         state.error = error;
@@ -52,6 +58,11 @@ export const getters = {
 export const actions = {
     async nuxtClientInit(context) {
         debugger
+
+        let settings = localStorage.getItem('settings');
+        settings = settings ? JSON.parse(settings) : {};
+        
+        context.commit('SET_SETTINGS', settings);
         /* Vue.config.errorHandler = function (err, vm, info) {
             debugger
             console.log('GLOBAL:', vw.$cookies)

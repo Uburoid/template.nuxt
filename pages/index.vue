@@ -1,16 +1,16 @@
 <template>
     <v-layout column justify-center align-center>
         <v-flex xs12 sm8 md6>
-            <div>HELLO, WORLD!</div>
+            <div>WELCOME TO OUR SITE!</div>
+            <nuxt-link to="/news">HOME PAGE</nuxt-link>
+            <nuxt-link to="/signin">SIGN IN</nuxt-link>
+            <nuxt-link to="/signup">SIGN UP</nuxt-link>
         </v-flex>
     </v-layout>
 </template>
 
 <script>
-export default {
-    
-    mounted() {
-        //console.log(document.cookie);
+    export default {
+        layout: 'landing'
     }
-}
 </script>

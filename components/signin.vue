@@ -70,7 +70,7 @@ export default {
             //if(!this.$store.state.error) {
                 this.$store.commit('SET_ACCOUNT', account);
 
-                this.$router.push((this.$store.state.page_with_error && this.$store.state.page_with_error.from) || '/');
+                this.$router.push((this.$store.state.page_with_error && this.$store.state.page_with_error.from) || '/news');
             //}
         }
     }

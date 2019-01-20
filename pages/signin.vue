@@ -9,21 +9,25 @@
 </template>
 
 <script>
-export default {
-    components: {
-        signin: () => import('@/components/signin'),
-        'signin-dialog': () => import('@/components/modals/signin')
-    },
-    asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
-        //debugger
-        //throw new Error('error in signin')  
-    },
-    data: () => ({
-        show: false
-    }),
-    methods: {
-        
+    export default {
+        layout (context) {
+            debugger
+            return context.store.state.last_route === '/' ? 'landing' : 'default';
+        },
+        components: {
+            signin: () => import('@/components/signin'),
+            'signin-dialog': () => import('@/components/modals/signin')
+        },
+        asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+            //debugger
+            //throw new Error('error in signin')  
+        },
+        data: () => ({
+            show: false
+        }),
+        methods: {
+            
+        }
     }
-}
 </script>
 

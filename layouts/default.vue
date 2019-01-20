@@ -136,10 +136,10 @@
             //throw new Error('default');
 
             if(process.browser) {
-                let settings = localStorage.getItem('settings');
+                /* let settings = localStorage.getItem('settings');
                 settings = settings ? JSON.parse(settings) : {};
                 
-                this.$store.commit('SET_SETTINGS', settings);
+                this.$store.commit('SET_SETTINGS', settings); */
 
                 //debugger
                 /* const cookie = document.cookie && document.cookie.split(',').reduce((memo, cookie) => {

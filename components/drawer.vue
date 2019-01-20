@@ -33,7 +33,8 @@ export default {
     props: ['show'],
     data: () => ({
         items: [
-            { icon: 'apps', title: 'Welcome', to: '/' },
+            { icon: 'fa-house', title: 'Home', to: '/' },
+            { icon: 'apps', title: 'News', to: '/news' },
             { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
             { icon: 'fa-error', title: 'NOT FOUND', to: '/not-found' },
             { icon: 'fa-phone', title: 'Messaging', to: '/messaging' },
