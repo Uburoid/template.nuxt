@@ -4,29 +4,30 @@
 
         <v-card-text>
             
-            <h1 v-if="err.statusCode === 404">Page not found</h1>
-            <h1 v-else>An error occurred</h1>
+            <h1>Page not found</h1>
 
-            <no-ssr>
-                <vue-json-pretty :data="err"/>
-            </no-ssr>
-
+            <div>{{ $store.state.page_with_error && $store.state.page_with_error.from }}</div>
         </v-card-text>
 
         <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn flat tag="a" @click.native="close">Home page</v-btn>
+        <v-btn flat tag="a" to="/">Home page</v-btn>
             <!-- <v-btn flat @click="close">Close</v-btn> -->
         </v-card-actions>
     </v-card>
 </template>
 
 <script>
+
     export default {
-        props: ['err', 'close'],
+        layout (context) {
+            debugger
+            return context.store.state.last_route === '/' ? 'landing' : 'default';
+        },
         components: {
-            VueJsonPretty: () => import('vue-json-pretty')
-        }
+            error:  () => import('@/components/errors/error'),
+        },
     }
 </script>
+

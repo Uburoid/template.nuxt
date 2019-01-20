@@ -5,6 +5,7 @@
             <nuxt-link to="/news">HOME PAGE</nuxt-link>
             <nuxt-link to="/signin">SIGN IN</nuxt-link>
             <nuxt-link to="/signup">SIGN UP</nuxt-link>
+            <nuxt-link to="/poppo">NOT FOUND</nuxt-link>
         </v-flex>
     </v-layout>
 </template>

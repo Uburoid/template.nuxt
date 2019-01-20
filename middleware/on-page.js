@@ -1,6 +1,18 @@
 export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
 
+    if(!route.matched.length) {
+        let page_with_error = { from: route.path, to: '/404' };
+        context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+        redirect('/404');
+        return
+    }
+
+    if(route.path === '/404' && !store.state.page_with_error) {
+        redirect('/');
+        return;
+    }
+
     if(store.state.error && store.state.error.from !== route.path) {
         store.commit('SET_ERROR', { ...store.state.error, clear: true });
     }

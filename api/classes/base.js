@@ -7,28 +7,30 @@ const { Metrics } = require('./metrics');
 
 const { Role } = require('../models');
 
-let roles = Role.find({
-    inherits: true
-}).then(res => {
-
-    roles = res.reduce((memo, role) => {
-
-        if(role.inherits) {
-            let parent = res.find(record => role.inherits._id === record._id);
-
-            if(parent) {
-                parent.children = parent.children || [];
-                parent.children.push(role);
-            }
-        }
-        else {
-            memo.push(role);
-        }
-
-        return memo;
-    }, []);
-
-});
+let roles = new Promise(resolve => {
+    Role.find({ inherits: true })
+        .then(res => {
+            //debugger
+            let roles = res.reduce((memo, role) => {
+        
+                if(role.inherits) {
+                    let parent = res.find(record => role.inherits._id === record._id);
+        
+                    if(parent) {
+                        parent.children = parent.children || [];
+                        parent.children.push(role);
+                    }
+                }
+                else {
+                    memo.push(role);
+                }
+        
+                return memo;
+            }, []);
+        
+            resolve(roles);
+        });    
+})
 
 let roles1 = [
     {
@@ -305,7 +307,7 @@ class SecuredAPI extends API {
         let error = super.$prepareError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
-            debugger
+            //debugger
             this.payload && this.payload.shadow_id && this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
             
             this.res.cookie('$token', '', { expires: new Date() });
@@ -331,7 +333,7 @@ class SecuredAPI extends API {
             roles = await roles;
 
             const acl = new ACL({ model, policy, roles });
-
+            //debugger
             allow = acl.enforce({
                 request: {
                     role: this.payload.role,

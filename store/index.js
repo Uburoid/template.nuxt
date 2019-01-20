@@ -22,7 +22,7 @@ export const state = () => ({
 export const mutations = {
 
     SET_LAST_ROUTE(state, route) {
-        debugger
+        //debugger
         state.last_route = state.last_route ? route : '/';
     },
 

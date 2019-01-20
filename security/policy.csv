@@ -11,6 +11,8 @@ deny, Пользователи, *, *, *, =invalid
 allow, Пользователи, *, *, *, =valid
 allow, Пользователи, *, pageData, { path: '=/news' }, *
 
+allow, *, *, *, { path: '=/404' }, *
+
 --deny,Аноним,Account,signout,,*
 
 --deny,*,*,*,{path:'=/inspire'},=invalid

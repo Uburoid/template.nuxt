@@ -38,8 +38,8 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         }
         catch (err) {
             debugger
-            //error(err);
-            throw err;
+            error(err);
+            throw { code: 0 };
             err.component = err.component || 'error-dialog';
 
             err = $error(err);

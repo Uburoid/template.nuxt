@@ -84,8 +84,10 @@ export default (context, inject) => {
     const $error = (err) => {
         debugger
         
-
+        if(err.code === 0) return;
+        
         if(!context.store.state.error || (context.store.state.error && context.store.state.error.clear)) {
+            err.redirect = err.redirect || (err.statusCode === 404 && '/404');
             err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
             err.from = context.route.path;
                 //err.from = context.route.path;

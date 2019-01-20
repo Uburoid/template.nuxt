@@ -239,7 +239,7 @@ class ACL {
             
                     return result
                 }
-                else return true;
+                else return false;
             },
             regExpMatcher: (policy, value) => {
                 let values = Array.isArray(value) ? value : [value];
