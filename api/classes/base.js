@@ -77,10 +77,10 @@ const cache = new LRU({
 });
 
 class AccessDenied extends Error {
-    constructor(message) {
+    constructor(code, message) {
         super(message);
 
-        this.code = 403;
+        this.code = code || 403;
     }
 }
 
@@ -116,13 +116,24 @@ class Base {
                         
                         try {
                             let allow = await self.$beforeAction(propKey, ...args);
-                            //allow = typeof(allow) === 'undefined' ? true : allow;
+                            let { access, policy } = typeof(allow) === 'object' ? allow : { access: allow };
 
-                            if(!allow) {
-                                if(self.payload.token_err) {
-                                    throw self.payload.token_err;
+                            if(!access) {
+                                if(policy.error_code) {
+                                    let err = { code: policy.error_code };
+
+                                    if(self.payload.token_err && self.payload.token_err.name === 'TokenExpiredError' && policy.error_code === 401) {
+                                        err = self.payload.token_err;
+                                    }
+
+                                    throw err;
                                 }
-                                else throw new AccessDenied(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                                else {
+                                    if(self.payload.token_err) {
+                                        throw self.payload.token_err;
+                                    }
+                                    else throw new AccessDenied(403, `Access to ${self.constructor.name}.${propKey}() denied.`);
+                                }
                             }
 
                             //debugger
@@ -192,11 +203,26 @@ class Base {
             name: err.name,
             stack: err.stack,
             component: 'error-dialog',
-            dialog: true,
+            dialog: false,
             server_error: true,
             display: err.display,
             redirect: err.redirect
         };
+
+        if(error.statusCode === 403) {
+            error = {
+                ...error,
+                message: `Access to ${this.constructor.name}.${method_name}() denied.`
+            }
+        }
+
+        if(error.statusCode === 404) {
+            error = {
+                ...error,
+                dialog: false,
+                message: 'This page not found on our site.'
+            }
+        }
 
         ///debugger
         //this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
@@ -325,10 +351,11 @@ class SecuredAPI extends API {
         let allow = await super.$beforeAction(method_name, ...args);
         
         if(allow) {
-            //debugger
+            debugger
             if(!this.payload) throw new Error('Payload not defined.');
 
             let [resource] = args;
+            const { page_exists, ...rest } = resource;
             
             roles = await roles;
 
@@ -340,7 +367,8 @@ class SecuredAPI extends API {
                     class: this.constructor.name, 
                     methods: method_name,
                     resource,
-                    token: this.payload.token_err ? 'invalid' : 'valid'
+                    token: this.payload.token_err ? 'invalid' : 'valid',
+                    page_exists
                 },
                 options: { strict: true, priority: true },
                 data: {

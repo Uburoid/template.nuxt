@@ -8,6 +8,7 @@ Vue.component('nuxt-error', {
 })
 
 Vue.mixin({
+    layout: 'landing',
     beforeCreate() {
         //debugger
         const methods = this.$options.methods || {};
@@ -97,13 +98,14 @@ export default (context, inject) => {
         if(!context.store.state.error || (context.store.state.error && context.store.state.error.clear)) {
             //err.redirect = err.redirect || (err.statusCode === 404 && '/404');
             err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
-            err.from = context.route.path;
+            err.from = err.from || context.route.path;
+            err.current = err.current || context.app.router.currentRoute.path;
 
            // err.display && context.store.commit('SET_ERROR', err);
            context.store.commit('SET_ERROR', err);
 
            if(err.redirect) {
-                let page_with_error = { from: err.from, to: err.redirect, current: context.app.router.currentRoute.path };
+                let page_with_error = { from: err.from, to: err.redirect, current: err.current };
                 context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
 
                 context.app.$cookies.set('page-with-error', page_with_error);

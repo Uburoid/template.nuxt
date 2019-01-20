@@ -100,6 +100,10 @@ module.exports = {
         //vendor: ['axios', 'vuetify'], //depricated
         analyze: false,
         extend (config, { isDev, isClient }) {
+            process.on('unhandledRejection', err => {
+                debugger
+                console.log('unhandledRejection => ', err);
+            });
             //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
             

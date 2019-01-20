@@ -6,6 +6,7 @@
 
 <script>
 export default {
+    layout: 'landing',
     components: {
     },
     asyncData(ctx) {

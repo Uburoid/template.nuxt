@@ -52,6 +52,7 @@
 
 <script>
 export default {
+    layout: 'landing',
     data: () => ({
         reciever: '+79009395505',
         messenger: 'telegram',

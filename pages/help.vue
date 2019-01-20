@@ -10,6 +10,7 @@
 //import VueJsonPretty from 'vue-json-pretty'
 
 export default {
+    layout: 'landing',
     head: {
         title: '$server help'
     },

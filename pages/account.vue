@@ -10,6 +10,7 @@
 //import VueJsonPretty from 'vue-json-pretty'
 
 export default {
+    layout: 'landing',
     components: {
         VueJsonPretty: () => import('vue-json-pretty')
     },

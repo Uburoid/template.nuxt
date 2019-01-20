@@ -1,6 +1,8 @@
 <template>
-    <page v-if="!err.dialog" :err="err" :close="close"/>
-    <modal v-else :err="err" :close="close"/>
+    <v-layout align-center justify-center column fill-height>
+        <page v-if="!err.dialog" :err="err" :close="close" :home="home"/>
+        <modal v-else :err="err" :close="close" :home="home"/>
+    </v-layout>
 
         <!-- <v-card v-show="true" full-width fill-height>
             <v-card-title class="headline">Something went wrong...</v-card-title>
@@ -52,19 +54,12 @@ export default {
         }
     },
     methods: {
-        close() {
-            //this.$nuxt.nuxt.err = void 0;
+        home() {
             this.$route.path === '/' ? this.$store.commit('SET_ERROR', void 0) : this.$router.push('/');
-
-            /* setTimeout(() => {
-                this.$store.commit('SET_ERROR', void 0);
-            }, 500); */
-
-
         },
-        /* reload() {
-            this.$route.path === '/' ? this.$router.go('/') : this.$router.push('/');
-        } */
+        close() {
+            this.$store.commit('SET_ERROR', void 0);
+        },
     }
 }
 </script>

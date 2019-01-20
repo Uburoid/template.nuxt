@@ -1,5 +1,6 @@
 <template>
-        <v-card style="height: 100%; display: flex; flex-direction: column; justify-content: space-between">
+    <v-layout align-center justify-center column fill-height>
+        <v-card xl>
             <v-card-title>
                 <v-icon class="mr-1 primary--text">fas fa-sign-in-alt</v-icon>
                 <span class="headline primary--text">Вход</span>
@@ -39,7 +40,7 @@
             </v-card-actions>
 
         </v-card>
-
+    </v-layout>
 </template>
 
 <script>

@@ -4,15 +4,16 @@
 --deny, *, *, *, *, =invalid
 
 --deny, Аноним, *, pageData, {path:'=/inspire'}, *
-deny, Аноним, *, *, *, *
+deny, Аноним, *, *, *, *, *, 403
+deny, *, *, *, *, *, =not-exists, 404
 
 
-deny, Пользователи, *, *, *, =invalid
-allow, Пользователи, *, *, *, =valid
-allow, Пользователи, *, pageData, { path: '=/news' }, *
-allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *
+deny, Пользователи, *, *, *, =invalid, *, 401
+allow, Пользователи, *, *, *, =valid, *
+allow, Пользователи, *, pageData, { path: '=/news' }, *, *
+allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *, *
 
-allow, *, *, *, { path: '=/404' }, *
+allow, *, *, *, { path: '=/404' }, *, *
 
 --deny,Аноним,Account,signout,,*
 

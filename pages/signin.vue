@@ -1,18 +1,13 @@
 <template>
-    <div>
-        <signin/>
-        <!-- <signin-dialog :show="show"/>
+    <signin/>
 
-        <v-btn @click="show = true"/>
-        <v-btn @click="submit">ENTER</v-btn> -->
-    </div>
 </template>
 
 <script>
     export default {
         layout (context) {
             debugger
-            return context.store.state.last_route === '/' ? 'landing' : 'default';
+            return !context.store.state.page_with_error && context.store.state.last_route === '/' ? 'default' : 'landing';
         },
         components: {
             signin: () => import('@/components/signin'),

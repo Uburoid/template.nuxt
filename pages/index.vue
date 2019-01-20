@@ -13,6 +13,6 @@
 
 <script>
     export default {
-        layout: 'landing'
+        layout: 'default'
     }
 </script>

@@ -6,7 +6,7 @@
         :hide-overlay="false"
         persistent
     >
-        <page :err="err" :close="close"/>
+        <page :err="err" :close="close" :home="home"/>
 
     </v-dialog>
 
@@ -14,7 +14,7 @@
 
 <script>
     export default {
-        props: ['err', 'close'],
+        props: ['err', 'close', 'home'],
         components: {
             page: () => import('@/components/errors/page')
         }

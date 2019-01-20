@@ -12,6 +12,8 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
     let params = JSON.stringify(payload || {});
     let key = `${endpoint}:${params}`;
 
+    payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
+
     let response = cache && axios_cache.get(key);
 
     if(!response) {
@@ -39,18 +41,10 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         catch (err) {
             debugger
             error(err);
-            throw { code: 0 };
-            err.component = err.component || 'error-dialog';
-
-            err = $error(err);
-
-            return err ? { data: { ...err }} : { data: void 0 };
-
-            throw err;
-            //error({ ...err });
-            err.redirect ? redirect(err.redirect) : error({ ...err });
-
-            return { data: { error: err }};
+            //throw { code: 0 };
+            /* if(process.browser) {
+                throw { code: 0 };
+            } */
         }
 
     }
@@ -139,11 +133,11 @@ export default async (context, inject) => {
 
     let response = await context.$axios({ url: '/_server_' });//CALL TO LOAD DEFAULT KEYS!
 
-    /* const Server = (new Function(response.data))();
+    const Server = (new Function(response.data))();
         
-    server = new Server({ execute, context }); */
+    server = new Server({ execute, context });
 
-    if(process.browser) {
+    /* if(process.browser) {
         debugger
         const Server = (new Function(response.data))();
         
@@ -154,7 +148,7 @@ export default async (context, inject) => {
         debugger
         let { Types } = require('../api/classes');
         server = new LocalServer({ context, Types });
-    }
+    } */
 
     context.$server = server;
     inject('server', server);

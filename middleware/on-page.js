@@ -1,31 +1,34 @@
 export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
 
-    if(!route.matched.length) {
-        /* let page_with_error = { from: route.path, to: '/404' };
-        context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
-
-        if(process.browser && window.$nuxt) {
-            const { $loading } = window.$nuxt.$root;
-            $loading.finish && $loading.finish(true);
-        }
-
-        redirect('/404');
-        return */
+    /* if(!route.matched.length) {
 
         let err = {
             statusCode: 404,
             redirect: '/404'
         }
 
+        //throw err;
         context.error(err);
+
+        //throw { code: 0 };
+
         return
     }
 
     if(route.path === '/404' && !store.state.page_with_error) {
-        redirect('/');
+        let err = {
+            statusCode: 404,
+            redirect: '/404',
+            ...store.state.page_with_error
+        }
+
+        //throw err;
+        context.error(err);
+        //throw { code: 0 };
+
         return;
-    }
+    } */
 
     if(store.state.error && store.state.error.from !== route.path) {
         store.commit('SET_ERROR', { ...store.state.error, clear: true });

@@ -1,5 +1,5 @@
 <template>
-    <v-card full-width fill-height>
+    <v-card>
         <v-card-title class="headline">Something went wrong...</v-card-title>
 
         <v-card-text>
@@ -16,7 +16,8 @@
         <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn flat tag="a" @click.native="close">Home page</v-btn>
+        <v-btn flat tag="a" @click.native="close">close</v-btn>
+        <v-btn flat tag="a" @click.native="home">Home page</v-btn>
             <!-- <v-btn flat @click="close">Close</v-btn> -->
         </v-card-actions>
     </v-card>
@@ -24,7 +25,7 @@
 
 <script>
     export default {
-        props: ['err', 'close'],
+        props: ['err', 'close', 'home'],
         components: {
             VueJsonPretty: () => import('vue-json-pretty')
         }
