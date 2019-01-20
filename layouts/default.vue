@@ -56,9 +56,10 @@
 
     <v-content>
         <!-- {{ !$store.state.error }} -->
-        <component v-if="error" :is="error.component"/>
+        <!-- <component v-if="error" :is="error.component"/> -->
+        <error v-if="error"/>
 
-        <div v-show="!error">
+        <div v-show="!error || (error && error.dialog)">
             <nuxt keep-alive/>
         </div>
         
@@ -75,7 +76,7 @@
         components: {
             drawer: () => import('@/components/drawer'),
             error:  () => import('@/components/errors/error'),
-            errorDialog:  () => import('@/components/errors/error-dialog'),
+            //errorDialog:  () => import('@/components/errors/error-dialog'),
         },
         asyncData(ctx) {
             debugger
@@ -132,7 +133,8 @@
             };
         },
         created() {
-            
+            //throw new Error('default');
+
             if(process.browser) {
                 let settings = localStorage.getItem('settings');
                 settings = settings ? JSON.parse(settings) : {};

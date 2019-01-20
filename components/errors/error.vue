@@ -1,17 +1,18 @@
 <template>
-        <v-card v-show="true" full-width fill-height>
+    <page v-if="!err.dialog" :err="err" :close="close"/>
+    <modal v-else :err="err" :close="close"/>
+
+        <!-- <v-card v-show="true" full-width fill-height>
             <v-card-title class="headline">Something went wrong...</v-card-title>
 
             <v-card-text>
                 
                 <h1 v-if="err.statusCode === 404">Page not found</h1>
-                <div v-else>
-                    <h1>An error occurred</h1>
-                    <!-- <h4 v-html="err"></h4> -->
-                    <no-ssr>
-                        <vue-json-pretty :data="err"/>
-                    </no-ssr>
-                </div>
+                <h1 v-else>An error occurred</h1>
+
+                <no-ssr>
+                    <vue-json-pretty :data="err"/>
+                </no-ssr>
 
             </v-card-text>
 
@@ -19,39 +20,35 @@
             <v-spacer></v-spacer>
 
             <v-btn flat tag="a" @click.native="close">Home page</v-btn>
-                <!-- <v-btn flat @click="close">Close</v-btn> -->
+                <v-btn flat @click="close">Close</v-btn>
             </v-card-actions>
-        </v-card>
+        </v-card> -->
 </template>
 
 
 <script>
 export default {
-    props: {
-        error: {
-            default: null
-        }
-    },
     components: {
-        VueJsonPretty: () => import('vue-json-pretty')
+        page: () => import('@/components/errors/page'),
+        modal: () => import('@/components/errors/modal')
     },
+
     data: () => ({
-        _err: void 0
+
     }),
     watch: {
        
        
     },
     created() {
-        console.log('CREATED error');
+        //console.log('CREATED error');
     },
     mounted() {
     },
     computed: {
         err() {
+            debugger
             return this.$store.state.error;
-            this._err = this._err || { ...this.$store.state.error };
-            return this._err;
         }
     },
     methods: {

@@ -4,7 +4,7 @@ const cookie = require("cookie");
 const axios_cache = new LRU();
 
 let execute = async ({ context, cache = true, method = 'get', endpoint = '/', payload, headers, redirectOnError = false }) => {
-    
+    debugger
     let { $axios, error, redirect, store, $error } = context;
 
     cache = cache && process.browser; //USE CACHE IN BROWSER ONLY
@@ -37,6 +37,9 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
             //flags && flags.auto_merge && data[flags.auto_merge] && context.store.commit('SET_ENTITIES', { data: data[flags.auto_merge] });
         }
         catch (err) {
+            debugger
+            //error(err);
+            throw err;
             err.component = err.component || 'error-dialog';
 
             err = $error(err);
@@ -141,14 +144,14 @@ export default async (context, inject) => {
     server = new Server({ execute, context }); */
 
     if(process.browser) {
-
+        debugger
         const Server = (new Function(response.data))();
         
         server = new Server({ execute, context });
     }
 
     if(process.server) {
-
+        debugger
         let { Types } = require('../api/classes');
         server = new LocalServer({ context, Types });
     }

@@ -131,6 +131,12 @@ class Base {
                             return response;
                         }
                         catch(err) {
+                            debugger
+                            err = self.$onError(propKey, err, ...args);
+
+                            if(error) error(err); else throw err;
+                            return
+                            throw err;
                             //debugger
                             err = self.$onError(propKey, err, ...args);
                             
@@ -184,6 +190,7 @@ class Base {
             name: err.name,
             stack: err.stack,
             component: 'error-dialog',
+            dialog: true,
             server_error: true,
             display: err.display,
             redirect: err.redirect
@@ -306,6 +313,7 @@ class SecuredAPI extends API {
 
             error.redirect = typeof(error.redirect) === 'undefined' ? '/signin' : error.redirect;
             error.component = 'error';
+            error.dialog = false;
         }
         //debugger
         return error;
@@ -341,11 +349,11 @@ class SecuredAPI extends API {
             /* allow = ACL(class_acl, method_name, this, args);
             allow = allow === 'allow'; */
 
-            if(allow && this.payload.token_err) {
+            /* if(allow && this.payload.token_err) {
                 this.payload.token_err.redirect = '';
                 this.payload.token_err.display = false;
                 throw this.payload.token_err;
-            }
+            } */
                 
         }
         

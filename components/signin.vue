@@ -33,7 +33,7 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="unimportant" flat @click.native="false">Восстановить пароль</v-btn>
+                <v-btn color="unimportant" flat @click.native="promised">Восстановить пароль</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn color="secondary" @click.native="submit">Войти</v-btn>
             </v-card-actions>
@@ -48,20 +48,30 @@ export default {
         email: 'mychrome51@gmail.com',
         password: '123'
     }),
+    
     methods: {
+        promised() {
+            return new Promise((resolve, reject) => {
+                reject(new Error('error in promise'));
+            })
+        },
         async submit() {
             debugger
             let { email, password } = this;
             
             //this.$store.commit('SET_ERROR', { display: true, component: 'error', message: 'asdadsasd'});
+            //window.onerror = function () {console.log('error!');};
+            //throw new Error('asasd');
+
+            let d = 100 / 0;
 
             let account = await this.$server.account.signin({ email, password }, { cache: false });
 
-            if(!this.$store.state.error) {
+            //if(!this.$store.state.error) {
                 this.$store.commit('SET_ACCOUNT', account);
 
                 this.$router.push((this.$store.state.page_with_error && this.$store.state.page_with_error.from) || '/');
-            }
+            //}
         }
     }
 }

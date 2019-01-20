@@ -14,7 +14,9 @@ export default {
         signin: () => import('@/components/signin'),
         'signin-dialog': () => import('@/components/modals/signin')
     },
-    asyncData(ctx) {
+    asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+        //debugger
+        //throw new Error('error in signin')  
     },
     data: () => ({
         show: false

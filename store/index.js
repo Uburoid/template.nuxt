@@ -1,3 +1,4 @@
+
 export const state = () => ({
     page_with_error: void 0,
     error: void 0,
@@ -5,7 +6,7 @@ export const state = () => ({
         user: {
             profile: {
                 avatar: '/api/account.avatar',
-                name: 'Anonymous'
+                name: 'Anonymous - default in store'
             },
             email: 'anonymous@example.com'
         },
@@ -49,6 +50,22 @@ export const getters = {
 }
 
 export const actions = {
+    async nuxtClientInit(context) {
+        debugger
+        /* Vue.config.errorHandler = function (err, vm, info) {
+            debugger
+            console.log('GLOBAL:', vw.$cookies)
+            // handle error
+            // `info` is a Vue-specific error info, e.g. which lifecycle hook
+            // the error was found in. Only available in 2.2.0+
+        }
+
+        window.onerror = function() {
+            debugger
+            console.log('GLOBAL:', vw.$cookies)
+        } */
+    },
+
     async nuxtServerInit (context, { req }) {
         /* try {
             let name = await this.$server.member.echo({ name: 'hello', add: { my: 'friend' }}, { cache: false });

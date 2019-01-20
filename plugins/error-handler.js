@@ -1,41 +1,137 @@
+import Vue from 'vue';
+
+Vue.component('nuxt-error', {
+    name: 'nuxt-error',
+    created() {
+        debugger
+    }
+})
+
+Vue.mixin({
+    beforeCreate() {
+        //debugger
+        const methods = this.$options.methods || {};
+        
+        Object.entries(methods).forEach(([key, method]) => {
+            
+
+            if(method.name !== 'wrappedMethod') {
+
+                const resultIsPromise = method.constructor.name === 'AsyncFunction';
+
+                let wrappedMethod = void 0;
+
+                if(resultIsPromise) {
+                    wrappedMethod =  async function (...args) {
+
+                        try {
+                            return await method.apply(this, args);
+                        }
+                        catch(err) {
+                            Vue.config.errorHandler && Vue.config.errorHandler(err, this);
+                        }
+        
+                    }
+                }
+                else {
+                    wrappedMethod =  function (...args) {
+
+                        try {
+                            let result = method.apply(this, args);
+                            const resultIsPromise = result && typeof result.then == 'function';
+                            
+                            resultIsPromise && result.catch(err => {
+                                Vue.config.errorHandler && Vue.config.errorHandler(err, this);
+                            });
+
+                            return result;
+                        }
+                        catch(err) {
+                            Vue.config.errorHandler && Vue.config.errorHandler(err, this);
+                        }
+        
+                    }
+                }
+
+                methods[key] = wrappedMethod
+            }
+
+        })
+    },
+})
 
 export default (context, inject) => {
+
+    Vue.config.errorHandler = (err, vm, info) => {
+        debugger
+
+        let error = { ...err };
+        error.message = err.message;
+        error.stack = err.stack;
+
+        error.statusCode = err.statusCode || err.code || 500;
+
+        //error.component = 'error-dialog';
+        error.dialog = typeof(err.dialog) === 'undefined' ? true : err.dialog;
+
+        context.error(error, info);
+        
+        return true;
+    }
 
     const errorFunction = context.error;
 
     const $error = (err) => {
         debugger
-        err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
+        
 
         if(!context.store.state.error || (context.store.state.error && context.store.state.error.clear)) {
-            err.component = err.component || 'error';
+            err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
             err.from = context.route.path;
+                //err.from = context.route.path;
 
            // err.display && context.store.commit('SET_ERROR', err);
            context.store.commit('SET_ERROR', err);
+
+           if(err.redirect) {
+                let page_with_error = { from: err.from, to: err.redirect };
+                context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+
+                if(!process.browser) {
+                    debugger
+                    context.app.$cookies.set('page-with-error', JSON.stringify(page_with_error));
+
+                    context.res.setHeader('location', err.redirect);
+                    context.res.statusCode = 302;
+                }
+                else context.redirect(err.redirect);
+            }
         }
 
         if(process.browser && window.$nuxt) {
             const { $loading } = window.$nuxt.$root;
-            $loading.fail && $loading.fail();
+            $loading && $loading.fail && $loading.fail();
         }
 
-        if(err.redirect) {
+        /* if(err.redirect) {
             let page_with_error = { from: err.from, to: err.redirect };
             context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
 
             if(!process.browser) {
+                debugger
+                context.app.$cookies.set('page-with-error', JSON.stringify(page_with_error));
+
                 context.res.setHeader('location', err.redirect);
-                context.res.cookie('page-with-error', JSON.stringify(page_with_error));
                 context.res.statusCode = 302;
             }
             else context.redirect(err.redirect);
-        }
+        } */
 
-        return err;
+        return context.store.state.error || err;
     };
 
     context.error = $error;
+    context.app.nuxt.error = $error;
     
     context.$error = $error;
     inject('error', $error);

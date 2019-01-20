@@ -18,3 +18,4 @@ Vue.use(Vuetify, {
         customProperties: true
     }
 });
+
