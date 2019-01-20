@@ -23,7 +23,7 @@
     export default {
         layout (context) {
             debugger
-            return context.store.state.last_route === '/' ? 'landing' : 'default';
+            return context.store.state.page_with_error && context.store.state.page_with_error.current === '/' ? 'landing' : 'default';
         },
         components: {
             error:  () => import('@/components/errors/error'),

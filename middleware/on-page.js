@@ -14,7 +14,7 @@ export default async (context) => {
         return */
 
         let err = {
-            stausCode: 404,
+            statusCode: 404,
             redirect: '/404'
         }
 

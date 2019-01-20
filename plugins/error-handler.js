@@ -98,18 +98,19 @@ export default (context, inject) => {
             //err.redirect = err.redirect || (err.statusCode === 404 && '/404');
             err.display = err.redirect ? false : typeof(err.display) === 'undefined' ? true : err.display;
             err.from = context.route.path;
-                //err.from = context.route.path;
 
            // err.display && context.store.commit('SET_ERROR', err);
            context.store.commit('SET_ERROR', err);
 
            if(err.redirect) {
-                let page_with_error = { from: err.from, to: err.redirect };
+                let page_with_error = { from: err.from, to: err.redirect, current: context.app.router.currentRoute.path };
                 context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);
+
+                context.app.$cookies.set('page-with-error', page_with_error);
 
                 if(!process.browser) {
                     debugger
-                    context.app.$cookies.set('page-with-error', JSON.stringify(page_with_error));
+                    //context.app.$cookies.set('page-with-error', JSON.stringify(page_with_error));
 
                     context.res.setHeader('location', err.redirect);
                     context.res.statusCode = 302;

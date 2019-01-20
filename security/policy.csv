@@ -5,11 +5,12 @@
 
 --deny, Аноним, *, pageData, {path:'=/inspire'}, *
 deny, Аноним, *, *, *, *
-allow, Аноним, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *
+
 
 deny, Пользователи, *, *, *, =invalid
 allow, Пользователи, *, *, *, =valid
 allow, Пользователи, *, pageData, { path: '=/news' }, *
+allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *
 
 allow, *, *, *, { path: '=/404' }, *
 
