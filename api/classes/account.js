@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { API } = require('./base');
+const { API, SecuredAPI } = require('./base');
 const FormData = require('form-data');
 const { JWT } = require('../jwt');
 const path = require('path');
@@ -7,7 +7,7 @@ const path = require('path');
 const models = require('../models');
 const { Member, Anonymous, Role, Email, List, RootMember } = models;
 
-class Account extends API {
+class Account extends SecuredAPI {
     constructor(...args) {
         super(...args);
     }

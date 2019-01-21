@@ -229,6 +229,13 @@ class Base {
             }
         }
 
+        if(error.statusCode === 405) {
+            error = {
+                ...error,
+                display: false
+            }
+        }
+
         ///debugger
         //this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
 

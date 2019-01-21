@@ -4,6 +4,7 @@
 --deny, *, *, *, *, =invalid
 
 --deny, Аноним, *, pageData, {path:'=/inspire'}, *
+
 deny, Аноним, *, *, *, *, *, 403
 deny, *, *, *, *, *, =not-exists, 404
 
@@ -15,9 +16,13 @@ allow, Пользователи, *, pageData, { path: '=/news' }, *, *
 allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *, *
 
 allow, *, *, *, { path: '=/404' }, *, *
+
 --allow, Аноним, *, *, *, *, *, 403
 allow, *, UI, menus, *, *, *
 
 --deny,Аноним,Account,signout,,*
 
 --deny,*,*,*,{path:'=/inspire'},=invalid
+
+allow, *, Account, *, *, *, *
+deny, Аноним, Account, get, *, *, *, 405

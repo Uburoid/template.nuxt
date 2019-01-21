@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="$store.state.account">
         <no-ssr>
             <vue-json-pretty :data="$store.state.account"/>
         </no-ssr>
