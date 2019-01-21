@@ -1,6 +1,6 @@
 <template>
     <v-layout justify-center align-center wrap>
-        <v-flex xs12 sm8 md6 fill-height>
+        <v-flex xs12 sm12 md6 fill-height>
             <v-toolbar flat color="white">
                 <v-toolbar-title>MODEL</v-toolbar-title>
                     <!-- <v-divider
