@@ -1,5 +1,5 @@
 <template lang="html">
-    <v-menu offset-x offset-y right>
+    <v-menu offset-y right>
         <v-btn fab flat small slot="activator">
             <v-avatar size="30">
                 <!-- <img :alt="profile.name" :src="profile.avatar"> -->

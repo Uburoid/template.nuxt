@@ -57,35 +57,35 @@ class UI extends SecuredAPI {
 
         let account_items = [
             {
-                title: 'Users',
+                title: 'users',
                 icon: 'fa-users',
                 to: '/users',
             },
-            { divider: true, inset: true, to: '-' },
+            { divider: true, inset: true, to: '/users' },
             {
-                title: 'Account',
+                title: 'account',
                 icon: 'fa-user',
                 to: '/account',
             },
             {
-                title: 'Help',
+                title: 'help',
                 icon: 'far fa-question-circle',
                 to: '/help',
             },
-            { divider: true, inset: true, to: '-' },
+            { divider: true, inset: true, to: '/help' },
             {
-                title: 'Sign up',
+                title: 'sign up',
                 icon: 'fa-user-plus',
                 to: '/signup',
             },
-            { divider: true, inset: true, to: '-' },
+            { divider: true, inset: true, to: '/signup' },
             {
-                title: 'Sign in',
+                title: 'sign in',
                 icon: 'fa-sign-in-alt',
                 to: '/signin',
             },
             {
-                title: 'Sign out',
+                title: 'sign out',
                 icon: 'fa-sign-out-alt',
                 to: '/signout',
             },

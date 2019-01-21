@@ -1,5 +1,5 @@
 <template>
-    <v-menu offset-x offset-y left>
+    <v-menu offset-y left>
             <v-btn fab flat small slot="activator">
                 <v-avatar size="36">
                     <img :alt="profile.name" :src="profile.avatar">
@@ -23,16 +23,29 @@
 
                 <v-divider class="mb-1"/>
 
-                <v-list-tile v-for="(item, index) in items" class="ma-0" 
-                    :key="index" 
-                    :to="item.to"
-                >
-                    <v-list-tile-avatar>
-                        <v-icon small>{{ item.icon }}</v-icon>
-                    </v-list-tile-avatar>
+                <template v-for="(item, index) in items">
+                    <v-divider
+                        v-if="item.divider"
+                        :inset="item.inset"
+                        :key="index"
+                    ></v-divider>
+
+                    <v-list-tile class="ma-0" dense
+                        v-else
+                        :key="item.title"
+                        :to="item.to"
+                        avatar
+                    >
+                        <v-list-tile-avatar>
+                            <v-icon small>{{ item.icon }}</v-icon>
+                        </v-list-tile-avatar>
+
+                        <v-list-tile-sub-title>{{ item.title }}</v-list-tile-sub-title>
+                    </v-list-tile>
                 
-                    <v-list-tile-sub-title>{{ item.title }}</v-list-tile-sub-title>
-                </v-list-tile>
+                    
+
+                </template>
             </v-list>
         </v-menu>
 </template>
@@ -54,7 +67,10 @@
         },
         computed: {
             ...mapState({
-                items: state => state.account_items,
+                items: state => state.account_items/* .map(item => {
+                    let { to, ...rest } = item;
+                    return item.divider ? rest : item;
+                }) */,
                 profile: state => state.account.user.profile,
                 user: state => state.account.user,
             })
@@ -67,3 +83,4 @@
         background-color: var(--v-blueGrey-lighten3)!important;
     }
 </style>
+
