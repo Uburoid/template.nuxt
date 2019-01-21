@@ -104,4 +104,6 @@ yarn-error.log*
 *.sw*
 
 #csv
-*.csv
+#*.csv
+backup/relations.csv
+backup/nodes.csv

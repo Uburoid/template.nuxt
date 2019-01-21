@@ -1,0 +1,3 @@
+deny, Аноним, {to:'.*'}, *
+--deny, Аноним, {to:'=/messaging'}, *
+deny, Пользователи, {to:'=/messaging'}, *
