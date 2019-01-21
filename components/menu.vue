@@ -71,7 +71,7 @@
                     let { to, ...rest } = item;
                     return item.divider ? rest : item;
                 }) */,
-                profile: state => state.account && state.account.user.profile,
+                profile: state => state.account.user.profile,
                 user: state => state.account.user,
             })
         }

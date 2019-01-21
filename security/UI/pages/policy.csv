@@ -25,4 +25,4 @@ allow, *, UI, menus, *, *, *
 --deny,*,*,*,{path:'=/inspire'},=invalid
 
 allow, *, Account, *, *, *, *
-deny, Аноним, Account, get, *, *, *, 405
+deny, Аноним, Account, =get, *, *, =exists, 405

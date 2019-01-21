@@ -37,6 +37,18 @@ export const mutations = {
     },
 
     SET_ACCOUNT(state, account) {
+        if(!account) {
+            account = {
+                user: {
+                    profile: {
+                        avatar: '/api/account.avatar',
+                        name: 'Anonymous'
+                    },
+                    email: 'anonymous@example.com'
+                },
+            }
+        }
+
         state.account = account;
     },
 
