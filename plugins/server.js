@@ -4,13 +4,15 @@ const cookie = require("cookie");
 const axios_cache = new LRU();
 
 let execute = async ({ context, cache = true, method = 'get', endpoint = '/', payload, headers, redirectOnError = false }) => {
-    
+    debugger
     let { $axios, error, redirect, store, $error } = context;
 
     cache = cache && process.browser; //USE CACHE IN BROWSER ONLY
 
     let params = JSON.stringify(payload || {});
     let key = `${endpoint}:${params}`;
+
+    payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
 
     let response = cache && axios_cache.get(key);
 
@@ -37,17 +39,12 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
             //flags && flags.auto_merge && data[flags.auto_merge] && context.store.commit('SET_ENTITIES', { data: data[flags.auto_merge] });
         }
         catch (err) {
-            err.component = err.component || 'error-dialog';
-
-            err = $error(err);
-
-            return err ? { data: { ...err }} : { data: void 0 };
-
-            throw err;
-            //error({ ...err });
-            err.redirect ? redirect(err.redirect) : error({ ...err });
-
-            return { data: { error: err }};
+            debugger
+            error(err);
+            //throw { code: 0 };
+            /* if(process.browser) {
+                throw { code: 0 };
+            } */
         }
 
     }
@@ -136,22 +133,22 @@ export default async (context, inject) => {
 
     let response = await context.$axios({ url: '/_server_' });//CALL TO LOAD DEFAULT KEYS!
 
-    /* const Server = (new Function(response.data))();
+    const Server = (new Function(response.data))();
         
-    server = new Server({ execute, context }); */
+    server = new Server({ execute, context });
 
-    if(process.browser) {
-
+    /* if(process.browser) {
+        debugger
         const Server = (new Function(response.data))();
         
         server = new Server({ execute, context });
     }
 
     if(process.server) {
-
+        debugger
         let { Types } = require('../api/classes');
         server = new LocalServer({ context, Types });
-    }
+    } */
 
     context.$server = server;
     inject('server', server);

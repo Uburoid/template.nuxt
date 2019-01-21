@@ -1,6 +1,28 @@
-import { resolve, reject } from 'q';
+
 
 (async () => {
+    let models = require('./models');
+
+    let role = await models.Role.findOne({
+        name: 'Администраторы'
+    });
+
+    let admin = await models.RootMember.findOne({
+        email: {
+            address: 'admin@atlant.club'
+        },
+        role: true
+    });
+
+    if(admin) {
+        admin = await models.RootMember({
+            email: {
+                address: 'admin@atlant.club'
+            },
+            role: true
+        });
+    }
+
     return
     /* const neo4j = require('neo4j-driver').v1;
     const driver = neo4j.driver('bolt://206.81.24.70:7687', neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true}); //WARNING: POSSIBLE NUMBER DATA LOSS!!!
@@ -593,8 +615,7 @@ router.use((err, req, res, next) => {
     
     res.status(error.statusCode).json(error); */
     console.log(err);
-    
-    res.status(err.statusCode || 400).json(err);
+    res.status(err.statusCode).json(err);
 });
 
 process.on('unhandledRejection', err => {

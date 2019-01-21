@@ -4,6 +4,20 @@ require('dotenv').config({
 
 module.exports = {
     //mode: 'spa',
+    //modern: 'server',
+    /* vue: {
+        config: {
+            errorHandler: (err, vm, info) => {
+                debugger
+
+                err.component = 'error-dialog';
+                vm.$error && vm.$error(err, info);
+                
+                //return false;
+                return !!vm.$error;
+            }
+        }
+    }, */
 
     server: {
         host: process.env.NUXT_HOST,
@@ -53,6 +67,7 @@ module.exports = {
     ** Plugins to load before mounting the App
     */
     plugins: [
+        '@/plugins/clientInit',
         '@/plugins/error-handler',
         '@/plugins/vuetify',
         '@/plugins/axios',
@@ -67,6 +82,8 @@ module.exports = {
     ** Nuxt.js modules
     */
     modules: [
+        //'@/modules/nuxt-error',
+        'cookie-universal-nuxt',
         //'@/modules/error-handler',
         //'@nuxtjs/localtunnel'
         //'@nuxtjs/separate-env',
@@ -83,12 +100,17 @@ module.exports = {
         //vendor: ['axios', 'vuetify'], //depricated
         analyze: false,
         extend (config, { isDev, isClient }) {
+            process.on('unhandledRejection', err => {
+                debugger
+                console.log('unhandledRejection => ', err);
+            });
             //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
             
             config.node = { __dirname: true };
         },
         optimization: {
+            minimize: true,
             splitChunks: {
                 chunks: 'all',
                 automaticNameDelimiter: '.',
@@ -99,7 +121,7 @@ module.exports = {
             }
           },
           maxChunkSize: 50000,
-          minimize: true,
+          
           parallel: true,
 
     },

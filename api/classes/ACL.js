@@ -23,7 +23,7 @@ class ACL {
         this.model = parsed_model;
         this.options = options;
 
-        this.policy = ACL.parsePolicy(policy, order);;
+        this.policy = ACL.parsePolicy(policy, order, parsed_model);;
         ACL.roles = roles;
 
         //this.options = { ...strict: true, ...options };
@@ -34,7 +34,10 @@ class ACL {
         options = options ? { ...default_options, ...options } : default_options;
         data = flatten(data);
         
-
+        debugger
+        let trace = [];
+        let origin = { ...flatten(request) };
+        origin = unflatten(origin);
 
         request = policy.reduce((memo, policy) => {
             let flatten_policy = flatten(policy);
@@ -59,31 +62,53 @@ class ACL {
                 return model[key] ? !!model[key](policy[key], value) : true;
             });
 
-            permission && memo.push(policy.permission);
+            permission && memo.push({ access: policy.permission, policy });
+            //permission && memo.push(policy.permission);
+            //permission && trace.push(policy);
 
             return memo;
         }, []);
         
-        let result = !!!request.length;
+        let result = !!request.length;
 
-        if(!result) {
+        if(result) {
+
             let last = request[request.length - 1];
 
-            if(options.strict) {
-                if(options.priority) {
-                    result = last === 'allow' && !request.some(permission => permission === 'deny');
-                }
-                else result = request.every(permission => permission === 'allow');
+            if(options.priority) {
+                result = last.access === 'allow' ? true : { ...last, access: false }; // && !request.some(permission => permission === 'deny');
             }
             else {
-                if(options.priority) {
-                    result = last === 'allow';
+                if(options.strict) {
+                    result = request.every(permission => permission.access === 'allow');
+                }
+                else {
+                    result = request.some(permission => permission.access === 'allow');
+                }
+            }
+        }
+        else {
+            result = { access: !options.strict };
+        }
+        /* if(result) {
+
+            let last = request[request.length - 1];
+
+            if(options.priority) {
+                result = last === 'allow'// && !request.some(permission => permission === 'deny');
+            }
+            else {
+                if(options.strict) {
+                    result = request.every(permission => permission === 'allow');
                 }
                 else {
                     result = request.some(permission => permission === 'allow');
                 }
             }
         }
+        else {
+            result = !options.strict;
+        } */
 
         //let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');
 
@@ -132,7 +157,7 @@ class ACL {
         return jsons;
     }
 
-    static parsePolicy(policy, model) {
+    static parsePolicy(policy, order, model) {
         let prepared = policy.split('\n').reduce((memo, line) => line.trim() ? memo.push(line.trim()) && memo : memo, []);
 
         policy = prepared.reduce((memo, value) => {
@@ -150,24 +175,29 @@ class ACL {
             rest.forEach((pattern, inx) => {
                 pattern = pattern.trim();
                 
-                if(pattern.slice(0, 1) === '~') {
-                    pattern = json5.parse(objects[pattern.slice(1)]);
-
-                    let flatten_pattern = flatten(pattern);
-
-                    pattern = Object.entries(flatten_pattern).reduce((memo, [key, value]) => {
-                        value = ACL.parseRegExp(value);
-                        memo[key] = value;
-
-                        return memo;
-                    }, {});
-
-                    pattern = unflatten(pattern);
-
+                if(model[order[inx]].name === 'immutable') {
+                    policy[order[inx]] = model[order[inx]](pattern);
                 }
-                else pattern = ACL.parseRegExp(pattern);
-
-                policy[model[inx]] = pattern;
+                else {
+                    if(pattern.slice(0, 1) === '~') {
+                        pattern = json5.parse(objects[pattern.slice(1)]);
+    
+                        let flatten_pattern = flatten(pattern);
+    
+                        pattern = Object.entries(flatten_pattern).reduce((memo, [key, value]) => {
+                            value = ACL.parseRegExp(value);
+                            memo[key] = value;
+    
+                            return memo;
+                        }, {});
+    
+                        pattern = unflatten(pattern);
+    
+                    }
+                    else pattern = ACL.parseRegExp(pattern);
+    
+                    policy[order[inx]] = pattern;
+                }
             });
 
             memo.push(policy);
@@ -211,6 +241,11 @@ class ACL {
 
     static get matchers() {
         return {
+            immutable(policy) {
+                //debugger
+                policy = isNaN(policy) ? policy : Number(policy);
+                return policy;
+            },
             roleMatcher: (policy, role) => {
                 if(ACL.roles) {
                     let flatten_roles = flatten(this.roles);
@@ -234,7 +269,7 @@ class ACL {
             
                     return result
                 }
-                else return true;
+                else return false;
             },
             regExpMatcher: (policy, value) => {
                 let values = Array.isArray(value) ? value : [value];
