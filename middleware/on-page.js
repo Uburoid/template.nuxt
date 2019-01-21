@@ -34,8 +34,8 @@ export default async (context) => {
         store.commit('SET_ERROR', { ...store.state.error, clear: true });
     }
 
-    let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
-    title = title || 'Ошибка';
+    let response = await app.$server.ui.pageData({ path: route.path }, { cache: false });
+    
 
     if (response) {
         let title = response.path;

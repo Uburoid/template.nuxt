@@ -62,7 +62,7 @@ Vue.mixin({
 })
 
 export default (context, inject) => {
-    debugger
+    //debugger
     const page_with_error = context.app.$cookies.get('page-with-error');
 
     page_with_error && context.store.commit('SET_PAGE_WITH_ERROR', page_with_error);

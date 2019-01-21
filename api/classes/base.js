@@ -356,7 +356,7 @@ class SecuredAPI extends API {
         let allow = await super.$beforeAction(method_name, ...args);
         
         if(allow) {
-            debugger
+            //debugger
             if(!this.payload) throw new Error('Payload not defined.');
 
             let [resource] = args;

@@ -34,7 +34,7 @@ class ACL {
         options = options ? { ...default_options, ...options } : default_options;
         data = flatten(data);
         
-        debugger
+        //debugger
         let trace = [];
         let origin = { ...flatten(request) };
         origin = unflatten(origin);

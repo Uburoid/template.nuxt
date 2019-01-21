@@ -26,8 +26,13 @@ class UI extends SecuredAPI {
     }
 
     menus() {
-        let drawer_items = [{ icon: "apps", title: "Welcome", to: "/" }, { icon: "bubble_chart", title: "Inspire", to: "/inspire" }, { icon: "fa-error", title: "NOT FOUND", to: "/not-found" }, { icon: "fa-phone", title: "Messaging", to: "/messaging" }];
-        //debugger
+        let drawer_items = [
+            { icon: "apps", title: "Welcome", to: "/" }, 
+            { icon: "bubble_chart", title: "Inspire", to: "/inspire" }, 
+            { icon: "fa-error", title: "NOT FOUND", to: "/not-found" }, 
+            { icon: "fa-phone", title: "Messaging", to: "/messaging" }
+        ];
+        debugger
         const acl = new ACL({ model, policy, roles: this.roles });
 
         drawer_items = drawer_items.reduce((memo, item) => {

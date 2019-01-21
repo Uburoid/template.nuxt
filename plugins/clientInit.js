@@ -2,7 +2,7 @@
 
 
 export default (context) => {
-    debugger
+    //debugger
     if (process.browser) {
         setTimeout(() => {
             context.store.dispatch('nuxtClientInit', context)
