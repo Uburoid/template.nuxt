@@ -14,7 +14,8 @@ export const state = () => ({
     title: 'init',
     settings: {
         drawer: false
-    }
+    },
+    drawer_items: []
 });
 
 export const mutations = {
@@ -41,6 +42,10 @@ export const mutations = {
         state.settings = settings;
 
         process.browser && localStorage && localStorage.setItem('settings', JSON.stringify(state.settings));
+    },
+
+    SET_DRAWER_ITEMS(state, items) {
+        state.drawer_items = items;
     }
 };
 

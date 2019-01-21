@@ -26,12 +26,21 @@ export default async (context) => {
     }, 500); */
     
     //store.commit('SET_ERROR', void 0);
-    let title = await app.$server.ui.pageData({ path: route.path }, { cache: false });
-    title = title || 'Ошибка';
+    let response = await app.$server.ui.pageData({ path: route.path }, { cache: false });
 
-    store.state.error && typeof(title) !== 'string' && (title = 'Ошибка');
-    
-    store.commit('SET_TITLE', title);
+    if (response) {
+        let title = response.path;
+
+        title = title || 'Ошибка';
+
+        store.state.error && typeof (title) !== 'string' && (title = 'Ошибка');
+
+        store.commit('SET_TITLE', title);
+        
+    }
+
+    let { drawer_items } = await app.$server.ui.menus({ path: route.path }, { cache: false });
+    store.commit("SET_DRAWER_ITEMS", drawer_items);
 
     //if(!store.state.error || (store.state.error && store.state.error.display)) {
         let account = await app.$server.account.get(0, { cache: false });

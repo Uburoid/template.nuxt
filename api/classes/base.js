@@ -11,23 +11,22 @@ let roles = Role.find({
     inherits: true
 }).then(res => {
 
-    roles = res.reduce((memo, role) => {
+    return res.reduce((memo, role) => {
+      if (role.inherits) {
+        let parent = res.find(record => role.inherits._id === record._id);
 
-        if(role.inherits) {
-            let parent = res.find(record => role.inherits._id === record._id);
-
-            if(parent) {
-                parent.children = parent.children || [];
-                parent.children.push(role);
-            }
+        if (parent) {
+          parent.children = parent.children || [];
+          parent.children.push(role);
         }
-        else {
-            memo.push(role);
-        }
+      } else {
+        memo.push(role);
+      }
 
-        return memo;
+      return memo;
     }, []);
 
+    
 });
 
 let roles1 = [
@@ -62,8 +61,8 @@ let roles1 = [
     }
 ]
 
-const model = './security/model.conf';
-const policy = './security/policy.csv';
+const model = './security/UI/pages/model.conf';
+const policy = './security/UI/pages/policy.csv';
 
 const { ACL } = require('./ACL');
 
@@ -84,6 +83,8 @@ class AccessDenied extends Error {
 
 class Base {
     constructor({ req, res, error, redirect, $error, route }) {
+        //debugger
+        this.roles = roles;
 
         this.fs = fs;
         //this.jwt = jwt;
@@ -113,6 +114,9 @@ class Base {
                     return async (...args) => {
                         
                         try {
+                            //debugger
+                            self.roles = await self.roles;
+
                             let allow = await self.$beforeAction(propKey, ...args);
                             //allow = typeof(allow) === 'undefined' ? true : allow;
 
@@ -320,9 +324,9 @@ class SecuredAPI extends API {
 
             let [resource] = args;
             
-            roles = await roles;
-
-            const acl = new ACL({ model, policy, roles });
+            //roles = await roles;
+            //debugger
+            const acl = new ACL({ model, policy, roles: this.roles });
 
             allow = acl.enforce({
                 request: {
