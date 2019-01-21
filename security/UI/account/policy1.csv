@@ -1,0 +1,14 @@
+allow, *, {to:'=-'}, *
+allow, Аноним, {to:'=/signup'}, *
+allow, Аноним, {to:'=/signin'}, *
+
+allow, Пользователи, {to:'=/signup'}, *
+--deny, Пользователи, {to:'=/users'}, *
+
+allow, Пользователи, {to:'=/signin'}, =invalid
+allow, Пользователи, {to:'=/signout'}, =invalid
+
+deny, Пользователи, {to:'=/signin'}, =valid
+allow, Пользователи, {to:'^.*$'}, =valid
+
+allow, Администраторы, {to:'=/users'}, =valid

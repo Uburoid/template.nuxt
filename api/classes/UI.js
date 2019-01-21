@@ -2,11 +2,12 @@
 const { API, SecuredAPI } = require('./base');
 const { ACL } = require("./ACL");
 
-const drawer_model = "./security/UI/drawer/model.conf";
-const drawer_policy = "./security/UI/drawer/policy.csv";
 
-const account_model = "./security/UI/account/model.conf";
-const account_policy = "./security/UI/account/policy.csv";
+const drawer_model = "../../security/UI/drawer/model.conf";
+const drawer_policy = "../../security/UI/drawer/policy.csv";
+
+const account_model = "../../security/UI/account/model.conf";
+const account_policy = "../../security/UI/account/policy.csv";
 
 class UI extends SecuredAPI {
     constructor(...args) {
@@ -29,14 +30,9 @@ class UI extends SecuredAPI {
     }
 
     menus() {
-        let drawer_items = [
-            { icon: "apps", title: "Welcome", to: "/" }, 
-            { icon: "bubble_chart", title: "News", to: "/news" }, 
-            { icon: "bubble_chart", title: "Inspire", to: "/inspire" }, 
-            { icon: "fa-error", title: "NOT FOUND", to: "/not-found" }, 
-            { icon: "fa-phone", title: "Messaging", to: "/messaging" }
-        ];
-        //debugger
+        let drawer_items = require('../../security/UI/drawer/menu');
+        delete require.cache[require.resolve('../../security/UI/drawer/menu')];
+
         let acl = new ACL({ model: drawer_model, policy: drawer_policy, roles: this.roles });
 
         drawer_items = drawer_items.reduce((memo, item) => {
@@ -55,41 +51,8 @@ class UI extends SecuredAPI {
             return memo;
         }, []);
 
-        let account_items = [
-            {
-                title: 'users',
-                icon: 'fa-users',
-                to: '/users',
-            },
-            { divider: true, inset: true, to: '/users' },
-            {
-                title: 'account',
-                icon: 'fa-user',
-                to: '/account',
-            },
-            {
-                title: 'help',
-                icon: 'far fa-question-circle',
-                to: '/help',
-            },
-            { divider: true, inset: true, to: '/help' },
-            {
-                title: 'sign up',
-                icon: 'fa-user-plus',
-                to: '/signup',
-            },
-            { divider: true, inset: true, to: '/signup' },
-            {
-                title: 'sign in',
-                icon: 'fa-sign-in-alt',
-                to: '/signin',
-            },
-            {
-                title: 'sign out',
-                icon: 'fa-sign-out-alt',
-                to: '/signout',
-            },
-        ]
+        let account_items = require('../../security/UI/account/menu');
+        delete require.cache[require.resolve('../../security/UI/account/menu')];
 
         acl = new ACL({ model: account_model, policy: account_policy, roles: this.roles });
 
@@ -100,7 +63,7 @@ class UI extends SecuredAPI {
                     resource: item,
                     token: this.payload.token_err ? "invalid" : "valid"
                 },
-                options: { strict: true, priority: false }
+                //options: { strict: false, priority: false }
             });
 
             let { access } = allow;
@@ -108,6 +71,8 @@ class UI extends SecuredAPI {
 
             return memo;
         }, []);
+
+        //console.info('---- ACCOUNT MENU', account_items);
 
         return { drawer_items, account_items };
     }

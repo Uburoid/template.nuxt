@@ -46,8 +46,10 @@
 <script>
 export default {
     data: () => ({
-        email: 'mychrome51@gmail.com',
-        password: '123'
+        /* email: 'mychrome51@gmail.com',
+        password: '123' */
+        email: 'admin@atlant.club',
+        password: 'DerGfhjkm8F'
     }),
     
     methods: {

@@ -1,4 +1,4 @@
-const path = require('path');
+
 const json5 = require('json5');
 const fs = require('fs-extra');
 const flatten = require('flat');
@@ -8,12 +8,19 @@ class ACL {
     constructor({ model, policy, roles }, matchers) {
         //debugger
 
-        let root = process.cwd();
-        const model_path = path.join(root, model);
-        const policy_path = path.join(root, policy);
+        try {
+            const model_path = require.resolve(model);
+            const policy_path = require.resolve(policy);
+    
+            model = fs.pathExistsSync(model_path) ? fs.readFileSync(model_path, { encoding: 'utf-8' }) : model;
+            policy = fs.pathExistsSync(policy_path) ? fs.readFileSync(policy_path, { encoding: 'utf-8' }) : policy;
 
-        model = fs.pathExistsSync(model_path) ? fs.readFileSync(model_path, { encoding: 'utf-8' }) : model;
-        policy = fs.pathExistsSync(policy_path) ? fs.readFileSync(policy_path, { encoding: 'utf-8' }) : policy;
+            this.model_path = model_path;
+            this.policy_path = policy_path;
+        }
+        catch(err) {
+
+        }
 
         matchers = matchers ? typeof(matchers) !== 'object' ? typeof(matchers) === 'function' ? { matchers } : {} : matchers : {};
         ACL.$matchers = { ...ACL.matchers, ...matchers };
@@ -69,6 +76,11 @@ class ACL {
             return memo;
         }, []);
         
+        /* console.info('>>>> ACL:enforce');
+        console.info('>>>> ACL:policy', this.policy_path);
+        console.info('ACL:request', origin);
+        console.info('ACL:applied polices', request); */
+
         let result = !!request.length;
 
         if(result) {
@@ -76,7 +88,7 @@ class ACL {
             let last = request[request.length - 1];
 
             if(options.priority) {
-                result = last.access === 'allow' ? true : { ...last, access: false }; // && !request.some(permission => permission === 'deny');
+                result = last.access === 'allow' ? { access: true } : { ...last, access: false }; // && !request.some(permission => permission === 'deny');
             }
             else {
                 if(options.strict) {
@@ -111,7 +123,7 @@ class ACL {
         } */
 
         //let result = options.strict ? request.every(permission => permission === 'allow') : request.some(permission => permission === 'allow');
-
+        //console.info('ACL:RESULT', result);
         return result;
     }
 

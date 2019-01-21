@@ -64,8 +64,8 @@ let roles1 = [
     }
 ]
 
-const model = './security/UI/pages/model.conf';
-const policy = './security/UI/pages/policy.csv';
+const model = '../../security/UI/pages/model.conf';
+const policy = '../../security/UI/pages/policy.csv';
 
 const { ACL } = require('./ACL');
 
@@ -333,8 +333,6 @@ class API extends Base {
 
 }
 
-const class_acl = require('./security/class_acl');
-
 class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
@@ -387,15 +385,6 @@ class SecuredAPI extends API {
                     _id: 100
                 }
             });
-
-            /* allow = ACL(class_acl, method_name, this, args);
-            allow = allow === 'allow'; */
-
-            /* if(allow && this.payload.token_err) {
-                this.payload.token_err.redirect = '';
-                this.payload.token_err.display = false;
-                throw this.payload.token_err;
-            } */
                 
         }
         

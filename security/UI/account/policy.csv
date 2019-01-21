@@ -1,12 +1,16 @@
-allow, *, {to:'=-'}, *
+deny, *, *, *
+
 allow, Аноним, {to:'=/signup'}, *
 allow, Аноним, {to:'=/signin'}, *
 
-allow, Пользователи, {to:'=/signup'}, *
+allow, Пользователи, *, =valid
 deny, Пользователи, {to:'=/users'}, *
+deny, Пользователи, {to:'=/signin'}, =valid
 
+deny, Пользователи, *, =invalid
 allow, Пользователи, {to:'=/signin'}, =invalid
 allow, Пользователи, {to:'=/signout'}, =invalid
 
-deny, Пользователи, {to:'=/signin'}, =valid
-allow, Пользователи, {to:'^.*$'}, =valid
+allow, Администраторы, {to:'=/users'}, =valid
+
+allow, *, {to:'=-'}, *
