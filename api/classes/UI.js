@@ -61,6 +61,7 @@ class UI extends SecuredAPI {
                 icon: 'fa-users',
                 to: '/users',
             },
+            { divider: true, inset: true, to: '-' },
             {
                 title: 'Account',
                 icon: 'fa-user',
@@ -71,15 +72,17 @@ class UI extends SecuredAPI {
                 icon: 'far fa-question-circle',
                 to: '/help',
             },
-            {
-                title: 'Sign in',
-                icon: 'fa-sign-in-alt',
-                to: '/signin',
-            },
+            { divider: true, inset: true, to: '-' },
             {
                 title: 'Sign up',
                 icon: 'fa-user-plus',
                 to: '/signup',
+            },
+            { divider: true, inset: true, to: '-' },
+            {
+                title: 'Sign in',
+                icon: 'fa-sign-in-alt',
+                to: '/signin',
             },
             {
                 title: 'Sign out',

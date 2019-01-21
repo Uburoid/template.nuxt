@@ -1,5 +1,6 @@
+allow, *, {to:'=-'}, *
 allow, Аноним, {to:'=/signup'}, *
-allow, Аноним, {to:'/signin'}, *
+allow, Аноним, {to:'=/signin'}, *
 
 allow, Пользователи, {to:'=/signup'}, *
 deny, Пользователи, {to:'=/users'}, *

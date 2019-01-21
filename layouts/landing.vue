@@ -1,73 +1,76 @@
 <template>
-  <v-app>
-    <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/>
-    
-    <v-toolbar fixed app clipped-left clipped-right flat>
-        <nuxt-link to="" @click.native="$store.commit('SET_SETTINGS', { drawer: !settings.drawer })">
-            <!-- <img class="top-toolbar-logo" src="~assets/2956ab668f2b82c.jpg" height="54"> -->
-            <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
-        </nuxt-link>
-
-        <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
-
-        <v-toolbar-title v-text="title"></v-toolbar-title>
-
-        <v-spacer></v-spacer>
-
-        <account-menu/>
-        <!-- <v-menu offset-x offset-y>
-            <v-btn fab flat small slot="activator">
-                <v-avatar size="36">
-                    <img :alt="profile.name" :src="profile.avatar">
-                </v-avatar>
-            </v-btn>
-
-            <v-list class="pa-1" dense>
-                <v-list-tile class="ma-2">
-                
-                    <v-list-tile-avatar size="36">
-                        <img :src="profile.avatar">
-                    </v-list-tile-avatar>
-                    
-                    <v-list-tile-content>
-                        <v-list-tile-title>{{ profile.name }}</v-list-tile-title>
-                        <v-list-tile-sub-title v-if="user.email">{{ user.email }}</v-list-tile-sub-title>
-                        
-                    </v-list-tile-content>
-                
-                </v-list-tile>
-
-                <v-divider class="mb-1"/>
-
-                <v-list-tile v-for="(item, index) in account_items" class="ma-0" 
-                    :key="index" 
-                    :to="item.to"
-                    @click="item.click"
-                >
-                    <v-list-tile-avatar>
-                        <v-icon small>{{ item.icon }}</v-icon>
-                    </v-list-tile-avatar>
-                
-                    <v-list-tile-sub-title>{{ item.title }}</v-list-tile-sub-title>
-                </v-list-tile>
-            </v-list>
-        </v-menu> -->
-
-    </v-toolbar>
-
-    <v-content>
-        <!-- {{ !$store.state.error }} -->
-        <!-- <component v-if="error" :is="error.component"/> -->
-        <error v-if="error"/>
-
-        <div v-show="!error || (error && error.dialog)" style="height:100%">
-            <nuxt style="height:100%" keep-alive/>
-        </div>
+    <v-app>
         
-    </v-content>
-
+        
+        <!-- <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/> -->
     
-  </v-app>
+        <v-toolbar fixed app clipped-left clipped-right flat>
+            <!-- <nuxt-link to="" @click.native="$store.commit('SET_SETTINGS', { drawer: !settings.drawer })">
+                <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
+            </nuxt-link> -->
+
+            <drawer/>
+
+            <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
+
+            <v-toolbar-title v-text="title"></v-toolbar-title>
+
+            <v-spacer></v-spacer>
+
+            <account-menu/>
+            <!-- <v-menu offset-x offset-y>
+                <v-btn fab flat small slot="activator">
+                    <v-avatar size="36">
+                        <img :alt="profile.name" :src="profile.avatar">
+                    </v-avatar>
+                </v-btn>
+
+                <v-list class="pa-1" dense>
+                    <v-list-tile class="ma-2">
+                    
+                        <v-list-tile-avatar size="36">
+                            <img :src="profile.avatar">
+                        </v-list-tile-avatar>
+                        
+                        <v-list-tile-content>
+                            <v-list-tile-title>{{ profile.name }}</v-list-tile-title>
+                            <v-list-tile-sub-title v-if="user.email">{{ user.email }}</v-list-tile-sub-title>
+                            
+                        </v-list-tile-content>
+                    
+                    </v-list-tile>
+
+                    <v-divider class="mb-1"/>
+
+                    <v-list-tile v-for="(item, index) in account_items" class="ma-0" 
+                        :key="index" 
+                        :to="item.to"
+                        @click="item.click"
+                    >
+                        <v-list-tile-avatar>
+                            <v-icon small>{{ item.icon }}</v-icon>
+                        </v-list-tile-avatar>
+                    
+                        <v-list-tile-sub-title>{{ item.title }}</v-list-tile-sub-title>
+                    </v-list-tile>
+                </v-list>
+            </v-menu> -->
+
+        </v-toolbar>
+
+        <v-content>
+            <!-- {{ !$store.state.error }} -->
+            <!-- <component v-if="error" :is="error.component"/> -->
+            <error v-if="error"/>
+
+            <div v-show="!error || (error && error.dialog)" style="height:100%">
+                <nuxt style="height:100%" keep-alive/>
+            </div>
+            
+        </v-content>
+
+        
+    </v-app>
 </template>
 
 <script>
