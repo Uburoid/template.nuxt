@@ -80,10 +80,10 @@ class ACL {
             }
             else {
                 if(options.strict) {
-                    result = request.every(permission => permission.access === 'allow');
+                    result = { access: request.every(permission => permission.access === 'allow') };
                 }
                 else {
-                    result = request.some(permission => permission.access === 'allow');
+                    result = { access: request.some(permission => permission.access === 'allow') };
                 }
             }
         }

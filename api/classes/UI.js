@@ -2,8 +2,11 @@
 const { API, SecuredAPI } = require('./base');
 const { ACL } = require("./ACL");
 
-const model = "./security/UI/drawer/model.conf";
-const policy = "./security/UI/drawer/policy.csv";
+const drawer_model = "./security/UI/drawer/model.conf";
+const drawer_policy = "./security/UI/drawer/policy.csv";
+
+const account_model = "./security/UI/account/model.conf";
+const account_policy = "./security/UI/account/policy.csv";
 
 class UI extends SecuredAPI {
     constructor(...args) {
@@ -28,29 +31,82 @@ class UI extends SecuredAPI {
     menus() {
         let drawer_items = [
             { icon: "apps", title: "Welcome", to: "/" }, 
+            { icon: "bubble_chart", title: "News", to: "/news" }, 
             { icon: "bubble_chart", title: "Inspire", to: "/inspire" }, 
             { icon: "fa-error", title: "NOT FOUND", to: "/not-found" }, 
             { icon: "fa-phone", title: "Messaging", to: "/messaging" }
         ];
-        debugger
-        const acl = new ACL({ model, policy, roles: this.roles });
+        //debugger
+        let acl = new ACL({ model: drawer_model, policy: drawer_policy, roles: this.roles });
 
         drawer_items = drawer_items.reduce((memo, item) => {
-          let allow = acl.enforce({
-            request: {
-              role: this.payload.role,
-              resource: item,
-              token: this.payload.token_err ? "invalid" : "valid"
-            },
-            options: { strict: true, priority: false }
-          });
+            let allow = acl.enforce({
+                request: {
+                    role: this.payload.role,
+                    resource: item,
+                    token: this.payload.token_err ? "invalid" : "valid"
+                },
+                options: { strict: false, priority: false }
+            });
 
-          allow && memo.push(item);
+            let { access } = allow;
+            access && memo.push(item);
 
-          return memo;
+            return memo;
         }, []);
 
-        return { drawer_items };
+        let account_items = [
+            {
+                title: 'Users',
+                icon: 'fa-users',
+                to: '/users',
+            },
+            {
+                title: 'Account',
+                icon: 'fa-user',
+                to: '/account',
+            },
+            {
+                title: 'Help',
+                icon: 'far fa-question-circle',
+                to: '/help',
+            },
+            {
+                title: 'Sign in',
+                icon: 'fa-sign-in-alt',
+                to: '/signin',
+            },
+            {
+                title: 'Sign up',
+                icon: 'fa-user-plus',
+                to: '/signup',
+            },
+            {
+                title: 'Sign out',
+                icon: 'fa-sign-out-alt',
+                to: '/signout',
+            },
+        ]
+
+        acl = new ACL({ model: account_model, policy: account_policy, roles: this.roles });
+
+        account_items = account_items.reduce((memo, item) => {
+            let allow = acl.enforce({
+                request: {
+                    role: this.payload.role,
+                    resource: item,
+                    token: this.payload.token_err ? "invalid" : "valid"
+                },
+                options: { strict: true, priority: false }
+            });
+
+            let { access } = allow;
+            access && memo.push(item);
+
+            return memo;
+        }, []);
+
+        return { drawer_items, account_items };
     }
 
     set() {

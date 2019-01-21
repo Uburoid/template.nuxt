@@ -17,7 +17,8 @@ export const state = () => ({
     settings: {
         drawer: false
     },
-    drawer_items: []
+    drawer_items: [],
+    account_items: []
 });
 
 export const mutations = {
@@ -53,6 +54,10 @@ export const mutations = {
 
     SET_DRAWER_ITEMS(state, items) {
         state.drawer_items = items;
+    },
+
+    SET_ACCOUNT_ITEMS(state, items) {
+        state.account_items = items;
     }
 };
 

@@ -4,7 +4,7 @@ const cookie = require("cookie");
 const axios_cache = new LRU();
 
 let execute = async ({ context, cache = true, method = 'get', endpoint = '/', payload, headers, redirectOnError = false }) => {
-    debugger
+    //debugger
     let { $axios, error, redirect, store, $error } = context;
 
     cache = cache && process.browser; //USE CACHE IN BROWSER ONLY

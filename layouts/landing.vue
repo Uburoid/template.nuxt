@@ -14,7 +14,8 @@
 
         <v-spacer></v-spacer>
 
-        <v-menu offset-x offset-y>
+        <account-menu/>
+        <!-- <v-menu offset-x offset-y>
             <v-btn fab flat small slot="activator">
                 <v-avatar size="36">
                     <img :alt="profile.name" :src="profile.avatar">
@@ -31,7 +32,7 @@
                     <v-list-tile-content>
                         <v-list-tile-title>{{ profile.name }}</v-list-tile-title>
                         <v-list-tile-sub-title v-if="user.email">{{ user.email }}</v-list-tile-sub-title>
-                        <!-- <v-list-tile-sub-title v-if="user.role">{{ user.role }}</v-list-tile-sub-title> -->
+                        
                     </v-list-tile-content>
                 
                 </v-list-tile>
@@ -50,7 +51,7 @@
                     <v-list-tile-sub-title>{{ item.title }}</v-list-tile-sub-title>
                 </v-list-tile>
             </v-list>
-        </v-menu>
+        </v-menu> -->
 
     </v-toolbar>
 
@@ -76,6 +77,7 @@
         components: {
             drawer: () => import('@/components/drawer'),
             error:  () => import('@/components/errors/error'),
+            accountMenu: () => import('@/components/menu'),
             //errorDialog:  () => import('@/components/errors/error-dialog'),
         },
         asyncData(ctx) {
@@ -84,7 +86,7 @@
         data: (vm) => {
 
             return {
-                items: [
+                /* items: [
                     {
                         access: 1000,
                         title: 'Users',
@@ -127,7 +129,7 @@
                         to: '/signup',
                         click: () => ({})
                     }
-                ]
+                ] */
                 
                 //title: 'Vuetify.js'
             };
@@ -158,13 +160,13 @@
             }
         },
         computed: {
-            account_items() {
+            /* account_items() {
                 return this.items.reduce((memo, item) => {
                     this.account.access > 0 ? this.account.access >= item.access && item.access > 0 && memo.push(item) : item.access === 0 && memo.push(item);
 
                     return memo;
                 }, []);
-            },
+            }, */
             /* settings() {
                 debugger
                 if(process.browser && localStorage) {

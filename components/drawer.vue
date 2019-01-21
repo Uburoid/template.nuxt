@@ -29,33 +29,28 @@
 </template>
 
 <script>
-export default {
-    props: ['show'],
-    data: () => ({
-        /* items: [
-            { icon: 'apps', title: 'Welcome', to: '/' },
-            { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
-            { icon: 'fa-error', title: 'NOT FOUND', to: '/not-found' },
-            { icon: 'fa-phone', title: 'Messaging', to: '/messaging' },
-        ] */
-    }),
-    methods: {
-    },
-    computed: {
-        items() {
-            return this.$store.state.drawer_items;
+    import { mapState, mapGetters } from 'vuex';
+
+    export default {
+        props: ['show'],
+        data: () => ({}),
+        methods: {
         },
-        visible: {
-            get() {
-                return this.show;
+        computed: {
+            visible: {
+                get() {
+                    return this.show;
+                },
+                set(val) {
+                    
+                    typeof(this.show) !== 'undefined' && val !== this.show && this.$emit('drawer', val);
+                }
             },
-            set(val) {
-                
-                typeof(this.show) !== 'undefined' && val !== this.show && this.$emit('drawer', val);
-            }
+            ...mapState({
+                items: state => state.drawer_items
+            })
         }
     }
-}
 </script>
 
 <style>
