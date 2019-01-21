@@ -7,27 +7,30 @@ const { Metrics } = require('./metrics');
 
 const { Role } = require('../models');
 
-let roles = Role.find({
-    inherits: true
-}).then(res => {
-
-    return res.reduce((memo, role) => {
-      if (role.inherits) {
-        let parent = res.find(record => role.inherits._id === record._id);
-
-        if (parent) {
-          parent.children = parent.children || [];
-          parent.children.push(role);
-        }
-      } else {
-        memo.push(role);
-      }
-
-      return memo;
-    }, []);
-
-    
-});
+let roles = new Promise(resolve => {
+    Role.find({ inherits: true })
+        .then(res => {
+            //debugger
+            let roles = res.reduce((memo, role) => {
+        
+                if(role.inherits) {
+                    let parent = res.find(record => role.inherits._id === record._id);
+        
+                    if(parent) {
+                        parent.children = parent.children || [];
+                        parent.children.push(role);
+                    }
+                }
+                else {
+                    memo.push(role);
+                }
+        
+                return memo;
+            }, []);
+        
+            resolve(roles);
+        });    
+})
 
 let roles1 = [
     {
@@ -74,10 +77,10 @@ const cache = new LRU({
 });
 
 class AccessDenied extends Error {
-    constructor(message) {
+    constructor(code, message) {
         super(message);
 
-        this.code = 403;
+        this.code = code || 403;
     }
 }
 
@@ -118,13 +121,24 @@ class Base {
                             self.roles = await self.roles;
 
                             let allow = await self.$beforeAction(propKey, ...args);
-                            //allow = typeof(allow) === 'undefined' ? true : allow;
+                            let { access, policy } = typeof(allow) === 'object' ? allow : { access: allow };
 
-                            if(!allow) {
-                                if(self.payload.token_err) {
-                                    throw self.payload.token_err;
+                            if(!access) {
+                                if(policy.error_code) {
+                                    let err = { code: policy.error_code };
+
+                                    if(self.payload.token_err && self.payload.token_err.name === 'TokenExpiredError' && policy.error_code === 401) {
+                                        err = self.payload.token_err;
+                                    }
+
+                                    throw err;
                                 }
-                                else throw new AccessDenied(`Access to ${self.constructor.name}.${propKey}() denied.`);
+                                else {
+                                    if(self.payload.token_err) {
+                                        throw self.payload.token_err;
+                                    }
+                                    else throw new AccessDenied(403, `Access to ${self.constructor.name}.${propKey}() denied.`);
+                                }
                             }
 
                             //debugger
@@ -135,8 +149,14 @@ class Base {
                             return response;
                         }
                         catch(err) {
+                            debugger
+                            err = self.$prepareError(propKey, err, ...args);
+
+                            if(error) error(err); else throw err;
+                            return
+                            throw err;
                             //debugger
-                            err = self.$onError(propKey, err, ...args);
+                            err = self.$prepareError(propKey, err, ...args);
                             
                             if($error) {
                                 return $error(err);
@@ -174,7 +194,7 @@ class Base {
         Metrics.save(this.req, method_name, this.payload);
     }
 
-    $onError(method_name, err, ...args) {
+    $prepareError(method_name, err, ...args) {
         
         switch(err.name) {
             case 'TokenExpiredError':
@@ -188,10 +208,26 @@ class Base {
             name: err.name,
             stack: err.stack,
             component: 'error-dialog',
+            dialog: false,
             server_error: true,
             display: err.display,
             redirect: err.redirect
         };
+
+        if(error.statusCode === 403) {
+            error = {
+                ...error,
+                message: `Access to ${this.constructor.name}.${method_name}() denied.`
+            }
+        }
+
+        if(error.statusCode === 404) {
+            error = {
+                ...error,
+                dialog: false,
+                message: 'This page not found on our site.'
+            }
+        }
 
         ///debugger
         //this.route && this.res.cookie('error', this.route.path, { httpOnly: false });
@@ -276,9 +312,9 @@ class API extends Base {
         //this.res.cookie('token', this.token, { httpOnly: false });
     }
 
-    /* $onError(method_name, err, ...args) {
+    /* $prepareError(method_name, err, ...args) {
         
-        let error = super.$onError(method_name, err, ...args);
+        let error = super.$prepareError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
             this.res.cookie('$token', '', { expires: new Date() });
@@ -297,12 +333,12 @@ class SecuredAPI extends API {
         super(...args);
     }
 
-    $onError(method_name, err, ...args) {
+    $prepareError(method_name, err, ...args) {
         
-        let error = super.$onError(method_name, err, ...args);
+        let error = super.$prepareError(method_name, err, ...args);
 
         if(error.statusCode === 401) {
-            debugger
+            //debugger
             this.payload && this.payload.shadow_id && this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
             
             this.res.cookie('$token', '', { expires: new Date() });
@@ -310,6 +346,7 @@ class SecuredAPI extends API {
 
             error.redirect = typeof(error.redirect) === 'undefined' ? '/signin' : error.redirect;
             error.component = 'error';
+            error.dialog = false;
         }
         //debugger
         return error;
@@ -319,24 +356,26 @@ class SecuredAPI extends API {
         let allow = await super.$beforeAction(method_name, ...args);
         
         if(allow) {
-            //debugger
+            debugger
             if(!this.payload) throw new Error('Payload not defined.');
 
             let [resource] = args;
+            const { page_exists, ...rest } = resource;
             
-            //roles = await roles;
-            //debugger
-            const acl = new ACL({ model, policy, roles: this.roles });
+            roles = await roles;
 
+            const acl = new ACL({ model, policy, roles });
+            //debugger
             allow = acl.enforce({
                 request: {
                     role: this.payload.role,
                     class: this.constructor.name, 
                     methods: method_name,
                     resource,
-                    token: this.payload.token_err ? 'invalid' : 'valid'
+                    token: this.payload.token_err ? 'invalid' : 'valid',
+                    page_exists
                 },
-                options: { strict: true, priority: false },
+                options: { strict: true, priority: true },
                 data: {
                     _id: 100
                 }
@@ -345,11 +384,11 @@ class SecuredAPI extends API {
             /* allow = ACL(class_acl, method_name, this, args);
             allow = allow === 'allow'; */
 
-            if(allow && this.payload.token_err) {
+            /* if(allow && this.payload.token_err) {
                 this.payload.token_err.redirect = '';
                 this.payload.token_err.display = false;
                 throw this.payload.token_err;
-            }
+            } */
                 
         }
         

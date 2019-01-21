@@ -1,11 +1,13 @@
+
 export const state = () => ({
     page_with_error: void 0,
     error: void 0,
+    last_route: void 0,
     account: {
         user: {
             profile: {
                 avatar: '/api/account.avatar',
-                name: 'Anonymous'
+                name: 'Anonymous - default in store'
             },
             email: 'anonymous@example.com'
         },
@@ -19,6 +21,11 @@ export const state = () => ({
 });
 
 export const mutations = {
+
+    SET_LAST_ROUTE(state, route) {
+        //debugger
+        state.last_route = state.last_route ? route : '/';
+    },
 
     SET_ERROR(state, error) {
         state.error = error;
@@ -54,6 +61,27 @@ export const getters = {
 }
 
 export const actions = {
+    async nuxtClientInit(context) {
+        debugger
+
+        let settings = localStorage.getItem('settings');
+        settings = settings ? JSON.parse(settings) : {};
+        
+        context.commit('SET_SETTINGS', settings);
+        /* Vue.config.errorHandler = function (err, vm, info) {
+            debugger
+            console.log('GLOBAL:', vw.$cookies)
+            // handle error
+            // `info` is a Vue-specific error info, e.g. which lifecycle hook
+            // the error was found in. Only available in 2.2.0+
+        }
+
+        window.onerror = function() {
+            debugger
+            console.log('GLOBAL:', vw.$cookies)
+        } */
+    },
+
     async nuxtServerInit (context, { req }) {
         /* try {
             let name = await this.$server.member.echo({ name: 'hello', add: { my: 'friend' }}, { cache: false });
