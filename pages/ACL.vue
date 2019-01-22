@@ -54,49 +54,113 @@
                 :headers="model.headers"
                 :items="model.rows"
                 class="elevation-0 pa-1"
-                fill-height
+                select-all="red--text"
+                v-model="selected"
+                item-key="key"
             >
-                <tr slot="items" slot-scope="props" 
-                    style="cursor: pointer"
-                    :class="{'grey--text': props.item.commented, 'green--text text--darken-2': props.item.access === 'allow', 'red--text text--darken-2': props.item.access === 'deny'}"
-                >
-                    <!-- <td :class="{'grey--text text--lighten-0': props.item.commented}" :style="{'text-decoration': props.item.commented && 'line-through'}">{{ props.item.access }}</td> -->
-                    <td>
-                        <v-icon 
-                            small
-                            :class="{
-                                'grey--text': props.item.commented, 
-                                'green--text text--darken-2': !props.item.commented && props.item.access === 'allow', 
-                                'red--text text--darken-2': !props.item.commented && props.item.access === 'deny'
-                            }"
-                        >
-                            {{ props.item.commented ? 'fas fa-star-of-life' : props.item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle' }}
-                        </v-icon>
-                    </td>
+            
+                <tr slot="headers" slot-scope="props">
+                    <!-- <th>
+                        <v-checkbox
+                            :input-value="props.all"
+                            :indeterminate="props.indeterminate"
+                            color="primary"
+                            hide-details
+                            
+                        />
+                    </th> -->
+                    <!-- <th class="body-1 font-weight-bold">actions</th>
+                    <th class="body-1 font-weight-bold">state</th> -->
 
-                    <td >{{ props.item.access }}</td>
-                    <td>{{ props.item.key }}</td>
-                    <td>{{ props.item.matcher }}</td>
-                    
-                    <td class="justify-end align-center layout px-0" :style="{'text-decoration': false}">
-                        <v-divider vertical/>
-                        <v-spacer/>
-                        <v-btn icon small @click="editModelRow(props.item)">
-                            <v-icon color="primary" small>fa-eraser</v-icon>
-                        </v-btn>
-                        <v-btn icon small @click="deleteModelRow(props.item)" >
-                            <v-icon small color="grey">fas fa-star-of-life</v-icon>
-                        </v-btn>
-                        <v-divider inset vertical/>
-                        <v-btn icon small @click="deleteModelRow(props.item)">
-                            <v-icon color="red darken-2" small>fas fa-times-circle</v-icon>
-                        </v-btn>
-                    </td>
+                    <th
+                        v-for="header in props.headers"
+                        :key="header.text"
+                        class="body-1 font-weight-bold"
+                    >
+                        <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
+                        <span v-else>{{ header.text }}</span>
+                    </th>
+
+                    <!-- <th>
+                        <v-icon small>fas fa-trash</v-icon>    
+                    </th> -->
                 </tr>
+                <template slot="items" slot-scope="props">
+                    <tr 
+                        style="cursor: pointer; border-bottom: 0px!important"
+                        :class="{
+                            'grey--text': props.item.commented, 
+                            'green--text text--darken-2': !props.item.commented && props.item.access === 'allow', 
+                            'red--text text--darken-2': !props.item.commented && props.item.access === 'deny',
+                            'grey lighten-4': props.selected
+                        }"
+                        :active1="props.selected"
+                        @click.stop="props.selected = !props.selected"
+                    >
+                        <!-- <td>
+                            <v-checkbox
+                                :input-value="props.selected"
+                                :indeterminate="props.indeterminate"
+                                color="primary"
+                                hide-details
+                                @click.stop="props.selected = !props.selected"
+                            />
+                        </td> -->
 
+                        <td class="px-0" style="border-right: 1px solid #ddd">
+                            <!-- <v-divider vertical/> -->
+                            <v-btn icon small @click.stop="editRow(props)">
+                                <v-icon color="primary" small>fa-eraser</v-icon>
+                            </v-btn>
+                            <v-btn icon small @click.stop="commentRow(props)" >
+                                <v-icon small color="grey">fas fa-star-of-life</v-icon>
+                            </v-btn>
+                        </td>
+                        
+                        <td>
+                            <v-icon 
+                                small
+                                :class="{
+                                    'grey--text': props.item.commented, 
+                                    'green--text text--darken-2': !props.item.commented && props.item.access === 'allow', 
+                                    'red--text text--darken-2': !props.item.commented && props.item.access === 'deny'
+                                }"
+                                class="justify-center layout px-0"
+                            >
+                                {{ props.item.commented ? 'fas fa-star-of-life' : props.item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle' }}
+                            </v-icon>
+                        </td>
+
+                        <td style="border-right: 1px solid #ddd; border-left: 1px solid #ddd">{{ props.item.access }}</td>
+                        <td style="border-right: 1px solid #ddd">{{ props.item.key }}</td>
+                        <td style="border-right: 1px solid #ddd">{{ props.item.matcher }}</td>
+                        
+                        <td class="px-0" style="border-left: 1px solid #ddd; text-align: center">
+                            <v-btn icon small @click.stop="deleteRow(props)">
+                                <v-icon color="red darken-2" small>fas fa-times-circle</v-icon>
+                            </v-btn>
+                        </td>
+                    </tr>
+                </template>
                 <!-- <template slot="no-data">
                     <v-btn color="primary" @click="initialize">Reset</v-btn>
                 </template> -->
+                <div slot="actions-prepend" v-bind:class="'red'">
+                    <v-btn icon small @click.stop="editRow(props)">
+                        <v-icon color="primary" small>fa-eraser</v-icon>
+                    </v-btn>
+                    <!-- <v-btn icon small @click.stop="commentRow(props)" >
+                        <v-icon small color="grey">fas fa-star-of-life</v-icon>
+                    </v-btn> -->
+                </div>
+                <div slot="actions-append" v-bind:class="'red'">
+                    <v-btn icon small @click.stop="editRow(props)">
+                        <v-icon color="primary" small>fa-eraser</v-icon>
+                    </v-btn>
+                    <!-- <v-btn icon small @click.stop="commentRow(props)" >
+                        <v-icon small color="grey">fas fa-star-of-life</v-icon>
+                    </v-btn> -->
+                </div>
             </v-data-table>
 
         </v-flex>
@@ -110,34 +174,32 @@
     export default {
         layout: 'landing',
         data: () => ({
+            m_selected: {
+                class: 'red'
+            },
             model: {
                 dialog: false,
+                selected: [],
                 headers: [
                     {
+                        text: 'actions',
+                    },
+                    {
                         text: 'state',
-                        align: 'left',
-                        sortable: false,
-                        value: 'state'
                     },
                     {
                         text: 'access',
-                        align: 'left',
-                        sortable: false,
-                        value: 'access'
                     },
                     {
                         text: 'key',
-                        align: 'left',
-                        sortable: false,
-                        value: 'key'
                     },
                     {
                         text: 'matcher',
-                        align: 'left',
-                        sortable: false,
-                        value: 'matcher'
                     },
-                    { text: 'Actions', value: 'name', sortable: false }
+                    {
+                        text: 'delete',
+                        icon: 'fas fa-trash'
+                    },
                 ],
                 rows: [
                     {
@@ -172,15 +234,29 @@
         computed: {
             formTitle () {
                 return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+            },
+            selected: {
+                get() {
+                    return this.model.selected;
+                },
+                set(value) {
+                    //debugger
+                    let [first, row] = value;
+                    this.model.selected = [row || first];
+                }
             }
         },
 
         methods: {
-            editModelRow() {
+            commentRow(props) {
+                debugger
+                console.log(props);
+            },
+            editRow(props) {
 
             },
 
-            deleteModelRow() {
+            deleteRow(props) {
 
             }
         }

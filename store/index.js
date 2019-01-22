@@ -79,7 +79,7 @@ export const getters = {
 
 export const actions = {
     async nuxtClientInit(context) {
-        debugger
+        //debugger
 
         let settings = localStorage.getItem('settings');
         settings = settings ? JSON.parse(settings) : {};
