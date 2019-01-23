@@ -216,7 +216,7 @@
                             style="width: 34px; height: 34px;"
                             :disabled="!model.selected.length"
                         >
-                            <v-icon small>fas fa-keyboard</v-icon>
+                            <v-icon small>fas fa-eraser</v-icon>
                         </v-btn>
                     </div>
                     
@@ -230,7 +230,7 @@
                             style="width: 34px; height: 34px;"
                             :disabled="!model.selected.length"
                         >
-                            <v-icon small>fas fa-times-circle</v-icon>
+                            <v-icon small>fas fa-times</v-icon>
                         </v-btn>
                     </div>
 
@@ -369,16 +369,24 @@
             },
 
             move(direction) {
-                
-                let clone = this.model.rows.slice();
+                //debugger
+                let clone = [...this.model.rows];
 
                 let [selected] = this.model.selected;
                 let from = this.model.rows.findIndex((el, inx) => el.key === selected.key);
-                let to = direction > 0 ? this.model.rows.length - 1 > from ? from + 1 : 0 : from === 0 ? this.model.rows.length - 1 : from - 1;
+                let to = from + direction;
 
-                [clone[from], clone[to]] = [clone[to], clone[from]];
+                if(to === this.model.rows.length || to === -1) {
+                    direction > 0 ? clone.unshift(clone.pop()) : clone.push(clone.shift());
+                }
+                else {
+                    [clone[from], clone[to]] = [clone[to], clone[from]];
+                }
+
+
 
                 this.model.rows = clone;
+                //let to = direction > 0 ? this.model.rows.length - 1 > from ? from + 1 : 0 : from === 0 ? this.model.rows.length - 1 : from - 1;
             },
 
             moveDown() {
