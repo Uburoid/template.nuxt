@@ -11,7 +11,7 @@
                     <v-spacer></v-spacer>
 
                     <v-dialog v-model="model.dialog" max-width="500px">
-                        <v-btn icon slot="activator" color="green darken-2" dark>
+                        <v-btn fab small slot="activator" color="green darken-2" dark>
                             <v-icon small>fa-plus</v-icon>
                         </v-btn>
                         <v-card>
@@ -21,23 +21,23 @@
 
                             <v-card-text>
                                 <v-container grid-list-md>
-                                <v-layout wrap>
-                                    <v-flex xs12 sm12 md6>
-                                        <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
-                                    </v-flex>
-                                </v-layout>
+                                    <v-layout wrap>
+                                        <v-flex xs12 sm12 md6>
+                                            <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
+                                        </v-flex>
+                                    </v-layout>
                                 </v-container>
                             </v-card-text>
 
@@ -90,9 +90,9 @@
                 <template slot="items" slot-scope="props">
                     <tr 
                         style="cursor: pointer; border-bottom: 0px!important"
-                        :class="{'grey lighten-4': props.selected}"
+                        :class="{'grey lighten-3': props.selected}"
                         :active1="props.selected"
-                        @click.stop="props.selected = !props.selected"
+                        @click.stop="props.selected = true"
                     >
                         <!-- <td style="border-right: 1px solid #ddd">{{ props.item.key }}</td> -->
 
@@ -106,11 +106,11 @@
                         >
                             <v-btn v-for="(btn, inx) in header.cell.buttons" :key="inx" 
                                 dark
-                                icon 
+                                fab 
                                 :color="btn.color"
                                 small
                                 @click="btn.click(props)"
-                                style="width: 30px; height: 30px;"
+                                style="width: 28px; height: 28px;"
                             >
                                 <v-icon  small>{{ btn.icon }}</v-icon>
                             </v-btn>
@@ -141,11 +141,11 @@
                             <div style="flex: 1">
                                 <v-btn 
                                     dark 
-                                    icon 
+                                    fab 
                                     small 
                                     color="green darken-2"
                                     @click.stop="moveUp"
-                                    style="width: 30px; height: 30px;"
+                                    style="width: 28px; height: 28px;"
                                     :disabled="!model.selected.length"
                                 >
                                     <v-icon small>fa-angle-up</v-icon>
@@ -153,11 +153,11 @@
                             
                                 <v-btn 
                                     dark 
-                                    icon 
+                                    fab 
                                     small 
                                     color="green darken-2"
                                     @click.stop="moveDown"
-                                    style="width: 30px; height: 30px;"
+                                    style="width: 28px; height: 28px;"
                                     :disabled="!model.selected.length"
                                 >
                                     <v-icon small>fa-angle-down</v-icon>
@@ -197,25 +197,7 @@
                 dialog: false,
                 selected: [],
                 headers: [
-                    {
-                        text: 'actions',
-                        cell: {
-                            style: { 'text-align': 'center' },
-                            buttons: [
-                                {
-                                    click: vm.editRow,
-                                    icon: 'fas fa-pen-square',
-                                    color: 'primary'
-                                },
-                                /* {
-                                    click: vm.commentRow,
-                                    icon: 'fas fa-star-of-life',
-                                    color: 'grey'
-                                } */
-                            ] 
-                        }
-                        
-                    },
+                    
                     {
                         text: 'state',
                         cell: {
@@ -244,11 +226,16 @@
                         }
                     },
                     {
-                        text: 'delete',
-                        icon: 'fas fa-trash',
+                        text: 'CRUD',
+                        //icon: 'fas fa-trash',
                         cell: {
                             style: { 'text-align': 'center' },
                             buttons: [
+                                {
+                                    click: vm.editRow,
+                                    icon: 'fas fa-keyboard',
+                                    color: 'primary'
+                                },
                                 {
                                     click: vm.deleteRow,
                                     icon: 'fas fa-times-circle',
@@ -309,20 +296,44 @@
                 debugger
                 console.log(props);
             },
+
             editRow(props) {
 
             },
 
             deleteRow(props) {
 
+            },
+
+            move(direction) {
+                
+                let clone = this.model.rows.slice();
+
+                let [selected] = this.model.selected;
+                let from = this.model.rows.findIndex((el, inx) => el.key === selected.key);
+                let to = direction > 0 ? this.model.rows.length - 1 > from ? from + 1 : 0 : from === 0 ? this.model.rows.length - 1 : from - 1;
+
+                [clone[from], clone[to]] = [clone[to], clone[from]];
+
+                this.model.rows = clone;
+            },
+
+            moveDown() {
+               this.move(1);
+            },
+
+            moveUp() {
+               this.move(-1);
             }
         }
     }
 </script>
 
-<style scoped>
-    .v-pagination__item {
+<style>
+    .v-pagination__item1, .v-pagination__navigation1 {
         box-shadow: none!important;
+        /* height: 30px!important;
+        width: 30px!important; */
     }
     /* 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) */
 </style>
