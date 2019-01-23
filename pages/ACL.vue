@@ -1,8 +1,8 @@
 <template>
-    <v-layout justify-center>
-        <v-flex  xs12 sm10 md8 lg6 xl4>
+    <v-layout justify-center class="pa-2 elevation-1">
+        <v-flex  xs12 sm10 md8 lg6 xl5>
 
-        <v-flex>
+        <v-card class="mb-2">
             <v-toolbar flat color="white" class="pr-0">
                 <v-toolbar-title>MODEL</v-toolbar-title>
                 <!-- <v-divider
@@ -57,11 +57,11 @@
 
 
             <v-data-table
-                style="flex: 1"
+                style="flex: 1; border: 1px solid #ddd"
                 :headers="model.headers"
                 :items="model.rows"
                 :pagination.sync="model.pagination"
-                class="elevation-0 pt-1 pb-1 pr-1"
+                class="elevation-0 ma-2 pa-1"
                 select-all="red--text"
                 v-model="selected"
                 item-key="key"
@@ -162,7 +162,7 @@
             </v-data-table>
 
             <div class="py-1" fill-height>
-                <v-list class="pa-0" style="height: 100%;" style1="height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <div class="pa-0" style="height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
                     <!-- <div style="display: flex; justify-content: center;">
                         <v-btn fab small color="green darken-2" dark>
@@ -234,16 +234,16 @@
                         </v-btn>
                     </div>
 
-                </v-list>
+                </div>
             </div>
 
             </div>
             
 
-        </v-flex>
-        <v-flex>
+        </v-card>
+        <v-card>
             POLICY
-        </v-flex>
+        </v-card>
         </v-flex>
     </v-layout>
 </template>
@@ -393,6 +393,10 @@
 </script>
 
 <style>
+.v-toolbar__content {
+    padding-left: 8px;
+    padding-right: 0px;
+}
     .v-pagination__item1, .v-pagination__navigation1 {
         box-shadow: none!important;
         /* height: 30px!important;
