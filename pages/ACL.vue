@@ -22,7 +22,7 @@
                             <v-card-text>
                                 <v-container grid-list-md>
                                 <v-layout wrap>
-                                    <v-flex xs12 sm6 md4>
+                                    <v-flex xs12 sm12 md6>
                                         <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
                                     </v-flex>
                                     <v-flex xs12 sm6 md4>
@@ -53,10 +53,12 @@
             <v-data-table
                 :headers="model.headers"
                 :items="model.rows"
+                :pagination.sync="model.pagination"
                 class="elevation-0 pa-1"
                 select-all="red--text"
                 v-model="selected"
                 item-key="key"
+                hide-actions
             >
             
                 <tr slot="headers" slot-scope="props">
@@ -88,79 +90,92 @@
                 <template slot="items" slot-scope="props">
                     <tr 
                         style="cursor: pointer; border-bottom: 0px!important"
-                        :class="{
-                            'grey--text': props.item.commented, 
-                            'green--text text--darken-2': !props.item.commented && props.item.access === 'allow', 
-                            'red--text text--darken-2': !props.item.commented && props.item.access === 'deny',
-                            'grey lighten-4': props.selected
-                        }"
+                        :class="{'grey lighten-4': props.selected}"
                         :active1="props.selected"
                         @click.stop="props.selected = !props.selected"
                     >
-                        <!-- <td>
-                            <v-checkbox
-                                :input-value="props.selected"
-                                :indeterminate="props.indeterminate"
-                                color="primary"
-                                hide-details
-                                @click.stop="props.selected = !props.selected"
-                            />
-                        </td> -->
+                        <!-- <td style="border-right: 1px solid #ddd">{{ props.item.key }}</td> -->
 
-                        <td class="px-0" style="border-right: 1px solid #ddd">
-                            <!-- <v-divider vertical/> -->
-                            <v-btn icon small @click.stop="editRow(props)">
-                                <v-icon color="primary" small>fa-eraser</v-icon>
-                            </v-btn>
-                            <v-btn icon small @click.stop="commentRow(props)" >
-                                <v-icon small color="grey">fas fa-star-of-life</v-icon>
-                            </v-btn>
-                        </td>
-                        
-                        <td>
-                            <v-icon 
+                        <td
+                            v-for="(header, inx) in model.headers"
+                            :key="header.text"
+                            class1="px-0"
+                            style1="border-left: 1px solid #ddd"
+                            :class="header.cell.class"
+                            :style="[header.cell.style, { 'border-right': inx === 0 && '1px solid #ddd', 'border-left': inx === model.headers.length - 1 && '1px solid #ddd' }]"
+                        >
+                            <v-btn v-for="(btn, inx) in header.cell.buttons" :key="inx" 
+                                dark
+                                icon 
+                                :color="btn.color"
                                 small
-                                :class="{
-                                    'grey--text': props.item.commented, 
-                                    'green--text text--darken-2': !props.item.commented && props.item.access === 'allow', 
-                                    'red--text text--darken-2': !props.item.commented && props.item.access === 'deny'
-                                }"
-                                class="justify-center layout px-0"
+                                @click="btn.click(props)"
+                                style="width: 30px; height: 30px;"
                             >
-                                {{ props.item.commented ? 'fas fa-star-of-life' : props.item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle' }}
-                            </v-icon>
-                        </td>
-
-                        <td style="border-right: 1px solid #ddd; border-left: 1px solid #ddd">{{ props.item.access }}</td>
-                        <td style="border-right: 1px solid #ddd">{{ props.item.key }}</td>
-                        <td style="border-right: 1px solid #ddd">{{ props.item.matcher }}</td>
-                        
-                        <td class="px-0" style="border-left: 1px solid #ddd; text-align: center">
-                            <v-btn icon small @click.stop="deleteRow(props)">
-                                <v-icon color="red darken-2" small>fas fa-times-circle</v-icon>
+                                <v-icon  small>{{ btn.icon }}</v-icon>
                             </v-btn>
+                            
+                            <v-icon 
+                                v-if="header.cell.icon"
+                                small
+                                class1="justify-center layout px-0"
+                                :class="header.cell.icon(props.item).color"
+                            >
+                                {{ header.cell.icon(props.item).name }}
+                            </v-icon>
+
+                            {{ props.item[header.cell.name] }}
                         </td>
+                        
                     </tr>
                 </template>
+
                 <!-- <template slot="no-data">
                     <v-btn color="primary" @click="initialize">Reset</v-btn>
                 </template> -->
-                <div slot="actions-prepend" v-bind:class="'red'">
-                    <v-btn icon small @click.stop="editRow(props)">
-                        <v-icon color="primary" small>fa-eraser</v-icon>
-                    </v-btn>
-                    <!-- <v-btn icon small @click.stop="commentRow(props)" >
-                        <v-icon small color="grey">fas fa-star-of-life</v-icon>
-                    </v-btn> -->
-                </div>
-                <div slot="actions-append" v-bind:class="'red'">
-                    <v-btn icon small @click.stop="editRow(props)">
-                        <v-icon color="primary" small>fa-eraser</v-icon>
-                    </v-btn>
-                    <!-- <v-btn icon small @click.stop="commentRow(props)" >
-                        <v-icon small color="grey">fas fa-star-of-life</v-icon>
-                    </v-btn> -->
-                </div>
+                <template slot="footer">
+                    <td :colspan="model.headers.length">
+                        <div style="display: flex; align-items: center;">
+                            <!-- <strong>This is an extra footer</strong> -->
+                        
+                            <div style="flex: 1">
+                                <v-btn 
+                                    dark 
+                                    icon 
+                                    small 
+                                    color="green darken-2"
+                                    @click.stop="moveUp"
+                                    style="width: 30px; height: 30px;"
+                                    :disabled="!model.selected.length"
+                                >
+                                    <v-icon small>fa-angle-up</v-icon>
+                                </v-btn>
+                            
+                                <v-btn 
+                                    dark 
+                                    icon 
+                                    small 
+                                    color="green darken-2"
+                                    @click.stop="moveDown"
+                                    style="width: 30px; height: 30px;"
+                                    :disabled="!model.selected.length"
+                                >
+                                    <v-icon small>fa-angle-down</v-icon>
+                                </v-btn>
+                            </div>
+                        
+                            <v-pagination 
+                                v-model="model.pagination.page" 
+                                :length="10"
+                                circle
+                                :total-visible="5"
+                                icon
+                            />
+                        </div>
+
+                    </td>
+                </template>
+
             </v-data-table>
 
         </v-flex>
@@ -173,32 +188,74 @@
 <script>
     export default {
         layout: 'landing',
-        data: () => ({
+        data: (vm) => ({
             m_selected: {
                 class: 'red'
             },
             model: {
+                pagination: {},
                 dialog: false,
                 selected: [],
                 headers: [
                     {
                         text: 'actions',
+                        cell: {
+                            style: { 'text-align': 'center' },
+                            buttons: [
+                                {
+                                    click: vm.editRow,
+                                    icon: 'fas fa-pen-square',
+                                    color: 'primary'
+                                },
+                                /* {
+                                    click: vm.commentRow,
+                                    icon: 'fas fa-star-of-life',
+                                    color: 'grey'
+                                } */
+                            ] 
+                        }
+                        
                     },
                     {
                         text: 'state',
+                        cell: {
+                            style: { 'text-align': 'center' },
+                            icon: item => {
+                                let name = item.commented ? 'fas fa-star-of-life' : item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle';
+                                let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
+
+                                return { color, name }
+                            }
+                        }
                     },
-                    {
+                    /* {
                         text: 'access',
-                    },
+                    }, */
                     {
                         text: 'key',
+                        cell: {
+                            name: 'key'
+                        }
                     },
                     {
                         text: 'matcher',
+                        cell: {
+                            name: 'matcher'
+                        }
                     },
                     {
                         text: 'delete',
-                        icon: 'fas fa-trash'
+                        icon: 'fas fa-trash',
+                        cell: {
+                            style: { 'text-align': 'center' },
+                            buttons: [
+                                {
+                                    click: vm.deleteRow,
+                                    icon: 'fas fa-times-circle',
+                                    color: 'red darken-2'
+                                }
+                            ]
+                        }
                     },
                 ],
                 rows: [
@@ -262,3 +319,10 @@
         }
     }
 </script>
+
+<style scoped>
+    .v-pagination__item {
+        box-shadow: none!important;
+    }
+    /* 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) */
+</style>
