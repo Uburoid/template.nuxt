@@ -138,7 +138,7 @@
                         <div style="display: flex; align-items: center;">
                             <!-- <strong>This is an extra footer</strong> -->
                         
-                            <div style="flex: 1">
+                            <div style="flex: 1; display: flex; flex-direction: column;">
                                 <v-btn 
                                     dark 
                                     fab 
