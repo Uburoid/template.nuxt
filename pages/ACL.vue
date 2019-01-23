@@ -168,7 +168,7 @@
                                 v-model="model.pagination.page" 
                                 :length="10"
                                 circle
-                                :total-visible="5"
+                                :total-visible="3"
                                 icon
                             />
                         </div>
