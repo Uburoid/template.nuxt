@@ -568,7 +568,7 @@ router.all(patterns, multipartDetector, async (req, res, next) => {
 
     let { type, action = 'get' } = req.params;
 
-    let object = new Types[type]({ req, res });
+    let object = new Types[type.toLowerCase()]({ req, res });
 
     try {
         let result = await object[action](req.body);

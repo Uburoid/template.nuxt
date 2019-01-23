@@ -2,7 +2,7 @@
     <v-layout justify-center class="pa-2 elevation-1">
         <v-flex  xs12 sm10 md8 lg6 xl5>
 
-        <v-card class="mb-2">
+        <v-card class="mb-2" style="">
             <v-toolbar flat color="white" class="pr-0">
                 <v-toolbar-title>MODEL</v-toolbar-title>
                 <!-- <v-divider
@@ -53,126 +53,117 @@
                 </v-dialog>
             </v-toolbar>
             
-            <div style="display: flex">
+            <div class="pa-2" style="display: flex">
 
+                <div style="flex: 1; display: flex; flex-direction: column">
 
-            <v-data-table
-                style="flex: 1; border: 1px solid #ddd"
-                :headers="model.headers"
-                :items="model.rows"
-                :pagination.sync="model.pagination"
-                class="elevation-0 ma-2 pa-1"
-                select-all="red--text"
-                v-model="selected"
-                item-key="key"
-                hide-actions
-            >
-            
-                <tr slot="headers" slot-scope="props">
-                    <!-- <th>
-                        <v-checkbox
-                            :input-value="props.all"
-                            :indeterminate="props.indeterminate"
-                            color="primary"
-                            hide-details
-                            
-                        />
-                    </th> -->
-                    <!-- <th class="body-1 font-weight-bold">actions</th>
-                    <th class="body-1 font-weight-bold">state</th> -->
-                    <th
-                        v-for="header in props.headers"
-                        :key="header.text"
-                        class="body-1 font-weight-bold"
+                    <v-data-table
+                        style="border: 1px solid #ddd;"
+                        :headers="model.headers"
+                        :items="[1]"
+                        class="elevation-0 mb-1 no-items"
+                        hide-actions
                     >
-                        <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
-                        <span v-else>{{ header.text }}</span>
-                    </th>
+                        <tr slot="headers" slot-scope="props">
+                            <th
+                                v-for="header in props.headers"
+                                :key="header.text"
+                                class="body-1 font-weight-bold"
+                                :width="header.width || '100px'"
+                                :style1="{ 'text-align': 'left' }"
+                                :style="header.cell.style || { 'text-align': 'left' }"
+                            >
+                                <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
+                                <span v-else>{{ header.text }}</span>
+                            </th>
+                        </tr>
+                    </v-data-table>
 
-                    <!-- <th>
-                        <v-icon small>fas fa-trash</v-icon>    
-                    </th> -->
-                </tr>
-
-                <template slot="items" slot-scope="props" style="display: flex;">
-
-                    <tr     
-                        style="cursor: pointer; border-bottom: 0px!important"
-                        :class="{'grey lighten-3': props.selected}"
-                        :active1="props.selected"
-                        @click.stop="props.selected = true"
+                    <v-data-table
+                        style="flex: 1; border: 1px solid #ddd; overflow: auto; max-height: 200px"
+                        class="elevation-0"
+                
+                        :headers="model.headers"
+                        :items="model.rows"
+                        :pagination.sync="model.pagination"
+                
+                        select-all="red--text"
+                        v-model="selected"
+                        item-key="key"
+                        hide-actions
+                        hide-headers
                     >
-                        
-
-                        <td
-                            v-for="(header, inx) in model.headers"
-                            :key="header.text"
-                            class1="px-0"
-                            style1="border-left: 1px solid #ddd"
-                            :class="header.cell.class"
-                            :style="[header.cell.style, { 'border-right': inx === 0 && '1px solid #ddd', 'border-left': inx === model.headers.length - 1 && '1px solid #ddd' }]"
-                        >
-                            <v-btn v-for="(btn, inx) in header.cell.buttons" :key="inx" 
-                                dark
-                                fab 
-                                :color="btn.color"
-                                small
-                                @click="btn.click(props)"
-                                style="width: 28px; height: 28px;"
-                            >
-                                <v-icon  small>{{ btn.icon }}</v-icon>
-                            </v-btn>
-                            
-                            <v-icon 
-                                v-if="header.cell.icon"
-                                small
-                                class1="justify-center layout px-0"
-                                :class="header.cell.icon(props.item).color"
-                            >
-                                {{ header.cell.icon(props.item).name }}
-                            </v-icon>
-
-                            {{ props.item[header.cell.name] }}
-                        </td>
-                        
-                    </tr>
-       
-
-                </template>
-
-                <!-- <template slot="no-data">
-                    <v-btn color="primary" @click="initialize">Reset</v-btn>
-                </template> -->
-
-                <template slot="footer">
-                    <td :colspan="model.headers.length">
-                        <div style="display: flex; align-items: center;">
-                            <v-pagination 
-                                v-model="model.pagination.page" 
-                                :length="10"
-                                circle
-                                :total-visible="3"
-                                icon
-                            />
-                        </div>
-
-                    </td>
-                </template>
-
-            </v-data-table>
-
-            <div class="py-1" fill-height>
-                <div class="pa-0" style="height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-
-                    <!-- <div style="display: flex; justify-content: center;">
-                        <v-btn fab small color="green darken-2" dark>
-                            <v-icon small>fa-plus</v-icon>
-                        </v-btn>
-                    </div>
                     
-                    <div class="px-2 pt-1" style="display: flex; justify-content: center;">
-                        <v-divider/>
-                    </div> -->
+                        <tr slot="headers" slot-scope="props">
+                            <th
+                                v-for="header in props.headers"
+                                :key="header.text"
+                                class="body-1 font-weight-bold"
+                                
+                            >
+                                <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
+                                <span v-else>{{ header.text }}</span>
+                            </th>
+
+                        </tr>
+
+                        <template slot="items" slot-scope="props" style="display: flex;">
+
+                            <tr     
+                                style="cursor: pointer; border-bottom1: 1px!important"
+                                :class="{'grey lighten-3': props.selected}"
+                                :active1="props.selected"
+                                @click.stop="props.selected = true"
+                            >
+                                
+
+                                <td
+                                    v-for="(header, inx) in model.headers"
+                                    :key="header.text"
+                                    class1="px-0"
+                                    :class="header.cell.class"
+
+                                    :style="header.cell.style"
+                                    style1="border-left: 1px solid #ddd"
+                                    :style2="[header.cell.style, { 'border-right': inx === 0 && '1px solid #ddd', 'border-left': inx === model.headers.length - 1 && '1px solid #ddd' }]"
+                                    :width="header.width || '100px'"
+                                >
+                                    <v-btn v-for="(btn, inx) in header.cell.buttons" :key="inx" 
+                                        dark
+                                        fab 
+                                        :color="btn.color"
+                                        small
+                                        @click="btn.click(props)"
+                                        style="width: 28px; height: 28px;"
+                                    >
+                                        <v-icon  small>{{ btn.icon }}</v-icon>
+                                    </v-btn>
+                                    
+                                    <v-icon 
+                                        v-if="header.cell.icon"
+                                        small
+                                        class1="justify-center layout px-0"
+                                        :class="header.cell.icon(props.item).color"
+                                    >
+                                        {{ header.cell.icon(props.item).name }}
+                                    </v-icon>
+
+                                    {{ props.item[header.cell.name] }}
+                                </td>
+                                
+                            </tr>
+            
+
+                        </template>
+
+                    </v-data-table>
+
+                    
+
+                </div>
+            
+            
+                <div class="ml-1" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
                     <div style="display: flex; justify-content: center;">
                         <v-btn 
@@ -235,12 +226,11 @@
                     </div>
 
                 </div>
-            </div>
 
             </div>
-            
 
         </v-card>
+
         <v-card>
             POLICY
         </v-card>
@@ -256,7 +246,9 @@
                 class: 'red'
             },
             model: {
-                pagination: {},
+                pagination: {
+                    rowsPerPage: -1
+                },
                 dialog: false,
                 selected: [],
                 headers: [
@@ -271,7 +263,8 @@
 
                                 return { color, name }
                             }
-                        }
+                        },
+                        width: '100px'
                     },
                     /* {
                         text: 'access',
@@ -280,13 +273,15 @@
                         text: 'key',
                         cell: {
                             name: 'key'
-                        }
+                        },
+                        //width: '50%'
                     },
                     {
                         text: 'matcher',
                         cell: {
                             name: 'matcher'
-                        }
+                        },
+                        width: '50%'
                     },
                     /* {
                         text: 'CRUD',
@@ -324,6 +319,24 @@
                     {
                         access: 'deny',
                         key: 'key-2',
+                        matcher: 'regExpMatcher',
+                        commented: false
+                    },
+                    {
+                        access: 'allow',
+                        key: 'key-3',
+                        matcher: 'regExpMatcher',
+                        commented: false
+                    },
+                    {
+                        access: 'deny',
+                        key: 'key-4',
+                        matcher: 'regExpMatcher',
+                        commented: true
+                    },
+                    {
+                        access: 'deny',
+                        key: 'key-5',
                         matcher: 'regExpMatcher',
                         commented: false
                     }
@@ -400,15 +413,15 @@
     }
 </script>
 
-<style>
-.v-toolbar__content {
-    padding-left: 8px;
-    padding-right: 0px;
-}
-    .v-pagination__item1, .v-pagination__navigation1 {
-        box-shadow: none!important;
-        /* height: 30px!important;
-        width: 30px!important; */
+<style scoped>
+    /* .v-toolbar__content {
+        padding-left: 8px;
+        padding-right: 0px;
+    } */
+    .no-items .v-table tbody tr:first-child {
+        display: none;
     }
-    /* 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) */
+    .no-items .v-table thead tr:first-child {
+        border: none;
+    }
 </style>
