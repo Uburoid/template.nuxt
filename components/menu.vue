@@ -14,7 +14,7 @@
                     </v-list-tile-avatar>
                     
                     <v-list-tile-content>
-                        <v-list-tile-title>{{ profile.name }}</v-list-tile-title>
+                        <v-list-tile-title class1="title font-weight-bold"><h2>{{ profile.name }}</h2></v-list-tile-title>
                         <v-list-tile-sub-title v-if="user.email">{{ user.email }}</v-list-tile-sub-title>
                         <!-- <v-list-tile-sub-title v-if="user.role">{{ user.role }}</v-list-tile-sub-title> -->
                     </v-list-tile-content>
