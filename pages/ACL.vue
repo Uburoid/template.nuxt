@@ -1,36 +1,89 @@
 <template>
     <v-layout justify-center class="pa-2 elevation-1">
-        <v-flex  xs12 sm10 md8 lg6 xl5>
-
-            <v-card class="mb-2" style="">
-                <acl-table title="Routes model" :model="model_table" :data="model" @changed="model = arguments[0]" @save="onSave"/>
-            </v-card>
-
+        <v-flex xs12 sm10 md8 lg6 xl5>
             <v-card>
-                <acl-table title="Routes policy" :model="policy_table" :data="policy" @changed="policy = arguments[0]" @save="onSave"/>
+            <v-toolbar flat color="white" class="">
+                <h2>{{ 'ACL Configuration' }}</h2>
+            </v-toolbar>
+            <v-layout class="elevation-0">
+
+            <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
+                <h3 class="pa-2">MODEL</h3>
+                <!-- <v-toolbar flat color="white" class="pr-5">
+                    <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
+                </v-toolbar> -->
+
+                <div class="pa-2">
+                    <no-ssr placeholder="Codemirror Loading...">
+                        <codemirror ref="myCm"
+                                    :value="model" 
+                                    :options="cmOptions"
+                                    @ready="onCmReady"
+                                    @focus="onCmFocus"
+                                    @input="onCmCodeChange">
+                        </codemirror>
+                    </no-ssr>
+                </div>
+
             </v-card>
+
+            <v-card tile flat class="ma-1" style="flex: 3; border: 1px solid #ddd">
+                <h3 class="pa-2">POLICY</h3>
+
+                <!-- <v-toolbar flat color="white" class="pr-5">
+                    <v-toolbar-title>{{ title || 'POLICY' }}</v-toolbar-title>
+                </v-toolbar> -->
+
+                <div class="pa-2">
+                    <no-ssr placeholder="Codemirror Loading...">
+                        <codemirror ref="myCm"
+                                    :value="policy" 
+                                    :options="cmOptions"
+                                    @ready="onCmReady"
+                                    @focus="onCmFocus"
+                                    @input="onCmCodeChange">
+                        </codemirror>
+                    </no-ssr>
+                </div>
+            </v-card>
+
+            </v-layout>
+            </v-card>
+
         </v-flex>
     </v-layout>
 </template>
 
 <script>
+
     export default {
         layout: 'landing',
         components: {
-            'acl-table': () => import('@/components/acl-table')
+            'acl-table': () => import('@/components/acl-table'),
+            //codemirror: ()  => import('codemirror'),
         },
         asyncData: async (ctx) => {
             debugger
-            //let model= await ctx.$server.acl.model();
-            let { model, order: policy_headers, policy } = await ctx.$server.acl.policy();
+            let model= await ctx.$server.acl.model();
+            let policy = await ctx.$server.acl.policy();
 
-            return { model, policy, policy_headers };
+            return { model, policy };
         },
         data: () => {
             debugger
             //if(!vm) return {};
 
             return {
+                code: 'const a = 10',
+                cmOptions: {
+                    // codemirror options
+                    tabSize: 4,
+                    mode: 'application/x-cypher-query',
+                    theme: 'neo',
+                    lineNumbers: true,
+                    line: true,
+                    // more codemirror options, 更多 codemirror 的高级配置...
+                },
                 model_table: {
                     min_height: '300px',
                     pagination: {
@@ -389,6 +442,17 @@
         methods: {
             onSave() {
                 debugger
+            },
+
+            onCmReady(cm) {
+                console.log('the editor is readied!', cm)
+            },
+            onCmFocus(cm) {
+                console.log('the editor is focus!', cm)
+            },
+            onCmCodeChange(newCode) {
+                console.log('this is new code', newCode)
+                this.code = newCode
             }
         }
     }

@@ -173,7 +173,7 @@ class ACL {
         let prepared = policy.split('\n').reduce((memo, line) => line.trim() ? memo.push(line.trim()) && memo : memo, []);
 
         policy = prepared.reduce((memo, value) => {
-            if(value.slice(0, 2) === '--') return memo; //is comment
+            if(value.slice(0, 2) === `//`) return memo; //is comment
 
             let objects = [];
             objects = ACL.detectJSONs(value, objects);
@@ -229,7 +229,7 @@ class ACL {
         const result = prepared.reduce((memo, pattern) => {
             pattern = pattern.trim();
 
-            if(pattern.slice(0, 2) === '--') return memo;
+            if(pattern.slice(0, 2) === '//') return memo;
 
             let [key, value] = pattern.split('=');
             key = key.trim();

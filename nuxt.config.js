@@ -60,7 +60,12 @@ module.exports = {
     ** Global CSS
     */
     css: [
-        '@/assets/custom.css'
+        '@/assets/custom.css',
+        'codemirror/lib/codemirror.css',
+        // merge css
+        //'codemirror/addon/merge/merge.css'
+        // theme css
+        //'codemirror/theme/base16-dark.css'
     ],
 
     /*
@@ -72,6 +77,7 @@ module.exports = {
         '@/plugins/vuetify',
         '@/plugins/axios',
         '@/plugins/server',
+        { ssr: false, src: '@/plugins/codemirror'}
         //'@/plugins/eventbus',
         //'@/plugins/croppa',
         //'@/plugins/utils',

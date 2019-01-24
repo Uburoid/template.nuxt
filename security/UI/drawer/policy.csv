@@ -1,4 +1,4 @@
 deny, Аноним, {to:'^(?!\/$).*$'}, *
---deny, Аноним, {to:'=/messaging'}, *
+//deny, Аноним, {to:'=/messaging'}, *
 deny, Пользователи, {to:'=/messaging'}, *
 deny, Пользователи, {to:'^(?!\/news$)(?!\/$).*$'}, =invalid
