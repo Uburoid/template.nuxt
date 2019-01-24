@@ -3,7 +3,7 @@
         <v-flex  xs12 sm10 md8 lg6 xl5>
 
             <v-card class="mb-2" style="">
-                <acl-table :model="model" :data="rows" @changed="rows = arguments[0]" @save="onSave"/>
+                <acl-table title="Routes model" :model="model" :data="rows" @changed="rows = arguments[0]" @save="onSave"/>
             </v-card>
 
             <v-card>
@@ -159,7 +159,7 @@
                                     return color;
                                 }
                             },
-                            width: '100px'
+                            width: '25%'
                         },
                         /* {
                             text: 'access',
@@ -169,14 +169,14 @@
                             cell: {
                                 name: 'key'
                             },
-                            //width: '50%'
+                            width: '40%'
                         },
                         {
                             text: 'matcher',
                             cell: {
                                 name: 'matcher'
                             },
-                            //width: '50%'
+                            width: '35%'
                         },
                         /* {
                             text: 'CRUD',

@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-toolbar flat color="white" class="pr-5">
-            <v-toolbar-title>MODEL</v-toolbar-title>
+            <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
 
             <v-spacer></v-spacer>
 
@@ -46,15 +46,17 @@
                         <th
                             v-for="header in props.headers"
                             :key="header.text"
+
                             class="body-1 font-weight-bold"
+
                             :width="header.width || '100px'"
-                            :style1="{ 'text-align': 'left' }"
                             :style="header.cell.style || { 'text-align': 'left' }"
                         >
                             <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
                             <span v-else>{{ header.text }}</span>
                         </th>
                     </tr>
+
                 </v-data-table>
 
                 <v-data-table
@@ -73,18 +75,21 @@
                     hide-headers
                 >
                 
-                    <tr slot="headers" slot-scope="props">
+                    <!-- <tr slot="headers" slot-scope="props">
                         <th
                             v-for="header in props.headers"
                             :key="header.text"
-                            class="body-1 font-weight-bold"
-                            
+
+                            class1="body-1 font-weight-bold"
+
+                            :width="header.width || '100px'"
+                            :style="header.cell.style || { 'text-align': 'left' }"
                         >
                             <v-icon v-if="header.icon" small>{{ header.icon }}</v-icon>
                             <span v-else>{{ header.text }}</span>
                         </th>
+                    </tr> -->
 
-                    </tr>
 
                     <template slot="items" slot-scope="props" style="display: flex;">
 
@@ -104,8 +109,6 @@
                                 :class="header.cell.class"
 
                                 :style="header.cell.style"
-                                style1="border-left: 1px solid #ddd"
-                                :style2="[header.cell.style, { 'border-right': inx === 0 && '1px solid #ddd', 'border-left': inx === model.headers.length - 1 && '1px solid #ddd' }]"
                                 :width="header.width || '100px'"
                             >
                                 <v-btn v-for="(btn, inx) in header.cell.buttons" :key="inx" 
@@ -236,7 +239,7 @@
 
 <script>
     export default {
-        props: ['model', 'data'],
+        props: ['title', 'model', 'data'],
         computed: {
             rows: {
                 get() {
