@@ -5,84 +5,33 @@
         <v-card class="mb-2" style="">
             <v-toolbar flat color="white" class="pr-5">
                 <v-toolbar-title>MODEL</v-toolbar-title>
-                <!-- <v-divider
-                    class="mx-2"
-                    inset
-                    vertical
-                ></v-divider> -->
+
                 <v-spacer></v-spacer>
 
-                <div class="ml-1" style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" :style="{ display: model.selected.length ? 'flex' : 'none' }">
+                <div 
+                    class="ml-1" 
+                    style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" 
+                    :style="{ display: model.actions && model.actions.top.length ? 'flex' : 'none' }"
+                >
 
-                    <div style="display: flex; justify-content: center;">
+                    <div 
+                        v-for="(action, inx) in model.actions.top"
+                        :key="inx"
+                        style="display: flex; justify-content: center;"
+                    >
                         <v-btn 
                             dark 
                             fab 
                             small 
-                            color="primary"
-                            @click.stop="moveUp"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
+                            :color="action.color || 'primary'"
+                            @click.stop="action.click && run(action.click)"
+                            style="width: 30px; height: 30px;"
                         >
-                            <v-icon small>fa-save</v-icon>
+                            <v-icon small>{{ action.icon }}</v-icon>
                         </v-btn>
                     </div>
-                
-                    <div style="display: flex; justify-content: center;">
-                        <v-btn 
-                            dark 
-                            fab 
-                            small 
-                            color="primary"
-                            @click.stop="moveDown"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
-                        >
-                            <v-icon small>fa-download</v-icon>
-                        </v-btn>
-                    </div>                    
 
                 </div>
-
-                <v-dialog v-model="model.dialog" max-width="500px">
-                    <v-btn fab small slot="activator" color="green darken-2" dark style="display: none">
-                        <v-icon small>fa-plus</v-icon>
-                    </v-btn>
-
-                    <v-card>
-                        <v-card-title>
-                            <span class="headline">{{ formTitle }}</span>
-                        </v-card-title>
-
-                        <v-card-text>
-                            <v-container grid-list-md>
-                                <v-layout wrap>
-                                    <v-flex xs12 sm12 md6>
-                                        <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
-                                    </v-flex>
-                                    <v-flex xs12 sm6 md4>
-                                        <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
-                                    </v-flex>
-                                </v-layout>
-                            </v-container>
-                        </v-card-text>
-
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <!-- <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                            <v-btn color="blue darken-1" flat @click="save">Save</v-btn> -->
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
             </v-toolbar>
             
             <div class="pa-2" style="display: flex; flex-direction: row">
@@ -112,7 +61,8 @@
                     </v-data-table>
 
                     <v-data-table
-                        style="flex: 1; border: 1px solid #ddd; overflow: auto; max-height: 200px"
+                        style="flex: 1; border: 1px solid #ddd; overflow: auto; min-height: 200px; max-height1: 200px"
+                        :style="{ 'min-height': model.min_height || '200px' }"
                         class="elevation-0"
                 
                         :headers="model.headers"
@@ -167,7 +117,7 @@
                                         :color="btn.color"
                                         small
                                         @click="btn.click(props)"
-                                        style="width: 28px; height: 28px;"
+                                        style="width: 30px; height: 30px;"
                                     >
                                         <v-icon  small>{{ btn.icon }}</v-icon>
                                     </v-btn>
@@ -189,117 +139,90 @@
 
                         </template>
 
+                        <!-- <template slot="footer" v-if="model.pagination.rowsPerPage > 0">
+                            <td :colspan="model.headers.length" align="center">
+                                <v-pagination v-model="model.pagination.page" :length="pagesCount" circle></v-pagination>
+                            </td>
+                        </template> -->
+                        <!-- <div slot="footer" style="display: flex; width: 100%; border-top: 1px solid #ddd">
+                            <v-pagination v-model="model.pagination.page" :length="3"></v-pagination>
+                        </div> -->
+
                     </v-data-table>
 
-                    
+                    <v-pagination v-if="model.pagination.rowsPerPage > 0" v-model="model.pagination.page" :length="pagesCount" circle></v-pagination>
 
                 </div>
             
             
-                <div class="ml-1" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div 
+                    v-if="model.actions && model.actions.top.length"
+                    class="ml-1" 
+                    style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;"
+                    :style="{ display: model.actions && model.actions.top.length ? 'flex' : 'none' }"
+                >
+                    <template
+                        v-for="(action, inx) in model.actions.right"
+                    >
+                        <div v-if="action.type === 'divider'" class="ma-1" :key="inx"/>
 
-                    <v-dialog v-model="model.dialog" max-width="500px">
-                        <v-btn fab small slot="activator" color="green darken-2" dark>
-                            <v-icon small>fa-plus</v-icon>
-                        </v-btn>
+                        <div v-else-if="action.type === 'fab'" style="display: flex; justify-content: center;" :key="inx">
+                            <v-btn 
+                                dark 
+                                fab 
+                                small 
+                                :color="action.color || 'primary'"
+                                @click.stop="action.click && run(action.click)"
+                                style="width: 30px; height: 30px;"
+                            >
+                                <v-icon small>{{ action.icon }}</v-icon>
+                            </v-btn>
+                        </div>
 
-                        <v-card>
-                            <v-card-title>
-                                <span class="headline">{{ formTitle }}</span>
-                            </v-card-title>
+                        <v-dialog v-else-if="action.type === 'dialog'" :key="inx" v-model="model.dialog" max-width="500px">
+                            <v-btn fab small slot="activator" color="green darken-2" dark>
+                                <v-icon small>{{ action.icon }}</v-icon>
+                            </v-btn>
 
-                            <v-card-text>
-                                <v-container grid-list-md>
-                                    <v-layout wrap>
-                                        <v-flex xs12 sm12 md6>
-                                            <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 sm6 md4>
-                                            <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 sm6 md4>
-                                            <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 sm6 md4>
-                                            <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 sm6 md4>
-                                            <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
-                                        </v-flex>
-                                    </v-layout>
-                                </v-container>
-                            </v-card-text>
+                            <v-card>
+                                <v-card-title>
+                                    <span class="headline">{{ formTitle }}</span>
+                                </v-card-title>
 
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <!-- <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                                <v-btn color="blue darken-1" flat @click="save">Save</v-btn> -->
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
+                                <v-card-text>
+                                    <v-container grid-list-md>
+                                        <v-layout wrap>
+                                            <v-flex xs12 sm12 md6>
+                                                <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
+                                            </v-flex>
+                                            <v-flex xs12 sm6 md4>
+                                                <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
+                                            </v-flex>
+                                            <v-flex xs12 sm6 md4>
+                                                <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
+                                            </v-flex>
+                                            <v-flex xs12 sm6 md4>
+                                                <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
+                                            </v-flex>
+                                            <v-flex xs12 sm6 md4>
+                                                <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
+                                            </v-flex>
+                                        </v-layout>
+                                    </v-container>
+                                </v-card-text>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <!-- <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+                                    <v-btn color="blue darken-1" flat @click="save">Save</v-btn> -->
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+
+                    </template>
+
                     
-                    <div class="my-1" style1="border-top: 1px solid #ddd; width: 100%"/>
-
-                    <div style="display: flex; justify-content: center;">
-                        <v-btn 
-                            dark 
-                            fab 
-                            small 
-                            color="primary"
-                            @click.stop="moveUp"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
-                        >
-                            <v-icon small>fa-angle-up</v-icon>
-                        </v-btn>
-                    </div>
                 
-                    <div style="display: flex; justify-content: center;">
-                        <v-btn 
-                            dark 
-                            fab 
-                            small 
-                            color="primary"
-                            @click.stop="moveDown"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
-                        >
-                            <v-icon small>fa-angle-down</v-icon>
-                        </v-btn>
-                    </div>
-
-                    <div class="my-1" style1="border-top: 1px solid #ddd; width: 100%"/>
-                    <!-- <div class="px-2 pb-1" style="display: flex; justify-content: center;">
-                        <v-divider/>
-                    </div> -->
-
-                    <div style="display: flex; justify-content: center;">
-                        <v-btn 
-                            dark 
-                            fab 
-                            small 
-                            color="green darken-2"
-                            @click.stop="moveUp"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
-                        >
-                            <v-icon small>fas fa-pen</v-icon>
-                        </v-btn>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: center;">
-                        <v-btn 
-                            dark 
-                            fab 
-                            small 
-                            color="red darken-2"
-                            @click.stop="moveDown"
-                            style="width: 34px; height: 34px;"
-                            :disabled="!model.selected.length"
-                        >
-                            <v-icon small>fas fa-times</v-icon>
-                        </v-btn>
-                    </div>
 
                 </div>
 
@@ -317,117 +240,185 @@
 <script>
     export default {
         layout: 'landing',
-        data: (vm) => ({
-            m_selected: {
-                class: 'red'
-            },
-            model: {
-                pagination: {
-                    rowsPerPage: -1
-                },
-                dialog: false,
-                selected: [],
-                headers: [
-                    
-                    {
-                        text: 'state',
-                        cell: {
-                            style: { 'text-align': 'center' },
-                            icon: item => {
-                                let name = item.commented ? 'fas fa-star-of-life' : item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle';
-                                let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
+        data: () => {
+            debugger
+            //if(!vm) return {};
 
-                                return { color, name }
+            return {
+                model: {
+                    min_height: '300px',
+                    pagination: {
+                        rowsPerPage: 4,
+                        page: 1
+                    },
+                    dialog: false,
+                    selected: [],
+                    actions: {
+                        top: [
+                            {
+                                color: 'red darken-2',
+                                //click: () => { debugger },
+                                icon: 'fas fa-save'
+                            },
+                            {
+                                //click: () => ({}),
+                                icon: 'fas fa-download'
                             }
-                        },
-                        width: '100px'
+                        ],
+                        right: [
+                            {
+                                type: 'dialog',
+                                icon: 'fas fa-plus'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveUp',
+                                icon: 'fas fa-angle-up'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveDown',
+                                icon: 'fas fa-angle-down'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'deep-orange darken-2',
+                                icon: 'fas fa-pen'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'red darken-2',
+                                icon: 'fas fa-times'
+                            },
+                        ]
                     },
-                    /* {
-                        text: 'access',
-                    }, */
-                    {
-                        text: 'key',
-                        cell: {
-                            name: 'key'
-                        },
-                        //width: '50%'
-                    },
-                    {
-                        text: 'matcher',
-                        cell: {
-                            name: 'matcher'
-                        },
-                        width: '50%'
-                    },
-                    /* {
-                        text: 'CRUD',
-                        //icon: 'fas fa-trash',
-                        cell: {
-                            style: { 'text-align': 'center' },
-                            buttons: [
-                                {
-                                    click: vm.editRow,
-                                    icon: 'fas fa-keyboard',
-                                    color: 'primary'
-                                },
-                                {
-                                    click: vm.deleteRow,
-                                    icon: 'fas fa-times-circle',
-                                    color: 'red darken-2'
+                    headers: [
+                        
+                        {
+                            text: 'state',
+                            cell: {
+                                style: { 'text-align': 'center' },
+                                icon: item => {
+                                    let name = item.commented ? 'fas fa-star-of-life' : item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle';
+                                    let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
+
+                                    return { color, name }
                                 }
-                            ]
+                            },
+                            width: '100px'
+                        },
+                        /* {
+                            text: 'access',
+                        }, */
+                        {
+                            text: 'key',
+                            cell: {
+                                name: 'key'
+                            },
+                            //width: '50%'
+                        },
+                        {
+                            text: 'matcher',
+                            cell: {
+                                name: 'matcher'
+                            },
+                            //width: '50%'
+                        },
+                        /* {
+                            text: 'CRUD',
+                            width: '150px',
+                            //icon: 'fas fa-trash',
+                            cell: {
+                                style: { 'text-align': 'center' },
+                                buttons: [
+                                    {
+                                        click: vm.editRow,
+                                        icon: 'fas fa-keyboard',
+                                        color: 'primary'
+                                    },
+                                    {
+                                        click: vm.deleteRow,
+                                        icon: 'fas fa-times-circle',
+                                        color: 'red darken-2'
+                                    }
+                                ]
+                            }
+                        }, */
+                    ],
+                    rows: [
+                        {
+                            access: 'allow',
+                            key: 'key',
+                            matcher: 'regExpMatcher',
+                            commented: false
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-1',
+                            matcher: 'regExpMatcher',
+                            commented: true
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-2',
+                            matcher: 'regExpMatcher',
+                            commented: false
+                        },
+                        {
+                            access: 'allow',
+                            key: 'key-3',
+                            matcher: 'regExpMatcher',
+                            commented: false
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-4',
+                            matcher: 'regExpMatcher',
+                            commented: true
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-5',
+                            matcher: 'regExpMatcher',
+                            commented: false
+                        },
+                        {
+                            access: 'allow',
+                            key: 'key-6',
+                            matcher: 'regExpMatcher',
+                            commented: false
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-7',
+                            matcher: 'regExpMatcher',
+                            commented: true
+                        },
+                        {
+                            access: 'deny',
+                            key: 'key-8',
+                            matcher: 'regExpMatcher',
+                            commented: false
                         }
-                    }, */
-                ],
-                rows: [
-                    {
-                        access: 'allow',
+                    ],
+                    editedIndex: -1,
+                    editedItem: {},
+                    defaultItem: {
                         key: 'key',
                         matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-1',
-                        matcher: 'regExpMatcher',
-                        commented: true
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-2',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'allow',
-                        key: 'key-3',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-4',
-                        matcher: 'regExpMatcher',
-                        commented: true
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-5',
-                        matcher: 'regExpMatcher',
-                        commented: false
                     }
-                ],
-                editedIndex: -1,
-                editedItem: {},
-                defaultItem: {
-                    key: 'key',
-                    matcher: 'regExpMatcher',
                 }
             }
-
-        }),
+        },
 
         computed: {
+
             formTitle () {
                 return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
             },
@@ -440,10 +431,19 @@
                     let [first, row] = value;
                     this.model.selected = [row || first];
                 }
+            },
+            pagesCount() {
+                if (!this.model.pagination.rowsPerPage || !this.model.pagination.totalItems) return 0;
+
+                return Math.ceil(this.model.pagination.totalItems / this.model.pagination.rowsPerPage);
             }
         },
 
         methods: {
+            run(...args) {
+                let [method, ...params] = args;
+                this[method].apply(this, args);
+            },
             commentRow(props) {
                 debugger
                 console.log(props);
@@ -467,15 +467,16 @@
 
                 if(to === this.model.rows.length || to === -1) {
                     direction > 0 ? clone.unshift(clone.pop()) : clone.push(clone.shift());
+                    direction > 0 ? this.model.pagination.page = 1 : this.model.pagination.page = this.pagesCount;
                 }
                 else {
                     [clone[from], clone[to]] = [clone[to], clone[from]];
+                    let page =  (direction > 0 ? to : from) % this.model.pagination.rowsPerPage;
+                    !page && (this.model.pagination.page += direction);
+                    //this.model.pagination.page = page;
                 }
 
-
-
                 this.model.rows = clone;
-                //let to = direction > 0 ? this.model.rows.length - 1 > from ? from + 1 : 0 : from === 0 ? this.model.rows.length - 1 : from - 1;
             },
 
             moveDown() {
