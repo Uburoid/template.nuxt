@@ -3,7 +3,7 @@
         <v-flex  xs12 sm10 md8 lg6 xl5>
 
         <v-card class="mb-2" style="">
-            <v-toolbar flat color="white" class="pr-0">
+            <v-toolbar flat color="white" class="pr-5">
                 <v-toolbar-title>MODEL</v-toolbar-title>
                 <!-- <v-divider
                     class="mx-2"
@@ -12,8 +12,40 @@
                 ></v-divider> -->
                 <v-spacer></v-spacer>
 
+                <div class="ml-1" style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" :style="{ display: model.selected.length ? 'flex' : 'none' }">
+
+                    <div style="display: flex; justify-content: center;">
+                        <v-btn 
+                            dark 
+                            fab 
+                            small 
+                            color="primary"
+                            @click.stop="moveUp"
+                            style="width: 34px; height: 34px;"
+                            :disabled="!model.selected.length"
+                        >
+                            <v-icon small>fa-save</v-icon>
+                        </v-btn>
+                    </div>
+                
+                    <div style="display: flex; justify-content: center;">
+                        <v-btn 
+                            dark 
+                            fab 
+                            small 
+                            color="primary"
+                            @click.stop="moveDown"
+                            style="width: 34px; height: 34px;"
+                            :disabled="!model.selected.length"
+                        >
+                            <v-icon small>fa-download</v-icon>
+                        </v-btn>
+                    </div>                    
+
+                </div>
+
                 <v-dialog v-model="model.dialog" max-width="500px">
-                    <v-btn fab small slot="activator" color="green darken-2" dark>
+                    <v-btn fab small slot="activator" color="green darken-2" dark style="display: none">
                         <v-icon small>fa-plus</v-icon>
                     </v-btn>
 
@@ -53,7 +85,7 @@
                 </v-dialog>
             </v-toolbar>
             
-            <div class="pa-2" style="display: flex">
+            <div class="pa-2" style="display: flex; flex-direction: row">
 
                 <div style="flex: 1; display: flex; flex-direction: column">
 
@@ -165,6 +197,47 @@
             
                 <div class="ml-1" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
+                    <v-dialog v-model="model.dialog" max-width="500px">
+                        <v-btn fab small slot="activator" color="green darken-2" dark>
+                            <v-icon small>fa-plus</v-icon>
+                        </v-btn>
+
+                        <v-card>
+                            <v-card-title>
+                                <span class="headline">{{ formTitle }}</span>
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-container grid-list-md>
+                                    <v-layout wrap>
+                                        <v-flex xs12 sm12 md6>
+                                            <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.calories" label="Calories"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.fat" label="Fat (g)"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.carbs" label="Carbs (g)"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 md4>
+                                            <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card-text>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <!-- <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+                                <v-btn color="blue darken-1" flat @click="save">Save</v-btn> -->
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    
+
                     <div style="display: flex; justify-content: center;">
                         <v-btn 
                             dark 
@@ -193,9 +266,10 @@
                         </v-btn>
                     </div>
 
-                    <div class="px-2 pb-1" style="display: flex; justify-content: center;">
+                    <div style="border-top: 1px solid #ddd; width: 100%"/>
+                    <!-- <div class="px-2 pb-1" style="display: flex; justify-content: center;">
                         <v-divider/>
-                    </div>
+                    </div> -->
 
                     <div style="display: flex; justify-content: center;">
                         <v-btn 
