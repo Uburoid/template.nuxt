@@ -472,8 +472,9 @@
                 else {
                     [clone[from], clone[to]] = [clone[to], clone[from]];
                     let page =  (direction > 0 ? to : from) % this.model.pagination.rowsPerPage;
-                    !page && (this.model.pagination.page += direction);
-                    //this.model.pagination.page = page;
+                    let current_page = Math.ceil((from + 1) / this.model.pagination.rowsPerPage);
+                    !page && (current_page += direction);
+                    this.model.pagination.page = current_page;
                 }
 
                 this.model.rows = clone;
