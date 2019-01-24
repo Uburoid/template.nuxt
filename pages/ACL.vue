@@ -238,7 +238,7 @@
                         </v-card>
                     </v-dialog>
                     
-                    <div style="border-top: 1px solid #ddd; width: 100%"/>
+                    <div class="my-1" style1="border-top: 1px solid #ddd; width: 100%"/>
 
                     <div style="display: flex; justify-content: center;">
                         <v-btn 
@@ -268,7 +268,7 @@
                         </v-btn>
                     </div>
 
-                    <div style="border-top: 1px solid #ddd; width: 100%"/>
+                    <div class="my-1" style1="border-top: 1px solid #ddd; width: 100%"/>
                     <!-- <div class="px-2 pb-1" style="display: flex; justify-content: center;">
                         <v-divider/>
                     </div> -->
