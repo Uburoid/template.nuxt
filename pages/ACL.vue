@@ -143,6 +143,7 @@
 
                             <tr     
                                 style="cursor: pointer; border-bottom1: 1px!important"
+                                :style="{ 'border-color': props.selected && '#ddd!important' }"
                                 :class="{'grey lighten-3': props.selected}"
                                 :active1="props.selected"
                                 @click.stop="props.selected = true"
@@ -237,6 +238,7 @@
                         </v-card>
                     </v-dialog>
                     
+                    <div style="border-top: 1px solid #ddd; width: 100%"/>
 
                     <div style="display: flex; justify-content: center;">
                         <v-btn 
@@ -281,7 +283,7 @@
                             style="width: 34px; height: 34px;"
                             :disabled="!model.selected.length"
                         >
-                            <v-icon small>fas fa-eraser</v-icon>
+                            <v-icon small>fas fa-pen</v-icon>
                         </v-btn>
                     </div>
                     
