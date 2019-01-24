@@ -20,9 +20,11 @@
             'acl-table': () => import('@/components/acl-table')
         },
         asyncData: async (ctx) => {
-            let { model, policy } = await ctx.$server.acl.get();
+            debugger
+            //let model= await ctx.$server.acl.model();
+            let { model, order: policy_headers, policy } = await ctx.$server.acl.policy();
 
-            return { model, policy };
+            return { model, policy, policy_headers };
         },
         data: () => {
             debugger
@@ -117,7 +119,7 @@
                         }
                     ]
                 },
-                policy_table: {
+                policy_table1: {
                     min_height: '300px',
                     pagination: {
                         rowsPerPage: -1,
@@ -248,7 +250,140 @@
         },
 
         computed: {
+            policy_table() { 
+                
+                let width = `${(100 - 5) / this.policy_headers.length}%`;
+                let headers = this.policy_headers.map(header => ({
+                    text: header,
+                    cell: {},
+                    width
+                }));
 
+                debugger
+
+                return {
+                    min_height: '300px',
+                    pagination: {
+                        rowsPerPage: -1,
+                        page: 1
+                    },
+                    dialog: false,
+                    selected: [],
+                    actions: {
+                        visible: true,
+                        top: [
+                            {
+                                color: 'red darken-2',
+                                click: 'save',
+                                icon: 'fas fa-save'
+                            },
+                            {
+                                //click: () => ({}),
+                                icon: 'fas fa-download'
+                            },
+                            {
+                                color: 'blue-grey darken-2',
+                                click: 'toggleActions',
+                                icon: (model) => {
+                                    return model.actions.visible ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+                                }
+                            },
+                        ],
+                        right: [
+                            {
+                                type: 'dialog',
+                                icon: 'fas fa-plus'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveUp',
+                                icon: 'fas fa-angle-up'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveDown',
+                                icon: 'fas fa-angle-down'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'deep-orange darken-2',
+                                icon: 'fas fa-pen'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'red darken-2',
+                                icon: 'fas fa-times'
+                            },
+                        ]
+                    },
+                    headers: [
+                        
+                        {
+                            text: 'state',
+                            cell: {
+                                style: { 'text-align': 'center' },
+                                icon: item => {
+                                    //let name = item.commented && 'fas fa-asterisk';
+                                    let name = item.commented ? 'fas fa-star-of-life' : item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle';
+
+                                    return name;
+                                },
+                                color: item => {
+                                    //let color = item.commented && 'grey--text';
+                                    let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
+
+                                    return color;
+                                }
+                            },
+                            width: '5%'
+                        },
+                        ...headers
+                        /* {
+                            text: 'access',
+                        }, */
+                        /* {
+                            text: 'key',
+                            cell: {
+                                name: 'key'
+                            },
+                            width: '40%'
+                        },
+                        {
+                            text: 'matcher',
+                            cell: {
+                                name: 'matcher'
+                            },
+                            width: '35%'
+                        }, */
+                        /* {
+                            text: 'CRUD',
+                            width: '150px',
+                            //icon: 'fas fa-trash',
+                            cell: {
+                                style: { 'text-align': 'center' },
+                                buttons: [
+                                    {
+                                        click: vm.editRow,
+                                        icon: 'fas fa-keyboard',
+                                        color: 'primary'
+                                    },
+                                    {
+                                        click: vm.deleteRow,
+                                        icon: 'fas fa-times-circle',
+                                        color: 'red darken-2'
+                                    }
+                                ]
+                            }
+                        }, */
+                    ]
+                }
+            }
         },
 
         methods: {

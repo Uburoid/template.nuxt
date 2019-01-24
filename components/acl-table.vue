@@ -131,7 +131,7 @@
                                     {{ header.cell.icon(props.item) }}
                                 </v-icon>
 
-                                {{ props.item[header.cell.name] }}
+                                {{ props.item[header.text] }}
                             </td>
                             
                         </tr>
@@ -199,7 +199,7 @@
                             <v-card-text>
                                 <v-container grid-list-md>
                                     <v-layout wrap>
-                                        <v-flex xs12 sm12 md6>
+                                        <!-- <v-flex xs12 sm12 md6>
                                             <v-text-field v-model="model.editedItem.name" label="Dessert name"></v-text-field>
                                         </v-flex>
                                         <v-flex xs12 sm6 md4>
@@ -213,7 +213,7 @@
                                         </v-flex>
                                         <v-flex xs12 sm6 md4>
                                             <v-text-field v-model="model.editedItem.protein" label="Protein (g)"></v-text-field>
-                                        </v-flex>
+                                        </v-flex> -->
                                     </v-layout>
                                 </v-container>
                             </v-card-text>
