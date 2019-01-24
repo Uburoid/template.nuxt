@@ -3,11 +3,11 @@
         <v-flex  xs12 sm10 md8 lg6 xl5>
 
             <v-card class="mb-2" style="">
-                <acl-table title="Routes model" :model="model" :data="rows" @changed="rows = arguments[0]" @save="onSave"/>
+                <acl-table title="Routes model" :model="model_table" :data="model" @changed="model = arguments[0]" @save="onSave"/>
             </v-card>
 
             <v-card>
-                POLICY
+                <acl-table title="Routes policy" :model="policy_table" :data="policy" @changed="policy = arguments[0]" @save="onSave"/>
             </v-card>
         </v-flex>
     </v-layout>
@@ -19,71 +19,108 @@
         components: {
             'acl-table': () => import('@/components/acl-table')
         },
+        asyncData: async (ctx) => {
+            let { model, policy } = await ctx.$server.acl.get();
+
+            return { model, policy };
+        },
         data: () => {
             debugger
             //if(!vm) return {};
 
             return {
-                rows: [
-                    {
-                        access: 'allow',
-                        key: 'key',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-1',
-                        matcher: 'regExpMatcher',
-                        commented: true
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-2',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'allow',
-                        key: 'key-3',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-4',
-                        matcher: 'regExpMatcher',
-                        commented: true
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-5',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'allow',
-                        key: 'key-6',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-7',
-                        matcher: 'regExpMatcher',
-                        commented: true
-                    },
-                    {
-                        access: 'deny',
-                        key: 'key-8',
-                        matcher: 'regExpMatcher',
-                        commented: false
-                    }
-                ],
-                model: {
+                model_table: {
                     min_height: '300px',
                     pagination: {
-                        rowsPerPage: 4,
+                        rowsPerPage: -1,
+                        page: 1
+                    },
+                    dialog: false,
+                    selected: [],
+                    actions: {
+                        visible: true,
+                        top: [
+                            {
+                                color: 'red darken-2',
+                                click: 'save',
+                                icon: 'fas fa-save'
+                            },
+                            {
+                                //click: () => ({}),
+                                icon: 'fas fa-download'
+                            },
+                            {
+                                color: 'blue-grey darken-2',
+                                click: 'toggleActions',
+                                icon: (model) => {
+                                    return model.actions.visible ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+                                }
+                            },
+                        ],
+                        right: [
+                            {
+                                type: 'dialog',
+                                icon: 'fas fa-plus'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveUp',
+                                icon: 'fas fa-angle-up'
+                            },
+                            {
+                                type: 'fab',
+                                click: 'moveDown',
+                                icon: 'fas fa-angle-down'
+                            },
+                            {
+                                type: 'divider'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'primary',
+                                icon: 'fas fa-pen'
+                            },
+                            {
+                                type: 'fab',
+                                color: 'red darken-2',
+                                icon: 'fas fa-times'
+                            },
+                        ]
+                    },
+                    headers: [
+                        
+                        {
+                            text: 'state',
+                            cell: {
+                                style: { 'text-align': 'center' },
+                                icon: item => item.commented && 'fas fa-asterisk',
+                                color: item => item.commented && 'grey--text'
+                            },
+                            width: '25%'
+                        },
+                        {
+                            text: 'key',
+                            cell: {
+                                name: 'key'
+                            },
+                            width: '40%'
+                        },
+                        {
+                            text: 'matcher',
+                            cell: {
+                                name: 'matcher'
+                            },
+                            width: '35%'
+                        }
+                    ]
+                },
+                policy_table: {
+                    min_height: '300px',
+                    pagination: {
+                        rowsPerPage: -1,
                         page: 1
                     },
                     dialog: false,
@@ -148,13 +185,14 @@
                             cell: {
                                 style: { 'text-align': 'center' },
                                 icon: item => {
-                                    let name = item.commented ? 'fas fa-asterisk' : item.access === 'deny' ? 'fas fa-minus-circle' : 'fas fa-check-circle';
+                                    let name = item.commented && 'fas fa-asterisk';
                                     //let name = item.commented ? 'fas fa-star-of-life' : item.access === 'deny' ? 'far fa-times-circle' : 'far fa-check-circle';
 
                                     return name;
                                 },
                                 color: item => {
-                                    let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
+                                    let color = item.commented && 'grey--text';
+                                    //let color = item.commented ? 'grey--text' : item.access === 'deny' ? 'red--text text--darken-2' : 'green--text text--darken-2';
 
                                     return color;
                                 }

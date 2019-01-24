@@ -1,12 +1,14 @@
 const account = require('./account');
 const project = require('./project');
 const ui = require('./UI');
+const acl = require('./ACL');
 
 let classes = {
     //...base,
     ...account,
     ...project,
-    ...ui
+    ...ui,
+    ...acl
 }
 
 const Types = Object.entries(classes).reduce((memo, item) => {

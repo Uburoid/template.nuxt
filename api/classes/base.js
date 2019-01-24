@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const { JWT } = require('../jwt');
 const LRU = require('lru-cache');
-const { Metrics } = require('./metrics');
+const { Metrics } = require('../metrics');
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,10 +64,10 @@ let roles1 = [
     }
 ]
 
-const model = '../../security/UI/pages/model.conf';
-const policy = '../../security/UI/pages/policy.csv';
+const model = '../security/UI/pages/model.conf';
+const policy = '../security/UI/pages/policy.csv';
 
-const { ACL } = require('./ACL');
+const { ACL } = require('../ACL');
 
 //const acl = new ACL({ model, policy, roles });
 /////////////////////////////////////////////////////////////////////////////////////
@@ -85,8 +85,13 @@ class AccessDenied extends Error {
 }
 
 class Base {
-    constructor({ req, res, error, redirect, $error, route }) {
+    constructor(...args) {
         //debugger
+        this.args = args;
+
+        let [first] = args;
+        let { req, res, error, redirect, $error, route } = first;
+
         this.roles = roles;
 
         this.fs = fs;
@@ -115,10 +120,11 @@ class Base {
                     let isPublic = ['$', '_'].includes(propKey.slice(0, 1));
 
                     return async (...args) => {
-                        
+                    
                         try {
                             //debugger
-                            self.roles = await self.roles;
+                            self.roles.then && (self.roles = await self.roles);
+                            //self.roles = await self.roles;
 
                             let allow = await self.$beforeAction(propKey, ...args);
                             let { access, policy } = typeof(allow) === 'object' ? allow : { access: allow };
@@ -309,7 +315,7 @@ class API extends Base {
         let payload = { _id, name, shadow_id, role, picture, class: this.payload.class };
         
         if(!this.payload.token_err) {
-            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
+            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '100s'});
 
             this.res.cookie('$token', this.token, { httpOnly: true });
             //this.res.cookie('page-with-error', '', { expires: new Date() });
@@ -364,7 +370,7 @@ class SecuredAPI extends API {
             //debugger
             if(!this.payload) throw new Error('Payload not defined.');
 
-            let [resource] = args;
+            let [resource = {}] = args;
             const { page_exists, ...rest } = resource;
             
             roles = await roles;

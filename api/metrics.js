@@ -1,5 +1,5 @@
 const uaParser = require('ua-parser-js');
-const { Browser, OS, Device, Vendor, Version, Account, IP } = require('../models/metrics_models');
+const { Browser, OS, Device, Vendor, Version, Account, IP } = require('./models/metrics_models');
 
 class Metrics {
     constructor({ req, res }) {
@@ -50,7 +50,7 @@ class Metrics {
         });
 
         //debugger;
-        const account_module = require('../classes/account');
+        const account_module = require('./classes/account');
         !account && (account = await account_module.Account.shadow(account_id));
 
         //debugger

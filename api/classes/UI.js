@@ -1,31 +1,38 @@
 
 const { API, SecuredAPI } = require('./base');
-const { ACL } = require("./ACL");
+const { ACL } = require("../ACL");
 
 
-const drawer_model = "../../security/UI/drawer/model.conf";
-const drawer_policy = "../../security/UI/drawer/policy.csv";
+const drawer_model = "../security/UI/drawer/model.conf";
+const drawer_policy = "../security/UI/drawer/policy.csv";
 
-const account_model = "../../security/UI/account/model.conf";
-const account_policy = "../../security/UI/account/policy.csv";
+const account_model = "../security/UI/account/model.conf";
+const account_policy = "../security/UI/account/policy.csv";
 
 class UI extends SecuredAPI {
     constructor(...args) {
         super(...args);
+
     }
 
-    pageData({ path }) {
-        //debugger
+    async pageData({ path }) {
+        debugger
         //console.log('REQUEST:', this.req.headers['x-forwarded-for'], this.req.client.remoteAddress, this.res.connection.remoteAddress, this.res.socket._sockname);
 
         path = path === '/' ? 'Welcome to us' : path.slice(1);
 
+        const { Types: classes } = require('./index');
+
+        let type = path.toLowerCase();
+        let object = classes[type] && new classes[type](...this.args);
+
         const ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
 
         path += ` - ${ip}`;
-        //path += ` - ${this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress}`
+
         return {
-            path
+            path,
+            data: object && object.pageData && await object.pageData()
         };
     }
 
