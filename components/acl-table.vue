@@ -177,7 +177,14 @@
                     </div>
 
                     <v-dialog v-else-if="action.type === 'dialog'" :key="inx" v-model="model.dialog" max-width="500px">
-                        <v-btn fab small slot="activator" color="green darken-2" dark>
+                        <v-btn 
+                            fab 
+                            small 
+                            slot="activator" 
+                            color="green darken-2" 
+                            dark
+                            style="width: 46px; height: 46px;"
+                        >
                             <v-icon small>{{ action.icon }}</v-icon>
                         </v-btn>
 
