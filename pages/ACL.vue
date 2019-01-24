@@ -29,7 +29,7 @@
 
                     </v-card>
 
-                    <v-card tile flat class="ma-1" style="width: 100%; flex: 1; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-1" style="max-height: 400px; width: 100%; flex: 1; border: 1px solid #ddd">
                         <h3 class="pa-2">POLICY</h3>
 
                         <!-- <v-toolbar flat color="white" class="pr-5">
