@@ -1,7 +1,7 @@
 <template>
     <v-layout justify-center class="pa-2 elevation-1">
         <v-flex xs12 sm10 md8 lg6 xl6>
-            <v-card >
+            <v-card class="mb-2">
             
                 <v-toolbar flat color="white" class="">
                     <h2>{{ 'ACL Configuration' }}</h2>
@@ -9,7 +9,7 @@
 
                 <v-layout class="elevation-0" wrap>
 
-                    <v-card tile flat class="ma-1" style="flex: 1; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
                         <h3 class="pa-2">MODEL</h3>
                         <!-- <v-toolbar flat color="white" class="pr-5">
                             <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
@@ -29,7 +29,7 @@
 
                     </v-card>
 
-                    <v-card tile flat class="ma-1" style="max-height: 400px; width: 100%; flex: 1; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-1" style="max-height: 400px; width: 100%; flex: 3; border: 1px solid #ddd">
                         <h3 class="pa-2">POLICY</h3>
 
                         <!-- <v-toolbar flat color="white" class="pr-5">
@@ -53,7 +53,60 @@
 
             </v-card>
 
+            <v-card class="mt-2">
+            
+                <v-toolbar flat color="white" class="">
+                    <h2>{{ 'Playground' }}</h2>
+                </v-toolbar>
+
+                <v-layout class="elevation-0" wrap>
+
+                    <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
+                        <h3 class="pa-2">REQUEST</h3>
+                        <!-- <v-toolbar flat color="white" class="pr-5">
+                            <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
+                        </v-toolbar> -->
+
+                        <div class="pa-2">
+                            <no-ssr placeholder="Codemirror Loading...">
+                                <codemirror ref1="model"
+                                            :value="model" 
+                                            :options="cmOptions"
+                                            @ready="onCmReady"
+                                            @focus="onCmFocus"
+                                            @input="onCmCodeChange">
+                                </codemirror>
+                            </no-ssr>
+                        </div>
+
+                    </v-card>
+
+                    <v-card tile flat class="ma-1" style="max-height: 400px; width: 100%; flex: 3; border: 1px solid #ddd">
+                        <h3 class="pa-2">RESPONSE</h3>
+
+                        <!-- <v-toolbar flat color="white" class="pr-5">
+                            <v-toolbar-title>{{ title || 'POLICY' }}</v-toolbar-title>
+                        </v-toolbar> -->
+
+                        <div class="pa-2">
+                            <no-ssr placeholder="Codemirror Loading...">
+                                <codemirror ref1="policy"
+                                            :value="policy" 
+                                            :options="cmOptions"
+                                            @ready="onCmReady"
+                                            @focus="onCmFocus"
+                                            @input="onCmCodeChange">
+                                </codemirror>
+                            </no-ssr>
+                        </div>
+                    </v-card>
+
+                </v-layout>
+
+            </v-card>
+
         </v-flex>
+
     </v-layout>
 </template>
 
