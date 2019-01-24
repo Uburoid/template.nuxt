@@ -22,7 +22,7 @@
                         small 
                         :color="action.color || 'primary'"
                         @click.stop="action.click && run(action.click)"
-                        style="width: 30px; height: 30px;"
+                        style="width: 34px; height: 34px;"
                     >
                         <v-icon small>{{ typeof(action.icon) === 'function' ? action.icon(model) : action.icon }}</v-icon>
                     </v-btn>
@@ -114,7 +114,7 @@
                                     :color="btn.color"
                                     small
                                     @click="btn.click(props)"
-                                    style="width: 30px; height: 30px;"
+                                    style="width: 34px; height: 34px;"
                                 >
                                     <v-icon  small>{{ btn.icon }}</v-icon>
                                 </v-btn>
@@ -170,7 +170,7 @@
                             small 
                             :color="action.color || 'primary'"
                             @click.stop="action.click && run(action.click)"
-                            style="width: 30px; height: 30px;"
+                            style="width: 34px; height: 34px;"
                         >
                             <v-icon small>{{ action.icon }}</v-icon>
                         </v-btn>
