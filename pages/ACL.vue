@@ -1,7 +1,7 @@
 <template>
     <v-layout justify-center class="pa-2 elevation-1">
         <v-flex xs12 sm10 md8 lg6 xl6>
-            <v-card>
+            <v-card >
             
                 <v-toolbar flat color="white" class="">
                     <h2>{{ 'ACL Configuration' }}</h2>
@@ -9,7 +9,7 @@
 
                 <v-layout class="elevation-0" wrap>
 
-                    <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-1" style="flex: 1; border: 1px solid #ddd">
                         <h3 class="pa-2">MODEL</h3>
                         <!-- <v-toolbar flat color="white" class="pr-5">
                             <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
@@ -17,7 +17,7 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <codemirror ref="myCm"
+                                <codemirror ref1="model"
                                             :value="model" 
                                             :options="cmOptions"
                                             @ready="onCmReady"
@@ -29,7 +29,7 @@
 
                     </v-card>
 
-                    <v-card tile flat class="ma-1" style="flex: 3; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-1" style="width: 100%; flex: 1; border: 1px solid #ddd">
                         <h3 class="pa-2">POLICY</h3>
 
                         <!-- <v-toolbar flat color="white" class="pr-5">
@@ -38,7 +38,7 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <codemirror ref="myCm"
+                                <codemirror ref1="policy"
                                             :value="policy" 
                                             :options="cmOptions"
                                             @ready="onCmReady"
@@ -82,25 +82,58 @@
                     // codemirror options
                     tabSize: 4,
                     mode: 'application/x-cypher-query',
+                    //mode: 'text/javascript',
                     theme: 'neo',
+                    //theme: 'base16-dark',
                     lineNumbers: true,
                     line: true,
+                    //viewportMargin: Infinity
                     // more codemirror options, 更多 codemirror 的高级配置...
                 }
             }
         },
 
         computed: {
+            cm_model() {
+                return this.$refs.model.codemirror
+            },
+            cm_policy() {
+                return this.$refs.policy.codemirror
+            }
+        },
+
+        mounted() {
+            debugger
             
         },
 
         methods: {
+            onCmReady(cm) {
+                console.log('the editor is readied!', cm)
+                
+                //cm.setSize('200px', 'auto');
             
+                //this.cm_policy.setSize('100%', '100%');
+            },
+            onCmFocus(cm) {
+                console.log('the editor is focus!', cm)
+            },
+            onCmCodeChange(newCode) {
+                console.log('this is new code', newCode)
+                this.code = newCode
+            }
         }
     }
 </script>
 
-<style scoped>
+<style>
+/* .CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+    .CodeMirror {
+        width: 100%!important;
+    } */
     /* .v-toolbar__content {
         padding-left: 8px;
         padding-right: 0px;
