@@ -40,14 +40,14 @@ class ACL extends SecuredAPI {
         let policy = this.fs.readFileSync(policy_path, { encoding: 'utf-8' });
 
         const request = {
-            role: 'Аноним',
-            class: 'UI',
-            methods: 'pageData',
-            resource: {
-                path: '/ACL'
+            "role": "Администраторы",
+            "class": "UI",
+            "methods": "pageData",
+            "resource": {
+                "path": "/ACL"
             },
-            token: 'valid',
-            page_exists: 'exists'
+            "token": "valid",
+            "page_exists": "exists"
         }
 
         return { model, policy, request };
