@@ -127,10 +127,10 @@ class Base {
                             //self.roles = await self.roles;
 
                             let allow = await self.$beforeAction(propKey, ...args);
-                            let { access, policy } = typeof(allow) === 'object' ? allow : { access: allow };
+                            let { access, policy = {} } = typeof(allow) === 'object' ? allow : { access: allow };
 
                             if(!access) {
-                                if(policy.error_code) {
+                                if(policy.error_code) { 
                                     let err = { code: policy.error_code };
 
                                     if(self.payload.token_err && self.payload.token_err.name === 'TokenExpiredError' && policy.error_code === 401) {
@@ -315,7 +315,7 @@ class API extends Base {
         let payload = { _id, name, shadow_id, role, picture, class: this.payload.class };
         
         if(!this.payload.token_err) {
-            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
+            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '1000s'});
 
             this.res.cookie('$token', this.token, { httpOnly: true });
             //this.res.cookie('page-with-error', '', { expires: new Date() });

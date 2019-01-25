@@ -52,6 +52,19 @@ class ACL extends SecuredAPI {
 
         return { model, policy, request };
     }
+
+    play({ request, model, policy }) {
+        //debugger
+        request = JSON.parse(request);
+
+        let acl = new AccessList({ model, policy, roles: this.roles });
+
+        let { access, debug } = acl.enforce({ request });
+        
+        debug = debug.map(row => row.policy.debug).join('\n');
+
+        return { access, debug };
+    }
 }
 
 module.exports = { ACL };

@@ -30,6 +30,8 @@ class ACL {
         this.model = parsed_model;
         this.options = options;
 
+        //this.debug = {};
+
         this.policy = ACL.parsePolicy(policy, order, parsed_model);;
         ACL.roles = roles;
 
@@ -102,6 +104,8 @@ class ACL {
         else {
             result = { access: !options.strict };
         }
+
+        result = { ...result, debug: request };
         /* if(result) {
 
             let last = request[request.length - 1];
@@ -170,9 +174,13 @@ class ACL {
     }
 
     static parsePolicy(policy, order, model) {
-        let prepared = policy.split('\n').reduce((memo, line) => line.trim() ? memo.push(line.trim()) && memo : memo, []);
+        let prepared = policy.split('\n').reduce((memo, line) => memo.push(line.trim()) && memo, []);
+        //let prepared = policy.split('\n').reduce((memo, line) => line.trim() ? memo.push(line.trim()) && memo : memo, []);
 
-        policy = prepared.reduce((memo, value) => {
+        policy = prepared.reduce((memo, value, inx) => {
+            let debug = `line: "${inx + 1}" => ${value}`;
+
+            if(!value) return memo; //empty string
             if(value.slice(0, 2) === `//`) return memo; //is comment
 
             let objects = [];
@@ -211,6 +219,8 @@ class ACL {
                     policy[order[inx]] = pattern;
                 }
             });
+
+            policy.debug = debug;
 
             memo.push(policy);
             return memo;

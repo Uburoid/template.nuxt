@@ -15,11 +15,11 @@
                     <div 
                         class="ml-1" 
                         style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" 
-                        :style="{ display: actions && actions.length ? 'flex' : 'none' }"
+                        :style="{ display: configuration_actions && configuration_actions.length ? 'flex' : 'none' }"
                     >
 
                         <div 
-                            v-for="(action, inx) in actions"
+                            v-for="(action, inx) in configuration_actions"
                             :key="inx"
                             style="display: flex; justify-content: center;"
                         >
@@ -52,9 +52,6 @@
                                 <codemirror 
                                     :code="branch.model" 
                                     :options="cmOptions"
-                                    @ready1="onCmReady"
-                                    @focus1="onCmFocus"
-                                    @input1="onCmCodeChange"
                                 />
                             </no-ssr>
                         </div>
@@ -72,9 +69,6 @@
                                 <codemirror
                                     :code="branch.policy" 
                                     :options="cmOptions"
-                                    @ready1="onCmReady"
-                                    @focus1="onCmFocus"
-                                    @input1="onCmCodeChange"
                                 />
                             </no-ssr>
                         </div>
@@ -101,11 +95,11 @@
                     <div 
                         class="ml-1" 
                         style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" 
-                        :style="{ display: actions && actions.length ? 'flex' : 'none' }"
+                        :style="{ display: playground_actions && playground_actions.length ? 'flex' : 'none' }"
                     >
 
-                        <!-- <div 
-                            v-for="(action, inx) in actions"
+                        <div 
+                            v-for="(action, inx) in playground_actions"
                             :key="inx"
                             style="display: flex; justify-content: center;"
                         >
@@ -119,7 +113,7 @@
                             >
                                 <v-icon small>{{ typeof(action.icon) === 'function' ? action.icon(model) : action.icon }}</v-icon>
                             </v-btn>
-                        </div> -->
+                        </div>
 
                     </div>
                 </v-toolbar>
@@ -144,9 +138,7 @@
                                         lineNumbers: true,
                                         line: true,
                                     }"
-                                    @ready1="onCmReady"
-                                    @focus1="onCmFocus"
-                                    @input1="onCmCodeChange"
+                                    @input="noRequestCahged"
                                 />
                             </no-ssr>
                         </div>
@@ -155,19 +147,16 @@
                     </v-card>
 
                     <v-card tile flat class="ma-0" style="max-height: 300px; width: 100%; flex: 3; border1: 1px solid #ddd">
-                        <h3 class="pa-2">RESULT</h3>
+                        <h3 class="pa-2">{{ result.access || 'RESULT' }}</h3>
 
                         <v-divider class="mx-2"/>
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <!-- <codemirror
-                                    :code="branch.policy" 
+                                <codemirror
+                                    :code="result.policy" 
                                     :options="cmOptions"
-                                    @ready1="onCmReady"
-                                    @focus1="onCmFocus"
-                                    @input1="onCmCodeChange"
-                                /> -->
+                                />
                             </no-ssr>
                         </div>
 
@@ -216,7 +205,11 @@
 
             return {
                 branch: { model: '', policy: '', request: '' }, //init_branch, // : { model: '', policy: '', request: '' },
-                actions: [
+                result: {
+                    access: '',
+                    policy: ''
+                },
+                configuration_actions: [
                     {
                         icon: 'fas fa-power-off',
                         click: 'reset',
@@ -226,6 +219,14 @@
                         icon: 'fas fa-save',
                         click: 'save',
                         color: 'primary'
+                    }
+                ],
+
+                playground_actions: [
+                    {
+                        icon: 'fas fa-play',
+                        click: 'play',
+                        color: 'green darken-2'
                     }
                 ],
 
@@ -274,7 +275,24 @@
             reset() {
                 debugger
             },
-            onCmReady(cm) {
+
+            async play() {
+                debugger
+                let result = await this.$server.acl.play({ request: this.branch.request, model: this.branch.model, policy: this.branch.policy }, { cache: false });
+                this.result.policy = result.debug;
+                this.result.access = this.result.access ? 'Access granted' : 'Access denied';
+
+                console.log(result);
+            },
+
+            noRequestCahged(newCode) {
+                //debugger
+                this.branch.request = newCode;
+                //console.log('this is new code', newCode)
+                //this.code = newCode
+            }
+
+            /* onCmReady(cm) {
                 //console.log('the editor is readied!', cm)
                 
                 //cm.setSize('200px', 'auto');
@@ -288,7 +306,7 @@
                 debugger
                 //console.log('this is new code', newCode)
                 //this.code = newCode
-            }
+            } */
         }
     }
 </script>
