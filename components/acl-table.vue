@@ -103,7 +103,7 @@
                             
 
                             <td
-                                v-for="(header, inx) in model.headers"
+                                v-for="(header) in model.headers"
                                 :key="header.text"
                                 class1="px-0"
                                 :class="header.cell.class"

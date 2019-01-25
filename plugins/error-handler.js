@@ -111,7 +111,7 @@ export default (context, inject) => {
                 context.app.$cookies.set('page-with-error', page_with_error);
 
                 if(!process.browser) {
-                    debugger
+                    //debugger
                     //context.app.$cookies.set('page-with-error', JSON.stringify(page_with_error));
 
                     context.res.setHeader('location', err.redirect);

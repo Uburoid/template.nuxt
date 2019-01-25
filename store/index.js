@@ -1,3 +1,4 @@
+import merge from 'deepmerge';
 
 export const state = () => ({
     page_with_error: void 0,
@@ -13,12 +14,15 @@ export const state = () => ({
         },
         access: 0
     },
-    title: 'init',
+    title: 'welcome',
     settings: {
         drawer: false
     },
     drawer_items: [],
-    account_items: []
+    account_items: [],
+    common: {
+        data: {}
+    }
 });
 
 export const mutations = {
@@ -70,6 +74,11 @@ export const mutations = {
 
     SET_ACCOUNT_ITEMS(state, items) {
         state.account_items = items;
+    },
+
+    SET_COMMON(state, data) {
+        state.common = { ...merge(state.common, data) };
+        //state.common = { ...state.common, ...data };
     }
 };
 

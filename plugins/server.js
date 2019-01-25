@@ -12,6 +12,8 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
     let params = JSON.stringify(payload || {});
     let key = `${endpoint}:${params}`;
 
+    typeof(payload) !== 'object' && (payload = { parameter: payload });
+    
     payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
 
     let response = cache && axios_cache.get(key);

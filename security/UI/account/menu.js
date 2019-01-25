@@ -1,8 +1,26 @@
 let items = [
     {
         title: 'ACL',
-        icon: 'fa-security',
-        to: '/ACL',
+        icon: 'fa-lock',
+        description: 'Access contlol lists',
+        //to: '/ACL/pages-access',
+        items: [
+            {
+                title: 'pages access',
+                icon: 'fa-lock',
+                to: '/ACL/pages-access',
+            },
+            {
+                title: 'main menu access',
+                icon: 'fa-unlock',
+                to: '/ACL/main-menu',
+            },
+            {
+                title: 'account menu access',
+                icon: 'fa-lock',
+                to: '/ACL/account-menu',
+            },
+        ]
     },
     {
         title: 'users',
@@ -19,6 +37,7 @@ let items = [
         title: 'help',
         icon: 'far fa-question-circle',
         to: '/help',
+        description: 'Help page for $server functions'
     },
     { divider: true, inset: false, to: '/help' },
     {

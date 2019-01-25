@@ -4,12 +4,17 @@
         
         <!-- <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/> -->
     
-        <v-toolbar fixed app clipped-left clipped-right flat style="z-index: 10">
-            <!-- <nuxt-link to="" @click.native="$store.commit('SET_SETTINGS', { drawer: !settings.drawer })">
+        <v-toolbar fixed app clipped-left clipped-right flat style="z-index: 5">
+            <nuxt-link to="" @click.native="left_drawer = !left_drawer">
                 <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
-            </nuxt-link> -->
+            </nuxt-link>
+            <!-- <v-btn fab flat small slot="activator">
+                <v-avatar size="30">
+                    <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg">
+                </v-avatar>
+            </v-btn> -->
 
-            <drawer/>
+            <!-- <drawer :show.sync="settings.drawer"/> -->
 
             <!-- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon> -->
 
@@ -17,7 +22,11 @@
 
             <v-spacer></v-spacer>
 
-            <account-menu/>
+            <nuxt-link to="" @click.native="right_drawer = !right_drawer">
+                <img :alt="profile.name" :src="profile.avatar" height="34">
+            </nuxt-link>
+
+            <!-- <account-menu/> -->
             <!-- <v-menu offset-x offset-y>
                 <v-btn fab flat small slot="activator">
                     <v-avatar size="36">
@@ -58,6 +67,9 @@
 
         </v-toolbar>
 
+        <drawer :visible.sync="left_drawer"/>
+        <account-menu :visible.sync="right_drawer"/>
+
         <v-content>
             <!-- {{ !$store.state.error }} -->
             <!-- <component v-if="error" :is="error.component"/> -->
@@ -89,52 +101,8 @@
         data: (vm) => {
 
             return {
-                /* items: [
-                    {
-                        access: 1000,
-                        title: 'Users',
-                        icon: 'fa-users',
-                        to: '/account',
-                        click: () => ({})
-                    },
-                    {
-                        access: 100,
-                        title: 'Account',
-                        icon: 'fa-user',
-                        to: '/account',
-                        click: () => ({})
-                    },
-                    {
-                        access: 100,
-                        title: 'Help',
-                        icon: 'far fa-question-circle',
-                        to: '/help',
-                        click: () => ({})
-                    },
-                    {
-                        access: 100,
-                        title: 'Sign out',
-                        icon: 'fa-sign-out-alt',
-                        to: '/signout',
-                        click: () => ({})
-                    },
-                    {
-                        access: 0,
-                        title: 'Sign in',
-                        icon: 'fa-sign-in-alt',
-                        to: '/signin',
-                        click: () => ({})
-                    },
-                    {
-                        access: 0,
-                        title: 'Sign up',
-                        icon: 'fa-user-plus',
-                        to: '/signup',
-                        click: () => ({})
-                    }
-                ] */
-                
-                //title: 'Vuetify.js'
+                left_drawer: false,
+                right_drawer: false
             };
         },
         created() {

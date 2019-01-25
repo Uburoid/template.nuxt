@@ -2,6 +2,7 @@ let items = [
     { 
         icon: "apps", 
         title: "HOME PAGE", 
+        description: 'The main landing page',
         to: "/" 
     }, 
     { 
