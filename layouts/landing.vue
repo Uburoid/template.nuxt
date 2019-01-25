@@ -4,7 +4,7 @@
         
         <!-- <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/> -->
     
-        <v-toolbar fixed app clipped-left clipped-right flat style="z-index: 5">
+        <v-toolbar fixed app clipped-left clipped-right flat style="z-index: 7">
             <nuxt-link to="" @click.native="left_drawer = !left_drawer">
                 <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
             </nuxt-link>
