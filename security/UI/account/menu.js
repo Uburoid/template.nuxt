@@ -3,20 +3,20 @@ let items = [
         title: 'ACL',
         icon: 'fa-lock',
         description: 'Access contlol lists',
-        //to: '/ACL/pages-access',
+        
         items: [
             {
-                title: 'pages access',
+                title: 'routes',
                 icon: 'fa-lock',
-                to: '/ACL/pages-access',
+                to: '/ACL/routes',
             },
             {
-                title: 'main menu access',
+                title: 'main menu',
                 icon: 'fa-unlock',
                 to: '/ACL/main-menu',
             },
             {
-                title: 'account menu access',
+                title: 'account menu',
                 icon: 'fa-lock',
                 to: '/ACL/account-menu',
             },

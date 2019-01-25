@@ -19,10 +19,7 @@ class ACL extends SecuredAPI {
         let policy_path = require.resolve('../../security/UI/pages/policy.csv');
 
         switch (parameter) {
-            case 'pages-access':
-                
-                break;
-        
+            
             case 'account-menu':
                 model_path = require.resolve('../../security/UI/account/model.conf');
                 policy_path = require.resolve('../../security/UI/account/policy.csv');
@@ -54,30 +51,6 @@ class ACL extends SecuredAPI {
         }
 
         return { model, policy, request };
-    }
-
-    policy1({ parameter }) {
-        let path = require.resolve('../../security/UI/pages/policy.csv');
-        switch (parameter) {
-            case 'pages-access':
-                
-                break;
-        
-            case 'account-menu':
-                path = require.resolve('../../security/UI/account/policy.csv');
-                break;
-
-            case 'main-menu':
-                path = require.resolve('../../security/UI/drawer/policy.csv');
-                break;
-
-            default:
-                break;
-        }
-
-        let policy = this.fs.readFileSync(path, { encoding: 'utf-8' });
-
-        return policy;
     }
 }
 
