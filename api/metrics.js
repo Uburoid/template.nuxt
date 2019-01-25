@@ -44,6 +44,9 @@ class Metrics {
     }
 
     static async save(req, method_name, account) {
+        let ua = uaParser(req.headers['user-agent']);
+        return ua;
+        
         const account_id = account._id;
         account = await Account.findOne({
             _id: account_id
@@ -54,7 +57,6 @@ class Metrics {
         !account && (account = await account_module.Account.shadow(account_id));
 
         //debugger
-        let ua = uaParser(req.headers['user-agent']);
 
         
         let browser = await Browser.save({ 
