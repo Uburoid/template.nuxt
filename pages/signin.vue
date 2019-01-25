@@ -6,7 +6,7 @@
 <script>
     export default {
         layout (context) {
-            debugger
+            //debugger
             return !context.store.state.page_with_error && context.store.state.last_route === '/' ? 'default' : 'landing';
         },
         components: {

@@ -315,7 +315,7 @@ class API extends Base {
         let payload = { _id, name, shadow_id, role, picture, class: this.payload.class };
         
         if(!this.payload.token_err) {
-            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '100s'});
+            this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '10s'});
 
             this.res.cookie('$token', this.token, { httpOnly: true });
             //this.res.cookie('page-with-error', '', { expires: new Date() });

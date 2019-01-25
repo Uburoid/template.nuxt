@@ -44,13 +44,13 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <codemirror ref1="model"
-                                            :code="branch.model" 
-                                            :options="cmOptions"
-                                            @ready1="onCmReady"
-                                            @focus1="onCmFocus"
-                                            @input="onCmCodeChange">
-                                </codemirror>
+                                <codemirror 
+                                    :code="branch.model" 
+                                    :options="cmOptions"
+                                    @ready1="onCmReady"
+                                    @focus1="onCmFocus"
+                                    @input1="onCmCodeChange"
+                                />
                             </no-ssr>
                         </div>
 
@@ -65,13 +65,13 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <!-- <codemirror ref1="policy"
-                                            :code="branch.policy" 
-                                            :options="cmOptions"
-                                            @ready1="onCmReady"
-                                            @focus1="onCmFocus"
-                                            @input1="onCmCodeChange">
-                                </codemirror> -->
+                                <codemirror
+                                    :code="branch.policy" 
+                                    :options="cmOptions"
+                                    @ready1="onCmReady"
+                                    @focus1="onCmFocus"
+                                    @input1="onCmCodeChange"
+                                />
                             </no-ssr>
                         </div>
                     </v-card>
@@ -96,13 +96,19 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <!-- <codemirror ref1="model"
-                                            :code="branch.request" 
-                                            :options="cmOptions"
-                                            @ready="onCmReady"
-                                            @focus="onCmFocus"
-                                            @input="onCmCodeChange">
-                                </codemirror> -->
+                                <codemirror 
+                                    :code="branch.request" 
+                                    :options="{
+                                        tabSize: 4,
+                                        mode: 'text/javascript',
+                                        theme: 'neo',
+                                        lineNumbers: true,
+                                        line: true,
+                                    }"
+                                    @ready1="onCmReady"
+                                    @focus1="onCmFocus"
+                                    @input1="onCmCodeChange"
+                                />
                             </no-ssr>
                         </div>
 
@@ -117,12 +123,12 @@
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <v-textarea
+                                <!-- <v-textarea
                                     name="input-7-1"
                                     label="Default style"
                                     :value="branch.policy"
                                     hint="Hint text"
-                                />
+                                /> -->
                                 <!-- <codemirror ref1="policy"
                                             :value="policy" 
                                             :options="cmOptions"
@@ -151,14 +157,11 @@
     export default {
         layout: 'landing',
         components: {
-            //'acl-table': () => import('@/components/acl-table'),
-            //codemirror: ()  => import('codemirror'),
+            
         },
         async fetch (ctx) {
             let { store, params } = ctx;
 
-            //if(store.state.common.ACL && store.state.common.ACL[params.branch]) return;
-            debugger
             let { model, policy, request } = await ctx.$server.acl.get(ctx.route.params.branch, { cache: true });
             
             let common = {
@@ -167,24 +170,17 @@
                         [params.branch]: { model, policy, request: JSON.stringify(request, void 0, 4) }
                     }
             }
-            //debugger
+
             store.commit('SET_COMMON', common);
         },
-        /* asyncData: async (ctx) => {
-            //debugger
-            let { model, policy, request } = await ctx.$server.acl.get(ctx.route.params.branch);
-            //let model= await ctx.$server.acl.model(ctx.route.params.branch);
-            //let policy = await ctx.$server.acl.policy(ctx.route.params.branch);
-            debugger
-            return { inner_branch: { model, policy, request: JSON.stringify(request, void 0, 4) }};
-            //return { branch: ctx.store.state.common.ACL ? ctx.store.state.common.ACL[ctx.route.params.branch] : { model: '', policy: '', request: '' }};
-        }, */
-        data: (vm) => {
-            debugger
-            //if(!vm) return {};
+        data(vm) {       
+            //debugger     
+            //vm = vm || this; //NUXT feature?!
+            
+            //let init_branch = vm.$store.state.common.ACL[vm.$route.params.branch];
 
             return {
-                branch: vm ? vm.common[vm.$route.params.branch] : { model: '', policy: '', request: '' },
+                branch: { model: '', policy: '', request: '' }, //init_branch, // : { model: '', policy: '', request: '' },
                 actions: [
                     {
                         icon: 'fas fa-power-off',
@@ -207,19 +203,13 @@
                     //theme: 'base16-dark',
                     lineNumbers: true,
                     line: true,
-                    //viewportMargin: Infinity
-                    // more codemirror options, 更多 codemirror 的高级配置...
+
                 }
             }
         },
 
         computed: {
-            /* branch() {
-                return this.common[this.$route.params.branch];
-                //return this.inner_branch;
-                //console.log(this.common[this.$route.params.branch]);
-                //return this.common[this.$route.params.branch];
-            }, */
+
             cm_model() {
                 return this.$refs.model.codemirror
             },
@@ -227,29 +217,13 @@
                 return this.$refs.policy.codemirror
             },
             ...mapState({
-                common: state => {
-                    debugger
-                    //return this ? state.common.ACL[this.$route.params.branch] : { model: '', policy: '', request: '' };
-                    return state.common.ACL;
-                }
+  
             })
         },
 
-        /* watch: {
-            '$store.state.common.ACL': function (val) {
-                this.branch = this.$store.state.common.ACL[this.$route.params.branch]
-            }
-        }, */
-
         async activated() {
             //debugger
-            //cachedData = cachedData ? cachedData : 'fuck';
-
-            //let { model, policy, request } = await this.$server.acl.get(this.$route.params.branch);
-            //let { model, policy, request } = this.common[this.$route.params.branch];
-
-            debugger
-            //this.branch = this.common[this.$route.params.branch]; //{ model, policy, request: JSON.stringify(request, void 0, 4) };
+            this.branch = this.$store.state.common.ACL[this.$route.params.branch]; //{ model, policy, request: JSON.stringify(request, void 0, 4) };
         },
 
         methods: {
