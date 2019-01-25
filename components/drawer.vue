@@ -48,7 +48,7 @@
         <v-list class="pa-1" dense>
             <v-list-tile class="ma-2">
             
-                <v-list-tile-avatar size="24">
+                <v-list-tile-avatar size="34">
                     <img src="~assets/Army_of_Russia.svg">
                 </v-list-tile-avatar>
                 

@@ -13,7 +13,7 @@
             <v-list class="pa-1" dense>
                 <v-list-tile class="ma-2">
                 
-                    <v-list-tile-avatar size="36">
+                    <v-list-tile-avatar size="34">
                         <img :src="profile.avatar">
                     </v-list-tile-avatar>
                     

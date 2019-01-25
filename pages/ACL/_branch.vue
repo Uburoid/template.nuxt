@@ -1,11 +1,15 @@
 <template>
     <v-layout justify-center class="pa-2 elevation-1">
         <v-flex xs12 sm10 md8 lg6 xl6>
+
             <v-card class="mb-2">
             
-                <v-toolbar flat color="white" class="">
-                    <h2>{{ 'ACL Configuration' }}</h2>
-
+                <v-toolbar dense flat color="white" class="">
+                    <h2>
+                        {{ 'ACL Configuration' }}
+                        <!-- <v-divider/> -->
+                    </h2>
+                                        
                     <v-spacer></v-spacer>
 
                     <div 
@@ -34,13 +38,14 @@
                     </div>
                 </v-toolbar>
 
-                <v-layout class="elevation-0" wrap>
+                <!-- <v-divider class="mx-2"/> -->
 
-                    <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
+                <v-layout class="elevation-0 pa-1" wrap>
+
+                    <v-card tile flat class="ma-0" style="flex: 2; border1: 1px solid #ddd">
                         <h3 class="pa-2">MODEL</h3>
-                        <!-- <v-toolbar flat color="white" class="pr-5">
-                            <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
-                        </v-toolbar> -->
+
+                        <v-divider class="mx-2"/>
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
@@ -54,14 +59,13 @@
                             </no-ssr>
                         </div>
 
+                        <v-divider class="mx-2"/>
                     </v-card>
 
-                    <v-card tile flat class="ma-1" style="max-height: 300px; width: 100%; flex: 3; border: 1px solid #ddd">
+                    <v-card tile flat class="ma-0" style="max-height: 300px; width: 100%; flex: 3; border1: 1px solid #ddd">
                         <h3 class="pa-2">POLICY</h3>
 
-                        <!-- <v-toolbar flat color="white" class="pr-5">
-                            <v-toolbar-title>{{ title || 'POLICY' }}</v-toolbar-title>
-                        </v-toolbar> -->
+                        <v-divider class="mx-2"/>
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
@@ -74,25 +78,60 @@
                                 />
                             </no-ssr>
                         </div>
+
+                        <v-divider class="mx-2"/>
+
                     </v-card>
 
                 </v-layout>
 
             </v-card>
 
-            <v-card v-if="true" class="mt-2">
+
+        
+
             
-                <v-toolbar flat color="white" class="">
+            <v-card class="mb-2">
+            
+                <v-toolbar dense flat color="white" class="">
                     <h2>{{ 'Playground' }}</h2>
+                                        
+                    <v-spacer></v-spacer>
+
+                    <div 
+                        class="ml-1" 
+                        style="height: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" 
+                        :style="{ display: actions && actions.length ? 'flex' : 'none' }"
+                    >
+
+                        <!-- <div 
+                            v-for="(action, inx) in actions"
+                            :key="inx"
+                            style="display: flex; justify-content: center;"
+                        >
+                            <v-btn 
+                                dark 
+                                fab 
+                                small 
+                                :color="action.color || 'primary'"
+                                @click.stop="action.click && run(action.click)"
+                                style="width: 34px; height: 34px;"
+                            >
+                                <v-icon small>{{ typeof(action.icon) === 'function' ? action.icon(model) : action.icon }}</v-icon>
+                            </v-btn>
+                        </div> -->
+
+                    </div>
                 </v-toolbar>
 
-                <v-layout class="elevation-0" wrap>
+                <!-- <v-divider class="mx-2"/> -->
 
-                    <v-card tile flat class="ma-1" style="flex: 2; border: 1px solid #ddd">
+                <v-layout class="elevation-0 pa-1" wrap>
+
+                    <v-card tile flat class="ma-0" style="flex: 2; border1: 1px solid #ddd">
                         <h3 class="pa-2">REQUEST</h3>
-                        <!-- <v-toolbar flat color="white" class="pr-5">
-                            <v-toolbar-title>{{ title || 'MODEL' }}</v-toolbar-title>
-                        </v-toolbar> -->
+
+                        <v-divider class="mx-2"/>
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
@@ -112,32 +151,28 @@
                             </no-ssr>
                         </div>
 
+                        <v-divider class="mx-2"/>
                     </v-card>
 
-                    <v-card tile flat class="ma-1" style="max-height: 400px; width: 100%; flex: 3; border: 1px solid #ddd">
-                        <h3 class="pa-2">RESPONSE</h3>
+                    <v-card tile flat class="ma-0" style="max-height: 300px; width: 100%; flex: 3; border1: 1px solid #ddd">
+                        <h3 class="pa-2">RESULT</h3>
 
-                        <!-- <v-toolbar flat color="white" class="pr-5">
-                            <v-toolbar-title>{{ title || 'POLICY' }}</v-toolbar-title>
-                        </v-toolbar> -->
+                        <v-divider class="mx-2"/>
 
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
-                                <!-- <v-textarea
-                                    name="input-7-1"
-                                    label="Default style"
-                                    :value="branch.policy"
-                                    hint="Hint text"
+                                <!-- <codemirror
+                                    :code="branch.policy" 
+                                    :options="cmOptions"
+                                    @ready1="onCmReady"
+                                    @focus1="onCmFocus"
+                                    @input1="onCmCodeChange"
                                 /> -->
-                                <!-- <codemirror ref1="policy"
-                                            :value="policy" 
-                                            :options="cmOptions"
-                                            @ready="onCmReady"
-                                            @focus="onCmFocus"
-                                            @input="onCmCodeChange">
-                                </codemirror> -->
                             </no-ssr>
                         </div>
+
+                        <v-divider class="mx-2"/>
+
                     </v-card>
 
                 </v-layout>

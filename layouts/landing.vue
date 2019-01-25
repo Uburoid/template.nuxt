@@ -4,9 +4,11 @@
         
         <!-- <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/> -->
     
-        <v-toolbar fixed app clipped-left clipped-right flat style="z-index: 7">
+        <v-toolbar dense fixed app clipped-left clipped-right flat style="z-index: 7">
             <nuxt-link to="" @click.native="left_drawer = !left_drawer">
-                <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg" height="34">
+                <v-avatar size="34">
+                    <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg">
+                </v-avatar>
             </nuxt-link>
             <!-- <v-btn fab flat small slot="activator">
                 <v-avatar size="30">
@@ -23,7 +25,10 @@
             <v-spacer></v-spacer>
 
             <nuxt-link to="" @click.native="right_drawer = !right_drawer">
-                <img :alt="profile.name" :src="profile.avatar" height="34">
+                <!-- <img :alt="profile.name" :src="profile.avatar" height="34"> -->
+                <v-avatar size="34">
+                    <img :alt="profile.name" :src="profile.avatar">
+                </v-avatar>
             </nuxt-link>
 
             <!-- <account-menu/> -->
