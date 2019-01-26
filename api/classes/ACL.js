@@ -62,6 +62,8 @@ class ACL extends SecuredAPI {
         let { access, debug } = acl.enforce({ request });
         
         debug = debug.map(row => row.policy.debug).join('\n');
+        
+        debug = debug || 'NO POLICY MATCH GIVEN REQUEST';
 
         return { access, debug };
     }

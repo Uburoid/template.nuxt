@@ -50,8 +50,9 @@
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
                                 <codemirror 
+                                    ref="model"
                                     :code="branch.model" 
-                                    :options="cmOptions"
+                                    :options="options"
                                 />
                             </no-ssr>
                         </div>
@@ -67,8 +68,9 @@
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
                                 <codemirror
+                                    ref="policy"
                                     :code="branch.policy" 
-                                    :options="cmOptions"
+                                    :options="options"
                                 />
                             </no-ssr>
                         </div>
@@ -130,6 +132,7 @@
                         <div class="pa-2">
                             <no-ssr placeholder="Codemirror Loading...">
                                 <codemirror 
+                                    ref="request"
                                     :code="branch.request" 
                                     :options="{
                                         tabSize: 4,
@@ -146,7 +149,7 @@
                         <v-divider class="mx-2"/>
                     </v-card>
 
-                    <v-card tile flat class="ma-0" style="max-height: 300px; width: 100%; flex: 3; border1: 1px solid #ddd">
+                    <v-card tile flat class="ma-0" style="max-height: 300px; min-height: 300px; flex: 3; border1: 1px solid #ddd">
                         <h3 class="pa-2">{{ result.access || 'RESULT' }}</h3>
 
                         <v-divider class="mx-2"/>
@@ -155,7 +158,7 @@
                             <no-ssr placeholder="Codemirror Loading...">
                                 <codemirror
                                     :code="result.policy" 
-                                    :options="cmOptions"
+                                    :options="options_read_only"
                                 />
                             </no-ssr>
                         </div>
@@ -207,7 +210,7 @@
                 branch: { model: '', policy: '', request: '' }, //init_branch, // : { model: '', policy: '', request: '' },
                 result: {
                     access: '',
-                    policy: ''
+                    policy: 'NOT EXECUTED YET'
                 },
                 configuration_actions: [
                     {
@@ -230,7 +233,7 @@
                     }
                 ],
 
-                cmOptions: {
+                options: {
                     // codemirror options
                     tabSize: 4,
                     mode: 'application/x-cypher-query',
@@ -239,7 +242,17 @@
                     //theme: 'base16-dark',
                     lineNumbers: true,
                     line: true,
-
+                }, 
+                options_read_only: {
+                    // codemirror options
+                    tabSize: 4,
+                    mode: 'application/x-cypher-query',
+                    //mode: 'text/javascript',
+                    theme: 'neo',
+                    //theme: 'base16-dark',
+                    lineNumbers: true,
+                    line: true,
+                    readOnly: true
                 }
             }
         },
@@ -278,16 +291,27 @@
 
             async play() {
                 debugger
-                let result = await this.$server.acl.play({ request: this.branch.request, model: this.branch.model, policy: this.branch.policy }, { cache: false });
+                console.log(this.$refs);
+                
+                let query = Object.entries(this.$refs).reduce((memo, [key, value]) => {
+                    memo[key] = value.cminstance.getValue();
+
+                    return memo;
+                }, {});
+
+                
+                let result = await this.$server.acl.play(query, { cache: false });
+                //let result = await this.$server.acl.play({ request: this.branch.request, model: this.branch.model, policy: this.branch.policy }, { cache: false });
+
                 this.result.policy = result.debug;
-                this.result.access = result.access ? 'Access granted' : 'Access denied';
+                this.result.access = result.access ? 'RESULT: Access granted' : 'RESULT: Access denied';
 
                 console.log(result);
             },
 
             noRequestCahged(newCode) {
                 //debugger
-                this.branch.request = newCode;
+                //this.branch.request = newCode;
                 //console.log('this is new code', newCode)
                 //this.code = newCode
             }
