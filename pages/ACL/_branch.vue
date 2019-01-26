@@ -280,7 +280,7 @@
                 debugger
                 let result = await this.$server.acl.play({ request: this.branch.request, model: this.branch.model, policy: this.branch.policy }, { cache: false });
                 this.result.policy = result.debug;
-                this.result.access = this.result.access ? 'Access granted' : 'Access denied';
+                this.result.access = result.access ? 'Access granted' : 'Access denied';
 
                 console.log(result);
             },
