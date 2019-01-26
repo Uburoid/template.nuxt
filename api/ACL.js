@@ -131,7 +131,7 @@ class ACL {
         return result;
     }
 
-    static parseRegExp(value) {
+    static parseRegExp(value, flags) {
         if(value.constructor.name === 'String') {
             if(value.startsWith('$data')) {
                 return value;
@@ -142,7 +142,9 @@ class ACL {
             else if(value === '*') {
                 return /.*/;
             }
-            else return new RegExp(value);
+            else {
+                return new RegExp(value, flags);
+            }
         }
         else return value;
     }
@@ -199,13 +201,17 @@ class ACL {
                     policy[order[inx]] = model[order[inx]](pattern);
                 }
                 else {
+                    let flags = model[order[inx]].params;
+
                     if(pattern.slice(0, 1) === '~') {
                         pattern = json5.parse(objects[pattern.slice(1)]);
     
                         let flatten_pattern = flatten(pattern);
     
                         pattern = Object.entries(flatten_pattern).reduce((memo, [key, value]) => {
-                            value = ACL.parseRegExp(value);
+                            //debugger
+
+                            value = ACL.parseRegExp(value, flags);
                             memo[key] = value;
     
                             return memo;
@@ -214,7 +220,7 @@ class ACL {
                         pattern = unflatten(pattern);
     
                     }
-                    else pattern = ACL.parseRegExp(pattern);
+                    else pattern = ACL.parseRegExp(pattern, flags);
     
                     policy[order[inx]] = pattern;
                 }
@@ -249,7 +255,10 @@ class ACL {
                 memo.options = { ...memo.options, ...json5.parse(objects[value.slice(1)]) }
             }
             else {
-                memo.model[key] = ACL.$matchers[value];
+                let [matcher, params] = value.split(':');
+                memo.model[key] = ACL.$matchers[matcher];
+                memo.model[key].params = params;
+
                 memo.order.push(key);
             }
 

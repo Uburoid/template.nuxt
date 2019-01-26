@@ -189,12 +189,12 @@
         async fetch (ctx) {
             let { store, params } = ctx;
 
-            let { model, policy, request } = await ctx.$server.acl.get(ctx.route.params.branch, { cache: true });
+            let { model, policy, request } = await ctx.$server.acl.get(params.list, { cache: true });
             
             let common = {
                 
                     ACL: {
-                        [params.branch]: { model, policy, request: JSON.stringify(request, void 0, 4) }
+                        [params.list]: { model, policy, request: JSON.stringify(request, void 0, 4) }
                     }
             }
 
@@ -272,7 +272,7 @@
 
         async activated() {
             //debugger
-            this.branch = this.$store.state.common.ACL[this.$route.params.branch]; //{ model, policy, request: JSON.stringify(request, void 0, 4) };
+            this.branch = this.$store.state.common.ACL[this.$route.params.list]; //{ model, policy, request: JSON.stringify(request, void 0, 4) };
         },
 
         methods: {
