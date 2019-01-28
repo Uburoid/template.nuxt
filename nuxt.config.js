@@ -3,6 +3,7 @@ require('dotenv').config({
 });
 
 module.exports = {
+    srcDir: './',
     //mode: 'spa',
     //modern: 'server',
     /* vue: {
