@@ -55,6 +55,8 @@ class ACL extends SecuredAPI {
 
     play({ request, model, policy }) {
         //debugger
+        console.log('play');
+        
         request = JSON.parse(request);
 
         let acl = new AccessList({ model, policy, roles: this.roles });
