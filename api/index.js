@@ -524,26 +524,28 @@ router.all('/rebuild', async (req, res, next) => {
     }); */
     const shell = require('shelljs');
     const { spawn } = require('child_process');
-    const ls = spawn('node', ['cicd.js']);
 
-    ls.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
+    const npm = spawn('npm', ['install']);
 
-        if(data === 'DONE') {
-            setTimeout(() => {
-                let restart = shell.exec('pm2 restart all');
-                console.log(`restart: ${restart}`);
-            }, 30000);
-        }
+    npm.on('close', (code) => {
+        console.log(`npm done ${code}`);
+
+        const ls = spawn('node', ['cicd.js']);
+
+        ls.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+    
+        ls.stderr.on('data', (data) => {
+            console.log(`stderr: ${data}`);
+        });
+    
+        ls.on('close', (code) => {
+            console.log(`child process exited with code ${code}`);
+        });
+    
     });
 
-    ls.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-
-    ls.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
 
     /* new Promise((resolve, reject) => {
         try {
