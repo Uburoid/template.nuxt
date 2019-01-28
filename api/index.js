@@ -539,6 +539,7 @@ router.all('/rebuild', async (req, res) => {
             console.log(`update: ${update}`);
         } */
 
+        
         /* let update = shell.exec('npm run build');
         console.log(`update: ${update}`);
 
@@ -569,7 +570,7 @@ router.all('/rebuild', async (req, res) => {
         cmd = shell.cd(process.cwd() + '/cicd');
         console.log(`cd cicd: ${cmd}`);
 
-        
+
         console.log(`npm operations strarting...`);
 
         let install = shell.exec('npm install');
