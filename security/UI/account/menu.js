@@ -1,6 +1,6 @@
 let items = [
     {
-        title: 'ACL - re',
+        title: 'ACL',
         icon: 'fa-lock',
         description: 'Access contlol lists',
         
