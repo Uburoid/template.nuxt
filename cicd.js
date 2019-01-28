@@ -28,8 +28,8 @@ if(npm) {
     console.log(`update: ${update}`);
 }
 
-   /*  let update = shell.exec('npm run build');
-    console.log(`build: ${update}`);
+/*  let update = shell.exec('npm run build');
+console.log(`build: ${update}`);
 
 
 let restart = shell.exec('pm2 restart all');
