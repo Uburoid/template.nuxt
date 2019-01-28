@@ -631,8 +631,8 @@ router.all('/rebuild', async (req, res, next) => {
         console.log(`ERROR: ${err}`);
     } */
 
-    next();
-    //res.sendStatus(200);
+    //next();
+    res.sendStatus(200);
 });
 
 let patterns = ['/:type\.:action', '/:type'];
