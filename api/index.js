@@ -541,7 +541,20 @@ router.all('/rebuild', async (req, res, next) => {
         });
     
         ls.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
+            console.log(`cicd ok ${code}`);
+
+            const build = spawn('npm', ['run', 'build']);
+
+            build.stderr.on('data', (data) => {
+                console.log(`build error: ${data}`);
+
+                const restart = spawn('pm2', ['restart', 'all']);
+            });
+
+            build.on('close', (code) => {
+                console.log(`build close: ${data}`);
+                const restart = spawn('pm2', ['restart', 'all']);
+            });    
         });
     
     });

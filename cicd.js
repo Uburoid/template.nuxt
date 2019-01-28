@@ -12,7 +12,7 @@ console.log(`pull: ${stash}`);
 let pull = shell.exec('git pull');
 console.log(`pull: ${pull}`);
 
-let npm = false;
+let npm = true;
 /* let npm = req.body.commits.some(commit => {
     return commit.modified.includes('package.json');
 }); */
@@ -28,9 +28,9 @@ if(npm) {
 }
 
 
-    let update = shell.exec('npm run build');
+   /*  let update = shell.exec('npm run build');
     console.log(`build: ${update}`);
 
 
 let restart = shell.exec('pm2 restart all');
-console.log(`restart: ${restart}`);
+console.log(`restart: ${restart}`); */
