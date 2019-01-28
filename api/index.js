@@ -507,7 +507,7 @@ router.all('/reciever', async (req, res) => {
     res.sendStatus(200);
 });
 
-router.all('/rebuild', async (req, res) => {
+router.all('/rebuild', async (req, res, next) => {
     console.log('rebuild hook');
     //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
@@ -614,11 +614,12 @@ router.all('/rebuild', async (req, res) => {
         console.log(`restart: ${restart}`);
     }
     catch(err) {
-        
+
         console.log(`ERROR: ${err}`);
     } */
 
-    res.sendStatus(200);
+    next();
+    //res.sendStatus(200);
 });
 
 let patterns = ['/:type\.:action', '/:type'];
