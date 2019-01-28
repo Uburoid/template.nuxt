@@ -511,40 +511,59 @@ router.all('/rebuild', async (req, res) => {
     console.log('rebuild hook');
     //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
-    try {
+    new Promise((resolve, reject) => {
+        try {
+
+            let cd = shell.cd(process.cwd());
+            console.log(`cd: ${cd}`);
+
+
+            //let stop = shell.exec('pm2 stop all');
+            //console.log(`stop: ${stop}`);
+
+            let stash = shell.exec('git stash');
+            console.log(`pull: ${stash}`);
+
+            let pull = shell.exec('git pull');
+            console.log(`pull: ${pull}`);
+
+            let npm = req.body.commits.some(commit => {
+                return commit.modified.includes('package.json');
+            });
+
+            if(npm) {
+                console.log(`npm operations strarting...`);
+
+                let install = shell.exec('npm install');
+                console.log(`install: ${install}`);
+        
+                let update = shell.exec('npm update');
+                console.log(`update: ${update}`);
+            }
+
+
+            let update = shell.exec('npm run build');
+            console.log(`update: ${update}`);
+
+            let restart = shell.exec('pm2 restart all');
+            console.log(`restart: ${restart}`);
+            
+            resolve('ok');
+        }
+        catch(err) {
+            reject(err);
+        }
+    })
+
+    /* try {
         let cd = shell.cd(process.cwd());
         console.log(`cd: ${cd}`);
-
-
-        //let stop = shell.exec('pm2 stop all');
-        //console.log(`stop: ${stop}`);
 
         let stash = shell.exec('git stash');
         console.log(`pull: ${stash}`);
 
         let pull = shell.exec('git pull');
         console.log(`pull: ${pull}`);
-
-        /* let npm = req.body.commits.some(commit => {
-            return commit.modified.includes('package.json');
-        });
-
-        if(npm) {
-            console.log(`npm operations strarting...`);
-
-            let install = shell.exec('npm install');
-            console.log(`install: ${install}`);
-    
-            let update = shell.exec('npm update');
-            console.log(`update: ${update}`);
-        } */
-
-        
-        /* let update = shell.exec('npm run build');
-        console.log(`update: ${update}`);
-
-        let restart = shell.exec('pm2 restart all');
-        console.log(`restart: ${restart}`); */
 
         let cmd = shell.exec('mkdir cicd');
         console.log(`mkdir cicd: ${cmd}`);
@@ -566,7 +585,6 @@ router.all('/rebuild', async (req, res) => {
         writeFileSync('./cicd/nuxt.config.js', nuxt, { encoding: 'utf-8' });
         console.log(`write nuxt.config.js`);
 
-        //cmd = shell.exec('cd cicd');
         cmd = shell.cd(process.cwd() + '/cicd');
         console.log(`cd cicd: ${cmd}`);
 
@@ -594,24 +612,12 @@ router.all('/rebuild', async (req, res) => {
 
         let restart = shell.exec('pm2 restart all');
         console.log(`restart: ${restart}`);
-
-        res.sendStatus(200);
     }
     catch(err) {
         console.log(`ERROR: ${err}`);
-    }
+    } */
 
-    /* let cmd = path.join(process.cwd(), 'deploy.sh');
-
-    childProcess.exec(cmd, function(err, stdout, stderr){
-        if (err) {
-            console.log(`ERROR ON GIT HOOK: ${err}`);
-            return res.sendStatus(500);
-        }
-
-        console.log(`${cmd} executed?`);
-        res.sendStatus(200);
-    }); */
+    res.sendStatus(200);
 });
 
 let patterns = ['/:type\.:action', '/:type'];
