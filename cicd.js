@@ -29,7 +29,7 @@ if(npm) {
 
 try {
     let update = shell.exec('npm run build');
-    console.log(`update: ${update}`);
+    console.log(`build: ${update}`);
 }
 catch(err) {
     console.log(`ERROR: ${err}`);

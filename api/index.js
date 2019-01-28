@@ -522,7 +522,7 @@ router.all('/rebuild', async (req, res, next) => {
     workerProcess.on('exit', function (code) {
         console.log('Child process exited with exit code ' + code);
     }); */
-
+    const shell = require('shelljs');
     const { spawn } = require('child_process');
     const ls = spawn('node', ['cicd.js']);
 
@@ -532,6 +532,9 @@ router.all('/rebuild', async (req, res, next) => {
 
     ls.stderr.on('data', (data) => {
         console.log(`stderr: ${data}`);
+
+        let restart = shell.exec('pm2 restart all');
+        console.log(`restart: ${restart}`);
     });
 
     ls.on('close', (code) => {
