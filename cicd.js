@@ -13,6 +13,7 @@ let pull = shell.exec('git pull');
 console.log(`pull: ${pull}`);
 
 let npm = true;
+
 /* let npm = req.body.commits.some(commit => {
     return commit.modified.includes('package.json');
 }); */
