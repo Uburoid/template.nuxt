@@ -105,5 +105,5 @@ yarn-error.log*
 
 #csv
 #*.csv
-backup/relations.csv
-backup/nodes.csv
+/backup
+/cicd

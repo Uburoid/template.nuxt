@@ -39,7 +39,8 @@
                         v-else-if="item.items && item.items.length"
                         no-action
                         :key="inx"
-                        :prepend-icon1="item.icon"
+                        :value="true"
+                        class="no-before"
                     >
                         <!-- <v-list-tile-avatar>
                             <v-icon small>{{ item.icon }}</v-icon>
@@ -155,6 +156,7 @@
     export default {
         props: ['visible'],
         data: () => ({
+            group: true
             /* items: [
                 { icon: 'apps', title: 'Welcome', to: '/' },
                 { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
@@ -186,6 +188,9 @@
     }
 </script>
 
-<style>
+<style scoped>
+    .no-before::before {
+        height: 0px!important;
+    }
 </style>
 
