@@ -549,12 +549,17 @@ router.all('/rebuild', async (req, res, next) => {
             build.stderr.on('data', (data) => {
                 console.log(`build error: ${data}`);
 
-                const restart = spawn('pm2', ['restart', 'all']);
+                setTimeout(() => {
+                    const restart = spawn('pm2', ['restart', 'all']);
+                }, 30000);
             });
 
             build.on('close', (code) => {
                 console.log(`build close: ${code}`);
-                const restart = spawn('pm2', ['restart', 'all']);
+
+                setTimeout(() => {
+                    const restart = spawn('pm2', ['restart', 'all']);
+                }, 30000);
             });    
         });
     
