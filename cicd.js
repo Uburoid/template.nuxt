@@ -27,13 +27,10 @@ if(npm) {
     console.log(`update: ${update}`);
 }
 
-try {
+
     let update = shell.exec('npm run build');
     console.log(`build: ${update}`);
-}
-catch(err) {
-    console.log(`ERROR: ${err}`);
-}
+
 
 let restart = shell.exec('pm2 restart all');
 console.log(`restart: ${restart}`);
