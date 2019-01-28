@@ -1,5 +1,3 @@
-import { resolve, reject } from 'q';
-import { readFileSync, writeFileSync } from 'fs';
 
 (async () => {
     return
@@ -477,9 +475,6 @@ let multipartDetector = function(req, res, next) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-const path = require('path');
-const childProcess = require('child_process');
-const shell = require('shelljs');
 
 const { Types, code } = require('./classes');
 const { loadDefaultKeyPair } = require('./jwt');

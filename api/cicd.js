@@ -1,3 +1,5 @@
+const shell = require('shelljs');
+
 try {
     let cd = shell.cd(process.cwd());
     console.log(`cd: ${cd}`);
@@ -12,9 +14,10 @@ try {
     let pull = shell.exec('git pull');
     console.log(`pull: ${pull}`);
 
-    let npm = req.body.commits.some(commit => {
+    let npm = true;
+    /* let npm = req.body.commits.some(commit => {
         return commit.modified.includes('package.json');
-    });
+    }); */
 
     if(npm) {
         console.log(`npm operations strarting...`);
@@ -33,8 +36,8 @@ try {
     let restart = shell.exec('pm2 restart all');
     console.log(`restart: ${restart}`);
     
-    resolve('ok');
+    //resolve('ok');
 }
 catch(err) {
-    reject(err);
+    console.log(`ERROR: ${err}`);
 }
