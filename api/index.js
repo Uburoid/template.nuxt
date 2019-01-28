@@ -511,7 +511,24 @@ router.all('/rebuild', async (req, res, next) => {
     console.log('rebuild hook');
     //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
-    new Promise((resolve, reject) => {
+    const { exec } = require('child_process');
+
+    let workerProcess = exec('node cicd.js', { detached: true },  function(error, stdout, stderr) {
+        if (error) {
+            console.log(error.stack);
+            console.log('Error code: ' + error.code);
+            console.log('Signal received: ' + error.signal);
+        }
+
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+    });
+
+    workerProcess.on('exit', function (code) {
+        console.log('Child process exited with exit code ' + code);
+    });
+
+    /* new Promise((resolve, reject) => {
         try {
 
             let cd = shell.cd(process.cwd());
@@ -553,7 +570,7 @@ router.all('/rebuild', async (req, res, next) => {
         catch(err) {
             reject(err);
         }
-    })
+    }) */
 
     /* try {
         let cd = shell.cd(process.cwd());
