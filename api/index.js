@@ -533,8 +533,11 @@ router.all('/rebuild', async (req, res, next) => {
     ls.stderr.on('data', (data) => {
         console.log(`stderr: ${data}`);
 
-        let restart = shell.exec('pm2 restart all');
-        console.log(`restart: ${restart}`);
+        console.log(`BUILD DONE?: ${restart}`);
+        setTimeout(() => {
+            let restart = shell.exec('pm2 restart all');
+            console.log(`restart: ${restart}`);
+        }, 30000);
     });
 
     ls.on('close', (code) => {
