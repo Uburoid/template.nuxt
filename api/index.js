@@ -575,7 +575,7 @@ router.all('/rebuild', async (req, res) => {
         cmd = shell.exec('mv .nuxt ../.nuxt');
         console.log(`mv .nuxt ../.nuxt: ${cmd}`);
 
-        cmd = shell.exec('cd ..');
+        cmd = shell.cd(process.cwd());
         console.log(`cd ..: ${cmd}`);
 
         cmd = shell.exec('rm -rf cicd');
