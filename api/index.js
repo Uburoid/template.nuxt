@@ -513,7 +513,7 @@ router.all('/rebuild', async (req, res, next) => {
 
     const { exec } = require('child_process');
 
-    let workerProcess = exec('node cicd.js', { detached: true },  function(error, stdout, stderr) {
+    let workerProcess = exec('node ./api/cicd.js', { detached: true },  function(error, stdout, stderr) {
         if (error) {
             console.log(error.stack);
             console.log('Error code: ' + error.code);
