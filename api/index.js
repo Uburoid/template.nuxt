@@ -614,6 +614,7 @@ router.all('/rebuild', async (req, res) => {
         console.log(`restart: ${restart}`);
     }
     catch(err) {
+        
         console.log(`ERROR: ${err}`);
     } */
 
