@@ -114,22 +114,22 @@ module.exports = {
             //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
             
-            config.node = { __dirname: true };
+            //config.node = { __dirname: true };
         },
         optimization: {
             minimize: true,
-            splitChunks: {
+            /* splitChunks: {
                 chunks: 'all',
                 automaticNameDelimiter: '.',
                 name: true,
                 cacheGroups: {},
                 minSize: 50000,
                 maxSize: 50000
-            }
+            } */
           },
-          maxChunkSize: 50000,
+          //maxChunkSize: 50000,
           
-          parallel: true,
+          //parallel: true,
 
     },
     
