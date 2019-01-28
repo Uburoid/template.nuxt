@@ -522,7 +522,6 @@ router.all('/rebuild', async (req, res, next) => {
     workerProcess.on('exit', function (code) {
         console.log('Child process exited with exit code ' + code);
     }); */
-
     const { spawn } = require('child_process');
 
     const npm = spawn('npm', ['install']);
