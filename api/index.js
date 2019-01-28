@@ -525,7 +525,7 @@ router.all('/rebuild', async (req, res) => {
         let pull = shell.exec('git pull');
         console.log(`pull: ${pull}`);
 
-        let npm = req.body.commits.some(commit => {
+        /* let npm = req.body.commits.some(commit => {
             return commit.modified.includes('package.json');
         });
 
@@ -537,7 +537,7 @@ router.all('/rebuild', async (req, res) => {
     
             let update = shell.exec('npm update');
             console.log(`update: ${update}`);
-        }
+        } */
 
         /* let update = shell.exec('npm run build');
         console.log(`update: ${update}`);
@@ -569,6 +569,16 @@ router.all('/rebuild', async (req, res) => {
         cmd = shell.cd(process.cwd() + '/cicd');
         console.log(`cd cicd: ${cmd}`);
 
+        
+        console.log(`npm operations strarting...`);
+
+        let install = shell.exec('npm install');
+        console.log(`install: ${install}`);
+
+        let update = shell.exec('npm update');
+        console.log(`update: ${update}`);
+
+        
         cmd = shell.exec('npm run build');
         console.log(`npm run build: ${cmd}`);
 
