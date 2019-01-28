@@ -553,7 +553,7 @@ router.all('/rebuild', async (req, res, next) => {
             });
 
             build.on('close', (code) => {
-                console.log(`build close: ${data}`);
+                console.log(`build close: ${code}`);
                 const restart = spawn('pm2', ['restart', 'all']);
             });    
         });
