@@ -28,7 +28,6 @@ if(npm) {
     console.log(`update: ${update}`);
 }
 
-
    /*  let update = shell.exec('npm run build');
     console.log(`build: ${update}`);
 
