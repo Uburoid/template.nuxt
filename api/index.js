@@ -526,7 +526,7 @@ router.all('/rebuild', async (req, res, next) => {
     const { spawn } = require('child_process');
 
     const npm = spawn('npm', ['install']);
-    console.log(`npm install ${npm}`);
+    console.log(`npm initial install`);
     
     npm.on('close', (code) => {
         console.log(`npm done ${code}`);
