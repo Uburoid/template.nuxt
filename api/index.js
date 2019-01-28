@@ -1,4 +1,5 @@
 import { resolve, reject } from 'q';
+import { readFileSync, writeFileSync } from 'fs';
 
 (async () => {
     return
@@ -514,6 +515,7 @@ router.all('/rebuild', async (req, res) => {
         let cd = shell.cd(process.cwd());
         console.log(`cd: ${cd}`);
 
+
         //let stop = shell.exec('pm2 stop all');
         //console.log(`stop: ${stop}`);
 
@@ -537,8 +539,47 @@ router.all('/rebuild', async (req, res) => {
             console.log(`update: ${update}`);
         }
 
-        let update = shell.exec('npm run build');
+        /* let update = shell.exec('npm run build');
         console.log(`update: ${update}`);
+
+        let restart = shell.exec('pm2 restart all');
+        console.log(`restart: ${restart}`); */
+
+        let cmd = shell.exec('mkdir cicd');
+        console.log(`mkdir cicd: ${cmd}`);
+
+        cmd = shell.exec('cp package.json cicd/package.json');
+        console.log(`cp package.json cicd/package.json: ${cmd}`);
+
+        cmd = shell.exec('cp .env.local cicd/.env.local');
+        console.log(`cp .env.local cicd/.env.local: ${cmd}`);
+
+        cmd = shell.exec('cp nuxt.config.js cicd/nuxt.config.js');
+        console.log(`cp nuxt.config.js cicd/nuxt.config.js: ${cmd}`);
+
+        let nuxt = readFileSync('./cicd/nuxt.config.js', { encoding: 'utf-8' });
+        console.log(`read nuxt.config.js`);
+
+        nuxt = nuxt.replace('srcDir: \'./\',', 'srcDir: \'../\',');
+
+        writeFileSync('./cicd/nuxt.config.js', nuxt, { encoding: 'utf-8' });
+        console.log(`write nuxt.config.js`);
+
+
+        cmd = shell.exec('cd cicd');
+        console.log(`cd cicd: ${cmd}`);
+
+        cmd = shell.exec('npm run build');
+        console.log(`npm run build: ${cmd}`);
+
+        cmd = shell.exec('mv .nuxt ../.nuxt');
+        console.log(`mv .nuxt ../.nuxt: ${cmd}`);
+
+        cmd = shell.exec('cd ..');
+        console.log(`cd ..: ${cmd}`);
+
+        cmd = shell.exec('rm -rf cicd');
+        console.log(`rm -rf cicd: ${cmd}`);
 
         let restart = shell.exec('pm2 restart all');
         console.log(`restart: ${restart}`);
