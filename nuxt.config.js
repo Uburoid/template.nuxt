@@ -118,14 +118,14 @@ module.exports = {
         },
         optimization: {
             minimize: true,
-            /* splitChunks: {
+            splitChunks: {
                 chunks: 'all',
                 automaticNameDelimiter: '.',
                 name: true,
                 cacheGroups: {},
                 minSize: 50000,
                 maxSize: 50000
-            } */
+            }
           },
           //maxChunkSize: 50000,
           
