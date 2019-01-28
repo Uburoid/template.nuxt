@@ -534,10 +534,6 @@ router.all('/rebuild', async (req, res, next) => {
             let cd = shell.cd(process.cwd());
             console.log(`cd: ${cd}`);
 
-
-            //let stop = shell.exec('pm2 stop all');
-            //console.log(`stop: ${stop}`);
-
             let stash = shell.exec('git stash');
             console.log(`pull: ${stash}`);
 
