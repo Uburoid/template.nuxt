@@ -565,7 +565,6 @@ router.all('/rebuild', async (req, res) => {
         writeFileSync('./cicd/nuxt.config.js', nuxt, { encoding: 'utf-8' });
         console.log(`write nuxt.config.js`);
 
-
         cmd = shell.exec('cd cicd');
         console.log(`cd cicd: ${cmd}`);
 
