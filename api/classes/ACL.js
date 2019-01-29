@@ -55,7 +55,7 @@ class ACL extends SecuredAPI {
 
     play({ request, model, policy }) {
         //debugger
-        //console.log('play');
+        console.log('play');
 
         request = JSON.parse(request);
 
