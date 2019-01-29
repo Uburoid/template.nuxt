@@ -524,7 +524,13 @@ router.all('/rebuild', async (req, res, next) => {
     }); */
     const { spawn, exec } = require('child_process');
 
-    exec('git stash && git pull && npm run build && pm2 restart all', (error, stdout, stderr) => {
+    let npm = req.body.commits.some(commit => {
+        return commit.modified.includes('package.json');
+    });
+
+    let command = npm ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
+
+    exec(command, (error, stdout, stderr) => {
         if (error) {
             console.log(`exec error: ${error}`);
         }
