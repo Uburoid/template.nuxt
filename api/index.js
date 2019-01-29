@@ -524,11 +524,11 @@ router.all('/rebuild', async (req, res, next) => {
     }); */
     const { spawn, exec } = require('child_process');
 
-    exec('git stash && git pull', (error, stdout, stderr) => {
+    exec('git stash && git pull && npm run build && pm2 restart all', (error, stdout, stderr) => {
         if (error) {
             console.log(`exec error: ${error}`);
         }
-        
+
         console.log(`stdout: ${stdout}`);
         console.log(`stderr: ${stderr}`);
     });

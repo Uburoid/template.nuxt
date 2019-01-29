@@ -1,7 +1,8 @@
 module.exports = {
     apps : [{
       name: "app",
-      script: "npm run build && npm run start",
+      script: "npm run start",
+      //script: "npm run build && npm run start",
       watch: true,
       env: {
         NODE_ENV: "development",
