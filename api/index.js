@@ -539,7 +539,7 @@ router.all('/rebuild', async (req, res, next) => {
         console.log(`stderr: ${stderr}`);
     }); */
 
-    let child = spawn('./deploy.sh');
+    let child = spawn('bash', ['deploy.sh']);
 
     child.stdout.on('data', (data) => {
         console.log(`child stdout: ${data}`);
