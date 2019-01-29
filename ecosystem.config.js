@@ -3,7 +3,7 @@ module.exports = {
       name: "app",
       script: "npm run start",
       //script: "npm run build && npm run start",
-      watch: true,
+      watch: false,
       env: {
         NODE_ENV: "development",
         
