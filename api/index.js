@@ -522,9 +522,18 @@ router.all('/rebuild', async (req, res, next) => {
     workerProcess.on('exit', function (code) {
         console.log('Child process exited with exit code ' + code);
     }); */
-    const { spawn } = require('child_process');
+    const { spawn, exec } = require('child_process');
 
-    const npm = spawn('npm', ['install']);
+    exec('git stash && git pull', (error, stdout, stderr) => {
+        if (error) {
+            console.log(`exec error: ${error}`);
+        }
+        
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+    });
+
+    /* const npm = spawn('npm', ['install']);
     console.log(`npm initial install`);
     
     npm.on('close', (code) => {
@@ -562,7 +571,7 @@ router.all('/rebuild', async (req, res, next) => {
             });    
         });
     
-    });
+    }); */
 
 
     /* new Promise((resolve, reject) => {
