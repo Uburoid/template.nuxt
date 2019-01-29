@@ -528,7 +528,8 @@ router.all('/rebuild', async (req, res, next) => {
         return commit.modified.includes('package.json');
     });
 
-    let command = pkg ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
+    let command = pkg ? 'npm-deploy.sh' : 'deploy.sh';
+    //let command = pkg ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
 
     /* exec(command, (error, stdout, stderr) => {
         if (error) {
@@ -539,7 +540,7 @@ router.all('/rebuild', async (req, res, next) => {
         console.log(`stderr: ${stderr}`);
     }); */
 
-    let child = spawn('sudo', ['bash', 'deploy.sh']);
+    let child = spawn('sudo', ['bash', command]);
 
     child.stdout.on('data', (data) => {
         console.info(`child stdout: ${data}`);
