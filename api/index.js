@@ -530,13 +530,23 @@ router.all('/rebuild', async (req, res, next) => {
 
     let command = npm ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
 
-    exec(command, (error, stdout, stderr) => {
+    /* exec(command, (error, stdout, stderr) => {
         if (error) {
             console.log(`exec error: ${error}`);
         }
 
         console.log(`stdout: ${stdout}`);
         console.log(`stderr: ${stderr}`);
+    }); */
+
+    let child = spawn(command);
+
+    child.stdout.on('data', (data) => {
+        console.log(`child stdout: ${data}`);
+    });
+
+    child.stderr.on('data', (data) => {
+        console.log(`child stderr: ${data}`);
     });
 
     /* const npm = spawn('npm', ['install']);
