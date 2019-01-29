@@ -105,18 +105,18 @@ module.exports = {
         ** You can extend webpack config here
         */
         //vendor: ['axios', 'vuetify'], //depricated
-        analyze: false,
+        //analyze: false,
         extend (config, { isDev, isClient }) {
-            process.on('unhandledRejection', err => {
+            /* process.on('unhandledRejection', err => {
                 debugger
                 console.log('unhandledRejection => ', err);
-            });
+            }); */
             //debugger
             isDev && isClient && (config.devtool = 'eval-source-map');
             
             //config.node = { __dirname: true };
         },
-        optimization: {
+        /* optimization: {
             minimize: true,
             splitChunks: {
                 chunks: 'all',
@@ -129,7 +129,7 @@ module.exports = {
         },
         maxChunkSize: 50000,
         
-        parallel: true,
+        parallel: true, */
 
     },
     
