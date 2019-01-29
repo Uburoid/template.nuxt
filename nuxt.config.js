@@ -126,10 +126,10 @@ module.exports = {
                 minSize: 50000,
                 maxSize: 50000
             }
-          },
-          //maxChunkSize: 50000,
-          
-          //parallel: true,
+        },
+        maxChunkSize: 50000,
+        
+        parallel: true,
 
     },
     
