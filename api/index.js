@@ -503,7 +503,7 @@ router.all('/reciever', async (req, res) => {
 });
 
 router.all('/rebuild', async (req, res, next) => {
-    console.info('github hook');
+    console.log('>>> github hook');
     //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
 
     /* const { exec } = require('child_process');
@@ -543,15 +543,15 @@ router.all('/rebuild', async (req, res, next) => {
     let child = spawn('sudo', ['bash', command]);
 
     child.stdout.on('data', (data) => {
-        console.info(`child stdout: ${data}`);
+        console.log(`>>> child stdout: ${data}`);
     });
 
     child.stderr.on('data', (data) => {
-        console.info(`child stderr: ${data}`);
+        console.log(`>>> child stderr: ${data}`);
     });
 
     child.on('close', (code) => {
-        console.info(`child ${code}`);
+        console.log(`>>> child ${code}`);
     });
 
     /* const npm = spawn('npm', ['install']);
