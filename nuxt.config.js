@@ -133,7 +133,7 @@ module.exports = {
 
     },
     
-    extractCSS: true,
+    //extractCSS: true,
 
     serverMiddleware: [
         '~/api'
