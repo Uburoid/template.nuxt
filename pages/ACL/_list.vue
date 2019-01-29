@@ -6,7 +6,7 @@
             
                 <v-toolbar dense flat color="white" class="">
 
-                    <v-icon small class="toolbar-icon mr-1">fas fa-tools</v-icon>
+                    <v-icon small color="primary" class="toolbar-icon mr-1">fas fa-tools</v-icon>
 
                     <h2>
                          {{ 'ACL Configuration' }}
@@ -94,7 +94,7 @@
             
                 <v-toolbar dense flat color="white" class="">
                     
-                    <v-icon small class="toolbar-icon mr-1">fas fa-dice</v-icon>
+                    <v-icon small color="primary" class="toolbar-icon mr-1">fas fa-dice</v-icon>
 
                     <h2>{{ 'Playground' }}</h2>
                                         
