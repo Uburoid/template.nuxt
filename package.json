@@ -42,5 +42,8 @@
     "vue-json-pretty": "^1.4.1",
     "vuetify": "^1.4.2"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "optionalDependencies": {
+    "fsevents": "*"
+  }
 }
