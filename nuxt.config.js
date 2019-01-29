@@ -116,7 +116,7 @@ module.exports = {
             
             //config.node = { __dirname: true };
         },
-        /* optimization: {
+        optimization: {
             minimize: true,
             splitChunks: {
                 chunks: 'all',
@@ -128,9 +128,8 @@ module.exports = {
             }
         },
         maxChunkSize: 50000,
-        
-        parallel: true, */
-
+        parallel: true,
+        extractCSS: true,
     },
     
     //extractCSS: true,
