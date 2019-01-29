@@ -129,7 +129,7 @@ module.exports = {
         },
         maxChunkSize: 50000,
         parallel: true,
-        extractCSS: true,
+        //extractCSS: true,
     },
     
     //extractCSS: true,
