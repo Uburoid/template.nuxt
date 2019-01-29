@@ -5,8 +5,11 @@
             <v-card class="mb-2">
             
                 <v-toolbar dense flat color="white" class="">
+
+                    <v-icon small class="toolbar-icon mr-1">fas fa-tools</v-icon>
+
                     <h2>
-                        {{ 'ACL Configuration' }}
+                         {{ 'ACL Configuration' }}
                         <!-- <v-divider/> -->
                     </h2>
                                         
@@ -90,6 +93,9 @@
             <v-card class="mb-2">
             
                 <v-toolbar dense flat color="white" class="">
+                    
+                    <v-icon small class="toolbar-icon mr-1">fas fa-dice</v-icon>
+
                     <h2>{{ 'Playground' }}</h2>
                                         
                     <v-spacer></v-spacer>
@@ -336,21 +342,8 @@
 </script>
 
 <style>
-/* .CodeMirror {
-  border: 1px solid #eee;
-  height: auto;
-}
-    .CodeMirror {
-        width: 100%!important;
-    } */
-    /* .v-toolbar__content {
-        padding-left: 8px;
-        padding-right: 0px;
-    } */
-    .no-items .v-table tbody tr:first-child {
-        display: none;
+    .toolbar-icon {
+        margin-left: -12px !important;
     }
-    .no-items .v-table thead tr:first-child {
-        border: none;
-    }
+
 </style>
