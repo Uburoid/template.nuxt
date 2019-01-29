@@ -524,11 +524,11 @@ router.all('/rebuild', async (req, res, next) => {
     }); */
     const { spawn, exec } = require('child_process');
 
-    let npm = req.body.commits.some(commit => {
+    let package = req.body.commits.some(commit => {
         return commit.modified.includes('package.json');
     });
 
-    let command = npm ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
+    let command = package ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
 
     /* exec(command, (error, stdout, stderr) => {
         if (error) {
@@ -548,6 +548,10 @@ router.all('/rebuild', async (req, res, next) => {
     child.stderr.on('data', (data) => {
         console.log(`child stderr: ${data}`);
     });
+
+    child.on('close', (code) => {
+        console.log(`child closed ${code}`);
+    }
 
     /* const npm = spawn('npm', ['install']);
     console.log(`npm initial install`);
