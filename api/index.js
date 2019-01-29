@@ -504,24 +504,7 @@ router.all('/reciever', async (req, res) => {
 
 router.all('/rebuild', async (req, res, next) => {
     console.log('rebuild hook');
-    //console.log(`HOOK DETAILS: ${JSON.stringify(req.body, null, 2)}`);
-
-    /* const { exec } = require('child_process');
-
-    let workerProcess = exec('node cicd.js', { detached: false },  function(error, stdout, stderr) {
-        if (error) {
-            console.log(error.stack);
-            console.log('Error code: ' + error.code);
-            console.log('Signal received: ' + error.signal);
-        }
-
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-    });
-
-    workerProcess.on('exit', function (code) {
-        console.log('Child process exited with exit code ' + code);
-    }); */
+    
     const { spawn, exec } = require('child_process');
 
     let package = req.body.commits.some(commit => {
@@ -530,16 +513,8 @@ router.all('/rebuild', async (req, res, next) => {
 
     let command = package ? 'git stash && git pull && npm install && npm run build && pm2 restart all' : 'git stash && git pull && npm run build && pm2 restart all';
 
-    /* exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`exec error: ${error}`);
-        }
-
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
-    }); */
-
-    let child = spawn('./deploy.sh');
+    //let child = spawn('./deploy.sh');
+    let child = spawn(command);
 
     child.stdout.on('data', (data) => {
         console.log(`child stdout: ${data}`);
@@ -551,153 +526,8 @@ router.all('/rebuild', async (req, res, next) => {
 
     child.on('close', (code) => {
         console.log(`child closed ${code}`);
-    }
+    });
 
-    /* const npm = spawn('npm', ['install']);
-    console.log(`npm initial install`);
-    
-    npm.on('close', (code) => {
-        console.log(`npm done ${code}`);
-
-        const ls = spawn('node', ['cicd.js']);
-
-        ls.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`);
-        });
-    
-        ls.stderr.on('data', (data) => {
-            console.log(`stderr: ${data}`);
-        });
-    
-        ls.on('close', (code) => {
-            console.log(`cicd ok ${code}`);
-
-            const build = spawn('npm', ['run', 'build']);
-
-            build.stderr.on('data', (data) => {
-                console.log(`build error: ${data}`);
-
-                setTimeout(() => {
-                    const restart = spawn('pm2', ['restart', 'all']);
-                }, 30000);
-            });
-
-            build.on('close', (code) => {
-                console.log(`build close: ${code}`);
-
-                setTimeout(() => {
-                    const restart = spawn('pm2', ['restart', 'all']);
-                }, 30000);
-            });    
-        });
-    
-    }); */
-
-
-    /* new Promise((resolve, reject) => {
-        try {
-
-            let cd = shell.cd(process.cwd());
-            console.log(`cd: ${cd}`);
-
-            let stash = shell.exec('git stash');
-            console.log(`pull: ${stash}`);
-
-            let pull = shell.exec('git pull');
-            console.log(`pull: ${pull}`);
-
-            let npm = req.body.commits.some(commit => {
-                return commit.modified.includes('package.json');
-            });
-
-            if(npm) {
-                console.log(`npm operations strarting...`);
-
-                let install = shell.exec('npm install');
-                console.log(`install: ${install}`);
-        
-                let update = shell.exec('npm update');
-                console.log(`update: ${update}`);
-            }
-
-
-            let update = shell.exec('npm run build');
-            console.log(`update: ${update}`);
-
-            let restart = shell.exec('pm2 restart all');
-            console.log(`restart: ${restart}`);
-            
-            resolve('ok');
-        }
-        catch(err) {
-            reject(err);
-        }
-    }) */
-
-    /* try {
-        let cd = shell.cd(process.cwd());
-        console.log(`cd: ${cd}`);
-
-        let stash = shell.exec('git stash');
-        console.log(`pull: ${stash}`);
-
-        let pull = shell.exec('git pull');
-        console.log(`pull: ${pull}`);
-
-        let cmd = shell.exec('mkdir cicd');
-        console.log(`mkdir cicd: ${cmd}`);
-
-        cmd = shell.exec('cp package.json cicd/package.json');
-        console.log(`cp package.json cicd/package.json: ${cmd}`);
-
-        cmd = shell.exec('cp .env.local cicd/.env.local');
-        console.log(`cp .env.local cicd/.env.local: ${cmd}`);
-
-        cmd = shell.exec('cp nuxt.config.js cicd/nuxt.config.js');
-        console.log(`cp nuxt.config.js cicd/nuxt.config.js: ${cmd}`);
-
-        let nuxt = readFileSync('./cicd/nuxt.config.js', { encoding: 'utf-8' });
-        console.log(`read nuxt.config.js`);
-
-        nuxt = nuxt.replace('srcDir: \'./\',', 'srcDir: \'../\',');
-
-        writeFileSync('./cicd/nuxt.config.js', nuxt, { encoding: 'utf-8' });
-        console.log(`write nuxt.config.js`);
-
-        cmd = shell.cd(process.cwd() + '/cicd');
-        console.log(`cd cicd: ${cmd}`);
-
-
-        console.log(`npm operations strarting...`);
-
-        let install = shell.exec('npm install');
-        console.log(`install: ${install}`);
-
-        let update = shell.exec('npm update');
-        console.log(`update: ${update}`);
-
-        
-        cmd = shell.exec('npm run build');
-        console.log(`npm run build: ${cmd}`);
-
-        cmd = shell.exec('mv .nuxt ../.nuxt');
-        console.log(`mv .nuxt ../.nuxt: ${cmd}`);
-
-        cmd = shell.cd(process.cwd());
-        console.log(`cd ..: ${cmd}`);
-
-        cmd = shell.exec('rm -rf cicd');
-        console.log(`rm -rf cicd: ${cmd}`);
-
-        let restart = shell.exec('pm2 restart all');
-        console.log(`restart: ${restart}`);
-    }
-    catch(err) {
-
-        console.log(`ERROR: ${err}`);
-    } */
-
-    //next();
     res.sendStatus(200);
 });
 
