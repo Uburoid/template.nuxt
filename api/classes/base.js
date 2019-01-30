@@ -64,8 +64,10 @@ let roles1 = [
     }
 ]
 
-const model = '../security/UI/pages/model.conf';
-const policy = '../security/UI/pages/policy.csv';
+const model = require.resolve('../../security/api.acl.model');
+const policy = require.resolve('../../security/api.acl.policy');
+/* const model = '../security/UI/pages/model.conf';
+const policy = '../security/UI/pages/policy.csv'; */
 
 const { ACL } = require('../ACL');
 

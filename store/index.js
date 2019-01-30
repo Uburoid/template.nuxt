@@ -68,11 +68,11 @@ export const mutations = {
         process.browser && localStorage && localStorage.setItem('settings', JSON.stringify(state.settings));
     },
 
-    SET_DRAWER_ITEMS(state, items) {
+    SET_MAIN_MENU(state, items) {
         state.drawer_items = items;
     },
 
-    SET_ACCOUNT_ITEMS(state, items) {
+    SET_ACCOUNT_MENU(state, items) {
         state.account_items = items;
     },
 

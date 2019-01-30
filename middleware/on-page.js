@@ -48,9 +48,9 @@ export default async (context) => {
         
     }
 
-    let { drawer_items, account_items } = await app.$server.ui.menus({ path: route.path }, { cache: false });
-    store.commit("SET_DRAWER_ITEMS", drawer_items);
-    store.commit("SET_ACCOUNT_ITEMS", account_items);
+    let { main_menu, account_menu } = await app.$server.ui.menus({ path: route.path }, { cache: false });
+    store.commit("SET_MAIN_MENU", main_menu);
+    store.commit("SET_ACCOUNT_MENU", account_menu);
 
     let account = await app.$server.account.get(0, { cache: false });
 

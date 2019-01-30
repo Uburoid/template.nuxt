@@ -3,12 +3,15 @@ const { API, SecuredAPI } = require('./base');
 const { ACL } = require("../ACL");
 
 
-const drawer_model = "../security/UI/drawer/model.conf";
+const model = require.resolve('../../security/ui.acl.model');
+const policy = require.resolve('../../security/ui.acl.policy');
+
+/* const drawer_model = "../security/UI/drawer/model.conf";
 const drawer_policy = "../security/UI/drawer/policy.csv";
 
 const account_model = "../security/UI/account/model.conf";
 const account_policy = "../security/UI/account/policy.csv";
-
+ */
 class UI extends SecuredAPI {
     constructor(...args) {
         super(...args);
@@ -37,12 +40,12 @@ class UI extends SecuredAPI {
     }
 
     menus() {
-        let drawer_items = require('../../security/UI/drawer/menu');
-        delete require.cache[require.resolve('../../security/UI/drawer/menu')];
+        let main_menu = require('../../security/UI/main/menu');
+        delete require.cache[require.resolve('../../security/UI/main/menu')];
 
-        let acl = new ACL({ model: drawer_model, policy: drawer_policy, roles: this.roles });
+        let acl = new ACL({ model, policy, roles: this.roles });
 
-        drawer_items = drawer_items.reduce((memo, item) => {
+        main_menu = main_menu.reduce((memo, item) => {
             let allow = acl.enforce({
                 request: {
                     role: this.payload.role,
@@ -58,12 +61,10 @@ class UI extends SecuredAPI {
             return memo;
         }, []);
 
-        let account_items = require('../../security/UI/account/menu');
+        let account_menu = require('../../security/UI/account/menu');
         delete require.cache[require.resolve('../../security/UI/account/menu')];
 
-        acl = new ACL({ model: account_model, policy: account_policy, roles: this.roles });
-
-        account_items = account_items.reduce((memo, item) => {
+        account_menu = account_menu.reduce((memo, item) => {
             let allow = acl.enforce({
                 request: {
                     role: this.payload.role,
@@ -81,7 +82,7 @@ class UI extends SecuredAPI {
 
         //console.info('---- ACCOUNT MENU', account_items);
 
-        return { drawer_items, account_items };
+        return { main_menu, account_menu };
     }
 
     set() {

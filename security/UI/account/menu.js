@@ -6,20 +6,15 @@ let items = [
         
         items: [
             {
-                title: 'routes',
-                icon: 'fa-lock',
-                to: '/ACL/routes',
+                title: 'API',
+                icon: 'fa-language',
+                to: '/ACL/api',
             },
             {
-                title: 'main menu',
-                icon: 'fa-unlock',
-                to: '/ACL/main-menu',
-            },
-            {
-                title: 'account menu',
-                icon: 'fa-lock',
-                to: '/ACL/account-menu',
-            },
+                title: 'UI',
+                icon: 'fa-language',
+                to: '/ACL/ui',
+            }
         ]
     },
     {

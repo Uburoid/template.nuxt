@@ -1,31 +1,22 @@
-//allow, *, *, $data._id, { path: '/inspire', owner: { _id: '$data._id' }}, *
+deny, *, *, *
 
-//allow, *, *, *, *, =valid
-//deny, *, *, *, *, =invalid
+allow, Аноним, {to:'=/signup'}, *
+allow, Аноним, {to:'=/signin'}, *
 
-//deny, Аноним, *, pageData, {path:'=/inspire'}, *
+allow, Пользователи, *, =valid
+deny, Пользователи, {to:'=/users'}, *
+deny, Пользователи, {to:'=/signin'}, =valid
 
-deny, Аноним, *, *, *, *, *, 403
-deny, *, *, *, *, *, =not-exists, 404
+deny, Пользователи, *, =invalid
+allow, Пользователи, {to:'=/signin'}, =invalid
+allow, Пользователи, {to:'=/signout'}, =invalid
 
+allow, Администраторы, {to:'=/users'}, =valid
 
+deny, Аноним, {to:'^(?!\/$).*$'}, *
 
-deny, Пользователи, *, *, *, =invalid, *, 401
-allow, Пользователи, *, *, *, =valid, *
-allow, Пользователи, *, pageData, { path: '=/news' }, *, *
-allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *, *
+deny, Пользователи, {to:'=/messaging'}, *
+deny, Пользователи, {to:'^(?!\/news$)(?!\/$).*$'}, =invalid
 
-allow, *, *, *, { path: '=/404' }, *, *
-
-//allow, Аноним, *, *, *, *, *, 403
-allow, *, UI, menus, *, *, *
-
-//deny,Аноним,Account,signout,,*
-
-//deny,*,*,*,{path:'=/inspire'},=invalid
-
-allow, *, Account, *, *, *, *
-deny, Аноним, Account, =get, *, *, =exists, 405
-
-deny, Пользователи, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *, 403
-allow, Администраторы, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *
+//allow delimeter
+allow, *, {to:'=-'}, *

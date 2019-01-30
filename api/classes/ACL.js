@@ -15,21 +15,40 @@ class ACL extends SecuredAPI {
     }
 
     get({ parameter }) {
-        let model_path = require.resolve('../../security/UI/pages/model.conf');
-        let policy_path = require.resolve('../../security/UI/pages/policy.csv');
+        let model_path = void 0;
+        let policy_path = void 0;
+        let request = void 0;
 
-        switch (parameter) {
+        switch (parameter.toLowerCase()) {
             
-            case 'account-menu':
-                model_path = require.resolve('../../security/UI/account/model.conf');
-                policy_path = require.resolve('../../security/UI/account/policy.csv');
+            case 'api':
+                model_path = require.resolve('../../security/api.acl.model');
+                policy_path = require.resolve('../../security/api.acl.policy');
             
+                request = {
+                    "role": "Администраторы",
+                    "class": "UI",
+                    "methods": "pageData",
+                    "resource": {
+                        "path": "/ACL"
+                    },
+                    "token": "valid",
+                    "page_exists": "exists"
+                }
+
                 break;
 
-            case 'main-menu':
-                model_path = require.resolve('../../security/UI/drawer/model.conf');
-                policy_path = require.resolve('../../security/UI/drawer/policy.csv');
-            
+            case 'ui':
+                model_path = require.resolve('../../security/ui.acl.model');
+                policy_path = require.resolve('../../security/ui.acl.policy');
+        
+                request = {
+                    "role": "Пользователи",
+                    "resource": {
+                        "to": "/ACL"
+                    },
+                    "token": "valid"
+                }
                 break;
 
             default:
@@ -38,17 +57,6 @@ class ACL extends SecuredAPI {
 
         let model = this.fs.readFileSync(model_path, { encoding: 'utf-8' });
         let policy = this.fs.readFileSync(policy_path, { encoding: 'utf-8' });
-
-        const request = {
-            "role": "Администраторы",
-            "class": "UI",
-            "methods": "pageData",
-            "resource": {
-                "path": "/ACL"
-            },
-            "token": "valid",
-            "page_exists": "exists"
-        }
 
         return { model, policy, request };
     }
