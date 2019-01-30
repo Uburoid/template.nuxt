@@ -6,13 +6,15 @@ allow, Аноним, {to:'=/signin'}, *
 allow, Пользователи, *, =valid
 deny, Пользователи, {to:'=/users'}, *
 deny, Пользователи, {to:'=/signin'}, =valid
-deny, Пользователи, {to: '^\/acl.*$'}, *
+deny, Пользователи, {to: '^\/acl.*$', title: '^(ACL$).*'}, *
+deny, Пользователи, {title: '^(ACL$).*'}, *
 
 deny, Пользователи, *, =invalid
 allow, Пользователи, {to:'=/signin'}, =invalid
 allow, Пользователи, {to:'=/signout'}, =invalid
 
 allow, Администраторы, {to:'=/users'}, =valid
+allow, Администраторы, *, =valid
 
 deny, Аноним, {to:'^(?!\/$).*$'}, *
 
