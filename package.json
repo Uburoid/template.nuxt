@@ -26,6 +26,7 @@
     "flat": "^4.1.0",
     "form-data": "^2.3.3",
     "fs-extra": "^7.0.1",
+    "javascript-state-machine": "^3.1.0",
     "json-dry": "^1.0.9",
     "json5": "^2.1.0",
     "jsonwebtoken": "^8.4.0",
