@@ -78,6 +78,14 @@
 
             </div>
         </v-window-item>
+
+        <v-window-item :value="'ОШИБКА'">
+            <div class="pa-3 text-xs-center">
+
+                <h3 class="title font-weight-light mb-2">ПРОИЗОШЛА ОШИБКА</h3>
+
+            </div>
+        </v-window-item>
     </v-window>
 
     <v-spacer/>
@@ -133,15 +141,15 @@ export default {
         this.machine = new (StateMachine.factory({
             init: 'EMail',
             transitions: [
-                { name: 'далее', from: 'EMail',  to: () => /* this.account.name ||  */'PIN', action: self.$server.account.checkEmail },
+                { name: 'далее', from: 'EMail',  to: () => { debugger; return this.action_result && this.action_result.error ? 'ОШИБКА' : 'PIN'}, action: self.$server.account.checkEmail },
                 { name: 'далее', from: 'PIN', to: 'Имя и пароль' },
                 //{ name: 'далее', from: 'PIN', to: 'Имя и пароль1' },
                 { name: 'отправить повторно', from: 'PIN', to: 'PIN', action: self.$server.account.checkEmail },
                 { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем' },
-                { name: 'сбросить', from: '*', to: 'EMail' },
+                { name: 'сбросить', from: '*', to: 'EMail' }
             ],
             data(params) {
-                return params;
+                return { ...params, action_result: {}};
             },
             methods: {
                 
@@ -155,13 +163,17 @@ export default {
                         transitions: this.transitions()
                     }
                 },
-                async onTransition({ from, to, transition }) {
-                    
+                async onBeforeTransition({ from, to, transition }) {
+                    this.action_result = {};
+
                     let trs = this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
 
                     let { action } = trs;
+                    
                     let result = action && await action(this.account, { cache: false });
-                    //let tr = this._fsm.config.transitionFor(args.from, args.transition);
+
+                    this.action_result = result | {};
+
                     console.log(this.account.name, trs, result);
                     console.log('onTransition', { from, to, transition });
                 }
