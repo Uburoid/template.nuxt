@@ -1,0 +1,9 @@
+role = roleMatcher
+class = regExpMatcher
+methods = regExpMatcher
+resource = resourceMatcher
+token = regExpMatcher
+page_exists = regExpMatcher
+//ip = ipMatcher
+error_code = immutable
+$options = { strict: true, priority: true }
