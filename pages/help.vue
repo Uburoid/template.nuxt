@@ -1,7 +1,7 @@
 <template>
     <div>
         <no-ssr>
-            <vue-json-pretty :data="$isServer ? {} : $server.help()"/>
+            <vue-json-pretty :data="$server.help()"/>
         </no-ssr>
     </div>
 </template>
@@ -18,8 +18,6 @@ export default {
         VueJsonPretty: () => import('vue-json-pretty')
     },
     asyncData(ctx) {
-        //debugger
-            
     },
     data: () => ({
     }),

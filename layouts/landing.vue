@@ -80,8 +80,8 @@
             <!-- <component v-if="error" :is="error.component"/> -->
             <error v-if="error"/>
 
-            <div v-show="!error || (error && error.dialog)" style="height:100%">
-                <nuxt style="height:100%" keep-alive/>
+            <div v-show="!error || (error && error.dialog)" style="height: 100%">
+                <nuxt style="height: 100%" keep-alive/>
             </div>
             
         </v-content>
