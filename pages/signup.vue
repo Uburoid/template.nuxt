@@ -11,15 +11,16 @@
         class="mx-auto"
         max-width="500"
         max-height="500"
+        style1="height: 500px"
     >
         <v-card-title class="title font-weight-regular justify-space-between">
             <span>{{ fsm.state }}</span>
-            <v-avatar
+            <!-- <v-avatar
                 color="primary lighten-2"
                 class="subheading white--text"
                 size="24"
                 v-text="fsm.state"
-            ></v-avatar>
+            ></v-avatar> -->
         </v-card-title>
 
     <v-window v-model="fsm.state">
@@ -70,14 +71,17 @@
                     contain
                     height="128"
                     src="https://cdn.vuetifyjs.com/images/logos/v.svg"
-                ></v-img>
+                />
+
                 <h3 class="title font-weight-light mb-2">Welcome to Vuetify</h3>
                 <span class="caption grey--text">Thanks for signing up!</span>
+
             </div>
         </v-window-item>
     </v-window>
 
-    <v-divider></v-divider>
+    <v-spacer/>
+    <v-divider/>
 
     <v-card-actions>
         <v-btn flat v-for="(transition, inx) in fsm.transitions" :key="inx" @click="machine[transition]()">{{ transition }}</v-btn>
