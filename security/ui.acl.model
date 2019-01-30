@@ -1,4 +1,4 @@
 role = roleMatcher
-resource = resourceMatcher
+resource = resourceMatcher:i
 token = regExpMatcher
 $options = { strict: true, priority: true }

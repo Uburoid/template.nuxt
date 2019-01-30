@@ -6,6 +6,7 @@ allow, Аноним, {to:'=/signin'}, *
 allow, Пользователи, *, =valid
 deny, Пользователи, {to:'=/users'}, *
 deny, Пользователи, {to:'=/signin'}, =valid
+deny, Пользователи, {to: '^\/acl.*$'}, *
 
 deny, Пользователи, *, =invalid
 allow, Пользователи, {to:'=/signin'}, =invalid
