@@ -176,7 +176,7 @@ class Account extends SecuredAPI {
     async checkEmail(obj) {
         return await new Promise(resolve => {
             setTimeout(() => {
-                resolve({ email: obj })
+                resolve('{ email: obj }')
             }, 2000);
         });
     }
