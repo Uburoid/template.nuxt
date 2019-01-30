@@ -156,7 +156,7 @@
                     </v-card>
 
                     <v-card tile flat class="ma-0" style="max-height: 300px; min-height: 300px; flex: 3; border1: 1px solid #ddd">
-                        <h3 class="pa-2">{{ result.access || 'RESULT' }}</h3>
+                        <h3 class="pa-2" :class="{'red--text text--darken-2': result.access === false, 'green--text text--darken-2': result.access === true}">{{ result.text }}</h3>
 
                         <v-divider class="mx-2"/>
 
@@ -216,7 +216,8 @@
                 branch: { model: '', policy: '', request: '' }, //init_branch, // : { model: '', policy: '', request: '' },
                 result: {
                     access: '',
-                    policy: 'NOT EXECUTED YET'
+                    policy: 'NOT EXECUTED YET',
+                    text: 'Access unknown'
                 },
                 configuration_actions: [
                     {
@@ -310,7 +311,8 @@
                 //let result = await this.$server.acl.play({ request: this.branch.request, model: this.branch.model, policy: this.branch.policy }, { cache: false });
 
                 this.result.policy = result.debug;
-                this.result.access = result.access ? 'RESULT: Access granted' : 'RESULT: Access denied';
+                this.result.access = result.access;
+                this.result.text = result.access ? 'Access GRANTED' : 'Access DENIED';
 
                 console.log(result);
             },
