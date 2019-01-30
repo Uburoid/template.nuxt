@@ -162,7 +162,7 @@ class Account extends SecuredAPI {
     }
 
     async recoverPassword() {
-
+        return {}
     }
 
     async changePassword() {
@@ -171,6 +171,14 @@ class Account extends SecuredAPI {
 
     async changeEmail() {
 
+    }
+
+    async checkEmail(obj) {
+        return await new Promise(resolve => {
+            setTimeout(() => {
+                resolve({ email: obj })
+            }, 2000);
+        });
     }
 }
 

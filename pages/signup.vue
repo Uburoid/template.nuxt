@@ -133,8 +133,9 @@ export default {
         this.machine = new (StateMachine.factory({
             init: 'EMail',
             transitions: [
-                { name: 'далее', from: 'EMail',  to: () => /* this.account.name ||  */'PIN' },
+                { name: 'далее', from: 'EMail',  to: () => /* this.account.name ||  */'PIN', action: self.$server.account.checkEmail },
                 { name: 'далее', from: 'PIN', to: 'Имя и пароль' },
+                { name: 'далее', from: 'PIN', to: 'Имя и пароль1' },
                 { name: 'отправить повторно', from: 'PIN', to: 'PIN' },
                 { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем' },
                 { name: 'сбросить', from: '*', to: 'EMail' },
@@ -154,9 +155,15 @@ export default {
                         transitions: this.transitions()
                     }
                 },
-                onTransition(...args) {
-                    console.log(this.account.name);
-                    console.log('onTransition', args);
+                async onTransition({ from, to, transition }) {
+                    
+                    let trs = this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
+
+                    let { action } = trs;
+                    let result = action && await action(this.account);
+                    //let tr = this._fsm.config.transitionFor(args.from, args.transition);
+                    console.log(this.account.name, trs, result);
+                    console.log('onTransition', { from, to, transition });
                 }
             }
         }))({ account: this.account });
