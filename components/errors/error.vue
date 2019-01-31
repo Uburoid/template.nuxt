@@ -54,7 +54,7 @@
         },
         computed: {
             err() {
-                debugger
+                //debugger
                 return this.$store.state.error;
             }
         },

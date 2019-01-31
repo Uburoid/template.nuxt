@@ -105,7 +105,7 @@
 import StateMachine from 'javascript-state-machine';
 
 export default {
-    layout: 'landing',
+    //layout: 'landing',
     head: {
         title: 'signup'
     },
@@ -173,7 +173,7 @@ export default {
                 },
                 onBeforeTransition({ from, to, transition }) {
                     //debugger
-                    let trs = this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
+                    let trs = this.getTransition({ from, transition }) || {};//this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
 
                     /* console.log(this.account.name, trs);
                     console.log('onTransition', { from, to, transition }); */

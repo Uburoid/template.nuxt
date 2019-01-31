@@ -8,7 +8,7 @@
 
 <script>
     export default {
-        layout: 'landing',
+        //layout: 'landing',
         mounted() {
             //console.log(document.cookie);
         }

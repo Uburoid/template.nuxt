@@ -8,7 +8,7 @@ Vue.component('nuxt-error', {
 })
 
 Vue.mixin({
-    layout: 'landing',
+    //layout: 'landing',
     beforeCreate() {
         //debugger
         const methods = this.$options.methods || {};

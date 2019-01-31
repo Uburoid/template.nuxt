@@ -1,6 +1,6 @@
 <template>
     <v-layout justify-center class="pa-2 elevation-1">
-        <v-flex xs12 sm10 md8 lg6 xl6>
+        <v-flex xs12 sm10 md10 lg8 xl6>
 
             <v-card class="mb-2">
             
@@ -188,7 +188,7 @@
     let cachedData = void 0;
 
     export default {
-        layout: 'landing',
+        //layout: 'landing',
         components: {
             
         },

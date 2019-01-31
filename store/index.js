@@ -85,6 +85,7 @@ export const mutations = {
     },
 
     SET_FSM(state, { route, data, init }) {
+        debugger
         if(state.fsm[route]) {
             !init && (state.fsm[route] = data);
         }

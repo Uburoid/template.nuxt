@@ -239,7 +239,7 @@
 
 <script>
     export default {
-        layout: 'landing',
+        //layout: 'landing',
         data: () => {
             debugger
             //if(!vm) return {};
