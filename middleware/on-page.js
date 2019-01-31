@@ -1,6 +1,9 @@
 export default async (context) => {
     let { app, store, route, redirect, req, res } = context;
 
+    //debugger
+
+    route.query.referer && store.commit('SET_REFERER', route.query.referer);
     /* if(!route.matched.length) {
 
         let err = {

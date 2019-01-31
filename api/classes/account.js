@@ -1,11 +1,14 @@
 const bcrypt = require('bcryptjs');
 const { API, SecuredAPI } = require('./base');
 const FormData = require('form-data');
-const { JWT } = require('../jwt');
+const generate = require('nanoid/generate');
+
 const path = require('path');
 
 const models = require('../models');
 const { Member, Anonymous, Role, Email, List, RootMember } = models;
+
+const { Messanger } = require('../messenger');
 
 class Account extends SecuredAPI {
     constructor(...args) {
@@ -173,11 +176,77 @@ class Account extends SecuredAPI {
 
     }
 
-    async checkEmail(obj) {
+    async checkPIN(account) {
+        let { email: address } = account;
+
+        let email = address && await Email.findOne({
+            address
+        });
+
+        if(!email) throw { message: 'Указанная Вами почта не зарегистрированна.', display: false }
+        
+        if(email.pin !== String(account.pin)) {
+            throw { message: 'Проверочный код не совпадает. Проверьте указанную вами почту и запросите проверочный код заново.', display: false }
+        }
+
+        return account;
+    }
+
+    async checkEmail(account) {
+        let { email: address } = account;
+
+        let email = await Email.findOne({
+            address
+        });
+
+        if(email && email.verified) {
+            email.verified = false;
+            //throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
+        }
+        
+        let pin = generate('0123456789', 10);
+
+        email = email || {
+            address,
+            pin
+        }
+        email = await Email.save({
+            ...email,
+            pin
+        });
+        
+
+        let { error, info } = await Messanger.sendMail({
+            to: address, 
+            subject: 'Регистрация на сайте', 
+            html: `Ваш адрес был указан при регистрации на сайте <a href="https://atlant.club">atlant.club</a>.<br><strong><br>Пин-код: ${pin}</strong><br><br>Если Вы не регистрировались на нашем сайте, то просто проигнорируйте данное сообщение.<br><br>С уважением, администрация <a href="https://atlant.club">atlant.club</a>.`
+        });
+
+        if(error) throw error;
+
+        return { ...account, email: address };
+    }
+
+    async checkReferer({ referer }) {
         debugger
-        let err = Date.now() % 2 === 0;
-        if(err) throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
-        return obj;
+        let found = referer && referer.ref && await Member.findOne({
+            ref: referer.ref
+        });
+
+        console.log(referer)
+
+        if(!found) {
+            let members = await Member.find();
+            let inx = Math.floor(Math.random() * (members.length - 0)) + 0;
+
+            found = members[inx];
+        }
+
+        let { name, ref, country, picture } = found;
+
+        return {
+            referer: { name, ref, country, picture }
+        };
     }
 }
 

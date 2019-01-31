@@ -21,22 +21,32 @@
                 <v-window v-model="fsm.state">
                     <v-window-item :value="'EMail'">
                         <v-card-text>
+                            <h2 class="mb-4">
+                                Your referer: {{ account.referer.name }}, {{ account.referer.country }} ({{ account.referer.ref }})
+                            </h2>
+
                             <v-text-field
                                 label="Email"
-                                value="john@vuetifyjs.com"
-                            ></v-text-field>
+                                v-model="account.email"
+                            />
+
                             <span class="caption grey--text text--darken-1">
                                 This is the email you will use to login to your Vuetify account
                             </span>
+
                         </v-card-text>
                     </v-window-item>
 
                     <v-window-item :value="'PIN'">
                         <v-card-text>
+                            <h3 class="mb-4">
+                                On the given email {{ account.email }} was send a PIN code. Check email and enter PIN in the text box below
+                            </h3>
+
                             <v-text-field
                                 label="PIN"
-                                
-                            ></v-text-field>
+                                v-model="account.pin"
+                            />
                             <span class="caption grey--text text--darken-1">
                                 Please enter a confirmation PIN
                             </span>
@@ -116,14 +126,27 @@ export default {
         store.commit('SET_FSM', { route: route.path, data: { state: 'EMail', transitions: [] }, init: true });
 
         return {
-            path: route.path
+            path: route.path,
+            account: {
+                referer: store.state.referer ? { ref: store.state.referer } : {},
+                ref: void 0,
+                name: void 0,
+                email: 'mychrome51@gmail.com' || 'john@vuetifyjs.com',
+                password: void 0,
+                pin: void 0
+            }
         }
     },
     data: () => {
         return {
-            account: {
-                name: 'asas'
-            }
+            /* account: {
+                referer: {},
+                ref: void 0,
+                name: void 0,
+                email: 'john@vuetifyjs.com',
+                password: void 0,
+                pin: void 0
+            } */
         }
         
     },
@@ -133,15 +156,17 @@ export default {
         this.machine = new (StateMachine.factory({
             init: 'EMail',
             transitions: [
-                { name: 'init', from: 'none',  to: 'EMail', action: self.$server.account.recoverPassword },
+                { name: 'init', from: 'none',  to: 'EMail', action: self.$server.account.checkReferer },
                 { name: 'далее', from: 'EMail',  to: 'PIN', action: self.$server.account.checkEmail, button: {right: true}},
-                { name: 'далее', from: 'PIN', to: 'Имя и пароль', button: {right: true} },
+                { name: 'далее', from: 'PIN', to: 'Имя и пароль', button: {right: true}, action: self.$server.account.checkPIN},
                 //{ name: 'далее', from: 'PIN', to: 'Имя и пароль1' },
                 { name: 'отправить повторно', from: 'PIN', to: 'PIN', action: self.$server.account.checkEmail },
                 { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем', action: self.$server.account.recoverPassword, button: {right: true} },
-                //{ name: 'сбросить', from: 'Поздравляем', to: 'EMail' },
+                { name: 'сбросить', from: 'Поздравляем', to: 'EMail' },
                 { name: '$goto', from: '*', to: (state) => state },
-                { name: 'сбросить', from: 'ОШИБКА', to: 'EMail', button: {right: false}} 
+                { name: 'сбросить', from: 'ОШИБКА', to: 'EMail', button: {right: false}},
+                { name: 'в начало', from: '*', to: 'EMail', button: {right: true}},
+
             ],
             data(params) {
                 return { ...params };
@@ -157,7 +182,7 @@ export default {
 
                     let transitions = this.transitions().filter(trs => trs.slice(0, 1) !== '$').map(trs => this.getTransition({ from: to, transition: trs }) || trs);
 
-                    let data = { 
+                    let data = {
                         state: this.state,
                         right: transitions.filter(trs => {
                             return trs.button ? trs.button.right : false
@@ -167,25 +192,29 @@ export default {
                         }),
                     }
 
-                    console.log(data);
+                    //console.log(data);
 
                     self.$store.commit('SET_FSM', { route: self.path, data });
                 },
                 onBeforeTransition({ from, to, transition }) {
                     //debugger
-                    let trs = this.getTransition({ from, transition }) || {};//this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
-
-                    /* console.log(this.account.name, trs);
-                    console.log('onTransition', { from, to, transition }); */
+                    let trs = this.getTransition({ from, transition }) || {};
 
                     let { action } = trs;
                     
                     if(action) {
+                        let fsm = this;
+
                         return new Promise(async (resolve, reject) => {
                             self.$store.commit('SET_ERROR', void 0)
 
-                            let result = action && await action(this.account, { cache: false });
-                            self.$store.state.error ? reject() || setImmediate(() => this.$goto('ОШИБКА')) : resolve(result);
+                            let result = action && await action(self.account, { cache: false });
+                            self.$store.state.error ? reject() || setImmediate(() => this.$goto('ОШИБКА')) : resolve();
+
+                            if(!self.$store.state.error) {
+                                self.$set(self.$data, 'account', { ...self.account, ...result });
+                            }
+
                         });
                     }
                 }

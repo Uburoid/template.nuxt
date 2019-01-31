@@ -25,7 +25,8 @@ export const state = () => ({
         data: {}
     },
     flows: {},
-    fsm: {}
+    fsm: {},
+    referer: void 0
 });
 
 export const mutations = {
@@ -85,11 +86,16 @@ export const mutations = {
     },
 
     SET_FSM(state, { route, data, init }) {
-        debugger
+        //debugger
         if(state.fsm[route]) {
             !init && (state.fsm[route] = data);
         }
         else state.fsm = { ...state.fsm, [route]: data};
+    },
+
+    SET_REFERER(state, referer) {
+        //debugger
+        state.referer = referer;
     }
 };
 
