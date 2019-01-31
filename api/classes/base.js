@@ -142,7 +142,7 @@ class Base {
                                     throw err;
                                 }
                                 else {
-                                    if(self.payload.token_err) {
+                                    if(self.payload.token_err) { 
                                         throw self.payload.token_err;
                                     }
                                     else throw new AccessDenied(403, `Access to ${self.constructor.name}.${propKey}() denied.`);
