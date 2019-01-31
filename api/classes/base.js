@@ -156,7 +156,7 @@ class Base {
 
                             return response;
                         }
-                        catch(err) {
+                        catch(err) { 
                             debugger
                             err = self.$prepareError(propKey, err, ...args);
 
