@@ -1,4 +1,5 @@
 import merge from 'deepmerge';
+import StateMachine from 'javascript-state-machine';
 
 export const state = () => ({
     page_with_error: void 0,
@@ -22,7 +23,9 @@ export const state = () => ({
     account_items: [],
     common: {
         data: {}
-    }
+    },
+    flows: {},
+    fsm: {}
 });
 
 export const mutations = {
@@ -79,6 +82,13 @@ export const mutations = {
     SET_COMMON(state, data) {
         state.common = { ...merge(state.common, data) };
         //state.common = { ...state.common, ...data };
+    },
+
+    SET_FSM(state, { route, data, init }) {
+        if(state.fsm[route]) {
+            !init && (state.fsm[route] = data);
+        }
+        else state.fsm = { ...state.fsm, [route]: data};
     }
 };
 
@@ -121,7 +131,9 @@ export const actions = {
         //let user = !req.headers.cookie && await this.$server.account.shadow();
 
         //console.log(req)
-    }
+    },
+
+    
 };
 
 export const strict = true;

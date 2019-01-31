@@ -26,8 +26,9 @@
 <script>
     export default {
         props: ['err', 'close', 'home'],
-        components: {
-            VueJsonPretty: () => import('vue-json-pretty')
-        }
+        /* components: {
+            VueJsonPretty
+            //VueJsonPretty: () => import('vue-json-pretty')
+        } */
     }
 </script>

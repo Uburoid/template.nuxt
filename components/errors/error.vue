@@ -29,37 +29,42 @@
 
 
 <script>
-export default {
-    components: {
-        page: () => import('@/components/errors/page'),
-        modal: () => import('@/components/errors/modal')
-    },
+    import modal from '@/components/errors/modal';
+    import page from '@/components/errors/page';
 
-    data: () => ({
+    export default {
+        components: {
+            page,
+            //page: () => import('@/components/errors/page'),
+            //modal: () => import('@/components/errors/modal')
+            modal
+        },
 
-    }),
-    watch: {
-       
-       
-    },
-    created() {
-        //console.log('CREATED error');
-    },
-    mounted() {
-    },
-    computed: {
-        err() {
-            debugger
-            return this.$store.state.error;
+        data: () => ({
+
+        }),
+        watch: {
+        
+        
+        },
+        created() {
+            //console.log('CREATED error');
+        },
+        mounted() {
+        },
+        computed: {
+            err() {
+                debugger
+                return this.$store.state.error;
+            }
+        },
+        methods: {
+            home() {
+                this.$route.path === '/' ? this.$store.commit('SET_ERROR', void 0) : this.$router.push('/');
+            },
+            close() {
+                this.$store.commit('SET_ERROR', void 0);
+            },
         }
-    },
-    methods: {
-        home() {
-            this.$route.path === '/' ? this.$store.commit('SET_ERROR', void 0) : this.$router.push('/');
-        },
-        close() {
-            this.$store.commit('SET_ERROR', void 0);
-        },
     }
-}
 </script>

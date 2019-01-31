@@ -160,7 +160,11 @@ class Base {
                             debugger
                             err = self.$prepareError(propKey, err, ...args);
 
-                            if(error) error(err); else throw err;
+                            if(error) {
+                                error(err); 
+                                return;
+                            }
+                            else throw err;
                             return
                             throw err;
                             //debugger
@@ -215,7 +219,6 @@ class Base {
             message: err.message,
             name: err.name,
             stack: err.stack,
-            component: 'error-dialog',
             dialog: false,
             server_error: true,
             display: err.display,

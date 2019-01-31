@@ -71,7 +71,7 @@ export default (context, inject) => {
     //this.deleteCookie('page-with-error');
 
 
-    Vue.config.errorHandler = (err, vm, info) => {
+    /* Vue.config.errorHandler = (err, vm, info) => {
         debugger
 
         let error = { ...err };
@@ -86,14 +86,23 @@ export default (context, inject) => {
         context.error(error, info);
         
         return true;
-    }
+    } */
 
     const errorFunction = context.error;
 
-    const $error = (err) => {
-        debugger
-        
-        if(!err || err.code === 0) return;
+    const $error = (error) => {
+        //debugger
+        if(!error || error.code === 0) return;
+
+        let err = { ...error };
+
+        err.message = error.message;
+        err.stack = error.stack;
+
+        err.statusCode = error.statusCode || error.code || 500;
+
+        //error.component = 'error-dialog';
+        err.dialog = typeof(error.dialog) === 'undefined' ? true : error.dialog;
 
         if(!context.store.state.error || (context.store.state.error && context.store.state.error.clear)) {
             //err.redirect = err.redirect || (err.statusCode === 404 && '/404');

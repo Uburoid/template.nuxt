@@ -17,10 +17,11 @@
 
 <script>
     import { mapState, mapGetters } from 'vuex';
+    import error from '@/components/errors/error';
 
     export default {
         components: {
-            error:  () => import('@/components/errors/error')
+            error
         },
         computed: {
             ...mapState({

@@ -13,10 +13,12 @@
 </template>
 
 <script>
+    import page from '@/components/errors/page';
+
     export default {
         props: ['err', 'close', 'home'],
         components: {
-            page: () => import('@/components/errors/page')
+            page
         }
     }
 </script>

@@ -78,7 +78,8 @@ module.exports = {
         '@/plugins/vuetify',
         '@/plugins/axios',
         '@/plugins/server',
-        { ssr: false, src: '@/plugins/codemirror/codemirror'}
+        { ssr: false, src: '@/plugins/codemirror/codemirror'},
+        { ssr: false, src: '@/plugins/json-pretty'}
         //'@/plugins/eventbus',
         //'@/plugins/croppa',
         //'@/plugins/utils',

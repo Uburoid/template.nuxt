@@ -1,116 +1,104 @@
 <template>
-    <!-- <div>
-        <div>{{ account.name }}</div>
-        <no-ssr>
-            <vue-json-pretty :data="fsm"/>
+    <v-layout justify-center class="pa-2 elevation-1">
+        <v-flex xs12 sm10 md8 lg6 xl6 d-flex justify-center align-center>
 
-            <v-btn flat v-for="(transition, inx) in fsm.transitions" :key="inx" @click="machine[transition]()">{{ transition }}</v-btn>
-        </no-ssr>
-    </div> -->
-    <v-card
-        class="mx-auto"
-        max-width="500"
-        max-height="500"
-        style1="height: 500px"
-    >
-        <v-card-title class="title font-weight-regular justify-space-between">
-            <span>{{ fsm.state }}</span>
-            <!-- <v-avatar
-                color="primary lighten-2"
-                class="subheading white--text"
-                size="24"
-                v-text="fsm.state"
-            ></v-avatar> -->
-        </v-card-title>
+            <v-card
+                class1="mx-auto"
+                max-width="500"
+                min-height="350"
+                style="display: flex; flex-direction: column"
+            >
+                <v-card-title class="title font-weight-regular justify-space-between">
+                    <span>{{ fsm.state }}</span>
+                    <!-- <v-avatar
+                        color="primary lighten-2"
+                        class="subheading white--text"
+                        size="24"
+                        v-text="fsm.state"
+                    ></v-avatar> -->
+                </v-card-title>
 
-    <v-window v-model="fsm.state">
-        <v-window-item :value="'EMail'">
-            <v-card-text>
-                <v-text-field
-                    label="Email"
-                    value="john@vuetifyjs.com"
-                ></v-text-field>
-                <span class="caption grey--text text--darken-1">
-                    This is the email you will use to login to your Vuetify account
-                </span>
-            </v-card-text>
-        </v-window-item>
+                <v-window v-model="fsm.state">
+                    <v-window-item :value="'EMail'">
+                        <v-card-text>
+                            <v-text-field
+                                label="Email"
+                                value="john@vuetifyjs.com"
+                            ></v-text-field>
+                            <span class="caption grey--text text--darken-1">
+                                This is the email you will use to login to your Vuetify account
+                            </span>
+                        </v-card-text>
+                    </v-window-item>
 
-        <v-window-item :value="'PIN'">
-            <v-card-text>
-                <v-text-field
-                    label="PIN"
-                    
-                ></v-text-field>
-                <span class="caption grey--text text--darken-1">
-                    Please enter a confirmation PIN
-                </span>
-            </v-card-text>
-        </v-window-item>
+                    <v-window-item :value="'PIN'">
+                        <v-card-text>
+                            <v-text-field
+                                label="PIN"
+                                
+                            ></v-text-field>
+                            <span class="caption grey--text text--darken-1">
+                                Please enter a confirmation PIN
+                            </span>
+                        </v-card-text>
+                    </v-window-item>
 
-        <v-window-item :value="'Имя и пароль'">
-            <v-card-text>
-                <v-text-field
-                    label="Password"
-                    type="password"
-                ></v-text-field>
-                <v-text-field
-                    label="Confirm Password"
-                    type="password"
-                ></v-text-field>
-                <span class="caption grey--text text--darken-1">
-                    Please enter a password for your account
-                </span>
-            </v-card-text>
-        </v-window-item>
+                    <v-window-item :value="'Имя и пароль'">
+                        <v-card-text>
+                            <v-text-field
+                                label="Password"
+                                type="password"
+                            ></v-text-field>
+                            <v-text-field
+                                label="Confirm Password"
+                                type="password"
+                            ></v-text-field>
+                            <span class="caption grey--text text--darken-1">
+                                Please enter a password for your account
+                            </span>
+                        </v-card-text>
+                    </v-window-item>
 
-        <v-window-item :value="'Поздравляем'">
-            <div class="pa-3 text-xs-center">
-                <v-img
-                    class="mb-3"
-                    contain
-                    height="128"
-                    src="https://cdn.vuetifyjs.com/images/logos/v.svg"
-                />
+                    <v-window-item :value="'Поздравляем'">
+                        <div class="pa-3 text-xs-center">
+                            <v-img
+                                class="mb-3"
+                                contain
+                                height="128"
+                                src="https://cdn.vuetifyjs.com/images/logos/v.svg"
+                            />
 
-                <h3 class="title font-weight-light mb-2">Welcome to Vuetify</h3>
-                <span class="caption grey--text">Thanks for signing up!</span>
+                            <h3 class="title font-weight-light mb-2">Welcome to Vuetify</h3>
+                            <span class="caption grey--text">Thanks for signing up!</span>
 
-            </div>
-        </v-window-item>
+                            <nuxt-link to="/inspire">Прочитайте наши новости</nuxt-link>
 
-        <v-window-item :value="'ОШИБКА'">
-            <div class="pa-3 text-xs-center">
+                        </div>
+                    </v-window-item>
 
-                <h3 class="title font-weight-light mb-2">ПРОИЗОШЛА ОШИБКА</h3>
+                    <v-window-item :value="'ОШИБКА'">
+                        <div class="pa-3">
 
-            </div>
-        </v-window-item>
-    </v-window>
+                            <no-ssr>
+                                <vue-json-pretty :data="$store.state.error"/>
+                            </no-ssr>
 
-    <v-spacer/>
-    <v-divider/>
+                        </div>
+                    </v-window-item>
+                </v-window>
 
-    <v-card-actions>
-        <v-btn flat v-for="(transition, inx) in fsm.transitions" :key="inx" @click="machine[transition]()">{{ transition }}</v-btn>
-        <!-- <v-btn
-        :disabled="step === 1"
-        flat
-        @click="step--"
-        >
-        Back
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn
-        :disabled="step === 3"
-        color="primary"
-        depressed
-        @click="step++"
-        >
-        Next
-        </v-btn> -->
-    </v-card-actions>
-    </v-card>
+                <v-spacer/>
+                
+                <v-divider v-if="fsm && ((fsm.left && fsm.left.length) || (fsm.right && fsm.right.length))"/>
+
+                <v-card-actions>
+                    <v-btn flat v-for="(transition, inx) in fsm.left" :key="`left-${inx}`" @click="machine[transition.name || transition]()">{{ transition.name || transition }}</v-btn>
+                    <v-spacer/>
+                    <v-btn flat v-for="(transition, inx) in fsm.right" :key="`right-${inx}`" @click="machine[transition.name || transition]()">{{ transition.name || transition }}</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script>
@@ -121,89 +109,102 @@ export default {
     head: {
         title: 'signup'
     },
-    components: {
-        VueJsonPretty: () => import('vue-json-pretty')
-    },
     asyncData(ctx) {
-    },
-    data: () => ({
-        fsm: {
-            state: 'EMail',
-            transitions: []
-        },
-        account: {
-            name: 'asas'
+        //debugger
+        let { route, $server, store } = ctx;
+        
+        store.commit('SET_FSM', { route: route.path, data: { state: 'EMail', transitions: [] }, init: true });
+
+        return {
+            path: route.path
         }
-    }),
+    },
+    data: () => {
+        return {
+            account: {
+                name: 'asas'
+            }
+        }
+        
+    },
     created() {
         let self = this;
 
         this.machine = new (StateMachine.factory({
             init: 'EMail',
             transitions: [
-                { name: 'далее', from: 'EMail',  to: () => { debugger; return this.action_result && this.action_result.error ? 'ОШИБКА' : 'PIN'}, action: self.$server.account.checkEmail },
-                { name: 'далее', from: 'PIN', to: 'Имя и пароль' },
+                { name: 'init', from: 'none',  to: 'EMail', action: self.$server.account.recoverPassword },
+                { name: 'далее', from: 'EMail',  to: 'PIN', action: self.$server.account.checkEmail, button: {right: true}},
+                { name: 'далее', from: 'PIN', to: 'Имя и пароль', button: {right: true} },
                 //{ name: 'далее', from: 'PIN', to: 'Имя и пароль1' },
                 { name: 'отправить повторно', from: 'PIN', to: 'PIN', action: self.$server.account.checkEmail },
-                { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем' },
-                { name: 'сбросить', from: '*', to: 'EMail' }
+                { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем', action: self.$server.account.recoverPassword, button: {right: true} },
+                //{ name: 'сбросить', from: 'Поздравляем', to: 'EMail' },
+                { name: '$goto', from: '*', to: (state) => state },
+                { name: 'сбросить', from: 'ОШИБКА', to: 'EMail', button: {right: false}} 
             ],
             data(params) {
-                return { ...params, action_result: {}};
+                return { ...params };
             },
             methods: {
-                
-                onEnterState: function() {
-                    debugger
-                    //this.account = { ...this.account, name: Date.now() };
-                    this.account.name = Date.now() + '';
-
-                    self.fsm = {
-                        state: this.state,
-                        transitions: this.transitions()
-                    }
+                getTransition({ from, transition }) {
+                    return this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition);
                 },
-                async onBeforeTransition({ from, to, transition }) {
-                    this.action_result = {};
 
+                onEnterState: function({ from, to, transition }) {
+                    //debugger
+                    let trs = this.getTransition({ from, to, transition });
+
+                    let transitions = this.transitions().filter(trs => trs.slice(0, 1) !== '$').map(trs => this.getTransition({ from: to, transition: trs }) || trs);
+
+                    let data = { 
+                        state: this.state,
+                        right: transitions.filter(trs => {
+                            return trs.button ? trs.button.right : false
+                        }),
+                        left: transitions.filter(trs => {
+                            return trs.button ? !trs.button.right : true
+                        }),
+                    }
+
+                    console.log(data);
+
+                    self.$store.commit('SET_FSM', { route: self.path, data });
+                },
+                onBeforeTransition({ from, to, transition }) {
+                    //debugger
                     let trs = this._fsm.config.options.transitions.find(trs => trs.from === from && trs.name === transition) || {};
+
+                    /* console.log(this.account.name, trs);
+                    console.log('onTransition', { from, to, transition }); */
 
                     let { action } = trs;
                     
-                    let result = action && await action(this.account, { cache: false });
+                    if(action) {
+                        return new Promise(async (resolve, reject) => {
+                            self.$store.commit('SET_ERROR', void 0)
 
-                    this.action_result = result | {};
-
-                    console.log(this.account.name, trs, result);
-                    console.log('onTransition', { from, to, transition });
+                            let result = action && await action(this.account, { cache: false });
+                            self.$store.state.error ? reject() || setImmediate(() => this.$goto('ОШИБКА')) : resolve(result);
+                        });
+                    }
                 }
             }
-        }))({ account: this.account });
-
-        
+        }))({ account: this.account });        
+    },
+    activated() {
     },
     mounted() {
-
     },
     computed: {
-        /* state() {
-            debugger
-            return {
-                state: this.fsm.state,
-                transitions: this.fsm.transitions()
-            }
-        } */
+        fsm() {
+            return this.$store.state.fsm[this.path] || {};
+        }
     },
     methods: {
     },
     watch: {
-        'machine.state'(val) {
-            debugger
-            this.fsm = {
-                state: this.machine.state,
-                transitions: this.machine.transitions()
-            }
-        }
+        
     }
 }
 </script>

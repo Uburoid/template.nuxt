@@ -174,11 +174,10 @@ class Account extends SecuredAPI {
     }
 
     async checkEmail(obj) {
-        return await new Promise(resolve => {
-            setTimeout(() => {
-                resolve('{ email: obj }')
-            }, 2000);
-        });
+        debugger
+        let err = Date.now() % 2 === 0;
+        if(err) throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
+        return obj;
     }
 }
 

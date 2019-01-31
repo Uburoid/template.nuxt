@@ -92,11 +92,12 @@
 
 <script>
     import { mapState, mapGetters } from 'vuex';
+    import error from '@/components/errors/error';
 
     export default {
         components: {
+            error,
             drawer: () => import('@/components/drawer'),
-            error:  () => import('@/components/errors/error'),
             accountMenu: () => import('@/components/menu'),
             //errorDialog:  () => import('@/components/errors/error-dialog'),
         },
