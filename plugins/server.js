@@ -42,7 +42,8 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         }
         catch (err) {
             debugger
-            error(err);
+            
+            return { data: { error: error(err) }};
             //throw { code: 0 };
             /* if(process.browser) {
                 throw { code: 0 };
