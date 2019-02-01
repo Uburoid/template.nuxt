@@ -5,7 +5,7 @@
         <!-- <drawer :show="settings.drawer" @drawer="$store.commit('SET_SETTINGS', { drawer: arguments[0] })"/> -->
     
         <v-toolbar dense fixed app clipped-left clipped-right flat style="z-index: 7">
-            <nuxt-link to="" @click.native="left_drawer = !left_drawer">
+            <nuxt-link :to="$route.fullPath" @click.native="left_drawer = !left_drawer">
                 <v-avatar size="34">
                     <img class="top-toolbar-logo" src="~assets/Army_of_Russia.svg">
                 </v-avatar>
@@ -24,7 +24,7 @@
 
             <v-spacer></v-spacer>
 
-            <nuxt-link to="" @click.native="right_drawer = !right_drawer">
+            <nuxt-link :to="$route.fullPath" @click.native="right_drawer = !right_drawer">
                 <!-- <img :alt="profile.name" :src="profile.avatar" height="34"> -->
                 <v-avatar size="34">
                     <img :alt="profile.name" :src="profile.avatar">
