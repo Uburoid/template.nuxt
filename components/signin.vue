@@ -70,11 +70,11 @@ export default {
 
             let account = await this.$server.account.signin({ email, password }, { cache: false });
 
-            //if(!this.$store.state.error) {
+            if(!this.$store.state.error) {
                 this.$store.commit('SET_ACCOUNT', account);
 
                 this.$router.push((this.$store.state.page_with_error && this.$store.state.page_with_error.from) || '/news');
-            //}
+            }
         }
     }
 }

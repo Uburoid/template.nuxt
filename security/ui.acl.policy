@@ -2,6 +2,7 @@ deny, *, *, *
 
 allow, Аноним, {to:'=/signup'}, *
 allow, Аноним, {to:'=/signin'}, *
+allow, Аноним, {to:'=/'}, *
 
 allow, Пользователи, *, =valid
 deny, Пользователи, {to:'=/users'}, *
@@ -13,13 +14,11 @@ deny, Пользователи, *, =invalid
 allow, Пользователи, {to:'=/signin'}, =invalid
 allow, Пользователи, {to:'=/signout'}, =invalid
 
-allow, Администраторы, {to:'=/users'}, =valid
-allow, Администраторы, *, =valid
-
-deny, Аноним, {to:'^(?!\/$).*$'}, *
-
 deny, Пользователи, {to:'=/messaging'}, *
 deny, Пользователи, {to:'^(?!\/news$)(?!\/$).*$'}, =invalid
+
+allow, Администраторы, {to:'=/users'}, =valid
+allow, Администраторы, *, =valid
 
 //allow delimeter
 allow, *, {to:'=-'}, *

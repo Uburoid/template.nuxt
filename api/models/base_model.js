@@ -313,10 +313,15 @@ class BaseModel {
         return this.update(data, true);
     }
 
-    static async update(data, save = false) {
-        let validated = this.validate(data, { use_defaults: save, convert_types: true });
+    static async transformTo(model, data) {
+        return this.update(data, true, model);
+    }
 
-        let write = this.write(validated);
+    static async update(data, save = false, transformTo = void 0) {
+        let Model = transformTo || this;
+        let validated = Model.validate(data, { use_defaults: save, convert_types: true });
+
+        let write = Model.write(validated);
 
         const traverse = (leaf, acc) => {
             acc = acc || [];
@@ -376,12 +381,13 @@ class BaseModel {
             }
             else {
                 query.cql = cypher.nodePattern({
-                    labels: leaf.$labels,
+                    labels: transformTo ? this.schema.$labels : leaf.$labels,
                     identifier: leaf.identifier,
                     data: leaf.keys
                 });
             }
 
+            query.labels = leaf.$labels;
             query.node = leaf.identifier;
             query.params[leaf.identifier] = { ...leaf.params };
             query.params[`create_${leaf.identifier}`] = { ...leaf.create_params };
@@ -405,17 +411,25 @@ class BaseModel {
         if(!hasKeys) throw new Error('Not enough key info provided. Cannot execute query.');
         
         
-        let { cql, params, result } = query.reverse().reduce((memo, element) => {
+        let { cql, params, result } = query.reverse().reduce((memo, element, inx) => {
             let [node, relation, remove] = element.cql.split('|');
 
-            const populate = (cql, identifier) => {
+            const populate = (cql, identifier, labels) => {
                 if(cql) {
                     cql = `MERGE ${cql}\n`;
 
                     let on_create = `ON CREATE SET ${identifier} = $create_${identifier}, ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
                     let on_update = `ON MATCH SET ${identifier} += $update_${identifier}, ${identifier} += $${identifier}\n`;
 
-                    cql = `${cql}${on_create}${on_update}`;
+                    let remove = '';
+                    let set = '';
+
+                    if(inx === 0 && transformTo) {
+                        remove = `REMOVE ${identifier}:${this.schema.$labels.map(label => `\`${label}\``).join(':')}\n`;
+                        set = `SET ${identifier}:${labels.map(label => `\`${label}\``).join(':')}\n`;
+                    }
+
+                    cql = `${cql}${on_create}${on_update}${remove}${set}`;
 
                     return cql;
                 }
@@ -425,7 +439,7 @@ class BaseModel {
 
             remove = remove && save ? `MERGE ${remove} DELETE ${element.remove}\n` : ''; //TODO: IS THIS NECESSARY?
 
-            let cql = `${populate(node, element.node)}${remove}${populate(relation, element.relation)}`;
+            let cql = `${populate(node, element.node, element.labels)}${remove}${populate(relation, element.relation)}`;
             memo.cql.push(cql);
             
             memo.result.push(element.node);
@@ -505,7 +519,7 @@ class BaseModel {
             });
         };
 
-        validated = this.validate(traversed, { use_defaults: false, convert_types: true });
+        validated = Model.validate(traversed, { use_defaults: false, convert_types: true });
         //validated = this.validate(traverseWrite(write, nodes), { use_defaults: false, convert_types: true });
 
         return validated;

@@ -119,11 +119,14 @@ export default {
     head: {
         title: 'signup'
     },
-    asyncData(ctx) {
-        //debugger
-        let { route, $server, store } = ctx;
+    asyncData(context) {
+        debugger
+        let { route, $server, store } = context;
         
         store.commit('SET_FSM', { route: route.path, data: { state: 'EMail', transitions: [] }, init: true });
+
+        const cookie = context.app.$cookies.get('_signup') || {};
+        context.app.$cookies.remove('_signup');
 
         return {
             path: route.path,
@@ -131,9 +134,12 @@ export default {
                 referer: store.state.referer ? { ref: store.state.referer } : {},
                 ref: void 0,
                 name: void 0,
-                email: 'mychrome51@gmail.com' || 'john@vuetifyjs.com',
+                email: void 0,
+                //email: 'john@vuetifyjs.com',
+                //email: 'mychrome51@gmail.com' || 'john@vuetifyjs.com',
                 password: void 0,
-                pin: void 0
+                pin: void 0,
+                ...cookie
             }
         }
     },

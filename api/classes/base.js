@@ -119,7 +119,11 @@ class Base {
                 const origMethod = target[propKey];
 
                 if(typeof(origMethod) === 'function') {
-                    let isPublic = ['$', '_'].includes(propKey.slice(0, 1));
+                    let isPrivate = ['$', '_'].includes(propKey.slice(0, 1));
+
+                    if(isPrivate) {
+                        return target[propKey]
+                    }
 
                     return async (...args) => {
                     
@@ -225,6 +229,14 @@ class Base {
             redirect: err.redirect
         };
 
+        if(err.cookie) {
+            Object.entries(err.cookie).forEach(([name, value]) => {
+                value = typeof(value) === 'object' ? JSON.stringify(value) : String(value);
+
+                this.res.cookie(name, value);
+            });
+        }
+
         if(error.statusCode === 403) {
             error = {
                 ...error,
@@ -318,7 +330,7 @@ class API extends Base {
         //debugger
         let { _id, name, shadow_id, role, picture } = this.payload;
         let payload = { _id, name, shadow_id, role, picture, class: this.payload.class };
-        
+
         if(!this.payload.token_err) {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '1000s'});
 
@@ -355,7 +367,7 @@ class SecuredAPI extends API {
 
         if(error.statusCode === 401) {
             //debugger
-            this.payload && this.payload.shadow_id && this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
+            //this.payload && this.payload.shadow_id && this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
             
             this.res.cookie('$token', '', { expires: new Date() });
             this.res.locals && (this.res.locals.token_expired = true);

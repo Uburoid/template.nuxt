@@ -6,7 +6,7 @@ const generate = require('nanoid/generate');
 const path = require('path');
 
 const models = require('../models');
-const { Member, Anonymous, Role, Email, List, RootMember } = models;
+const { PreMember, Member, Anonymous, Role, Email, List, RootMember } = models;
 
 const { Messanger } = require('../messenger');
 
@@ -73,26 +73,34 @@ class Account extends SecuredAPI {
         return account;
     }
 
-    async signin({ email, password }) {
+    async signin({ email: address, password }) {
         debugger
 
-        let found = await Member.findOne({
-            email: {
-                address: email,
-            },
+        let email = address && await Email.findOne({
+            address,
+            member: true
+        });
+
+        let found = email && email.member;
+        
+        found = found && await Member.findOne({
+            _id: found._id,
             role: true,
             wallet: true
         });
 
-        let auth = found && await bcrypt.compare(`${email}:${password}`, found.hash);
+        let auth = found && await bcrypt.compare(`${address}:${password}`, found.hash);
         //throw new Error('Завершите регистрацию');
         if(auth) {
             this.payload = { ...found, shadow_id: this.payload.shadow_id || this.payload._id, role: found.role.name };
+            
+            this.res.cookie('$shadow', this.payload.shadow_id, { httpOnly: true });
+
             return this.get();
         }
         else {
-            if(!found.email.verified) {
-                throw new Error('Завершите регистрацию');
+            if(!found && email && email.verified) {
+                throw { code: 401, redirect: '/signup', cookie: { _signup: { email: address }}}
             }
             else {
                 throw new Error('Пользователь не найден');
@@ -132,19 +140,27 @@ class Account extends SecuredAPI {
 
     static async shadow(_id) {
         debugger
-        let role = await Role.findOne({
-            name: 'Аноним'
+
+        let account = await Anonymous.findOne({
+            _id: _id,
+            role: true
         });
 
-        !role && (role = await Role.save({
-            name: 'Аноним'
-        }));
-        
-        let account = await Anonymous.save({
-            _id: _id,
-            name: 'shadow',
-            role
-        });
+        if(!account) {
+
+            let role = await Role.findOne({
+                name: 'Аноним'
+            });
+
+            !role && (role = await Role.save({
+                name: 'Аноним'
+            }));
+            
+            account = await Anonymous.save({
+                name: 'shadow',
+                role
+            });
+        }
 
         account = { ...account, role: account.role.name };
         
@@ -184,24 +200,57 @@ class Account extends SecuredAPI {
         });
 
         if(!email) throw { message: 'Указанная Вами почта не зарегистрированна.', display: false }
-        
+
         if(email.pin !== String(account.pin)) {
             throw { message: 'Проверочный код не совпадает. Проверьте указанную вами почту и запросите проверочный код заново.', display: false }
+        }
+
+        if(!email.verified) {
+    
+            let referer = await Member.findOne({ ref: account.referer.ref });
+
+            if(referer) {
+                let shadow = await Anonymous.findOne({
+                    _id: this.payload._id,
+                    role: true
+                });
+    
+                let preMember = await Anonymous.transformTo(PreMember, {
+                    _id: shadow._id,
+                    role: shadow.role,
+                    name: generate('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 10),
+                    referer,
+                    email
+                });
+                
+                email = await Email.save({
+                    ...email,
+                    verified: true
+                });
+
+                //return { ...account, email: address, pin: email.pin };
+            }
         }
 
         return account;
     }
 
     async checkEmail(account) {
+        debugger
         let { email: address } = account;
 
         let email = await Email.findOne({
-            address
+            address,
+            member: true
         });
 
         if(email && email.verified) {
-            email.verified = false;
-            //throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
+            //email.verified = false;
+            if(email.member) {
+                throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
+            }
+
+            return { ...account, email: address, pin: email.pin };
         }
         
         let pin = generate('0123456789', 10);
@@ -215,6 +264,7 @@ class Account extends SecuredAPI {
             pin
         });
         
+        console.log('pin', pin);
 
         let { error, info } = await Messanger.sendMail({
             to: address, 

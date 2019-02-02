@@ -161,7 +161,7 @@
             ...mapState({
                 account: state => state.account,
                 user: state => state.account.user,
-                profile: state => state.account.user.profile,
+                profile: state => state.account.user ? state.account.user.profile : {},
                 title: state => state.title,
                 error: state => {
                     return state.error && state.error.display && state.error;

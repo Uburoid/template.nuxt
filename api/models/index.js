@@ -82,7 +82,12 @@ class Account extends Node {
             role: {
                 type: account2role,
                 required: true
-            }
+                //TODO: make default cql to get node from db with given pattern i.e. match (n :RELATION {_id: $param}) RETURN n -> Model.find[One]({ _id: $param })
+            },
+            email: {
+                type: member2email,
+                required: false
+            },
         }
     }
 }
@@ -109,14 +114,11 @@ class Club extends Account {
     }
 }
 
-class Member extends Account {
+class PreMember extends Account {
     static get schema() {
         let schema = {
             ...super.schema,
-            $labels: ['Учетная запись', 'Пользователь'],
-
-            
-            hash: String,
+            $labels: ['Учетная запись', 'Предпользователь'],
             ref: {
                 type: String,
                 required: true,
@@ -124,6 +126,35 @@ class Member extends Account {
                     return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
                 }
             },
+            referer: {
+                type: referer,
+                required: true
+            },
+            email: {
+                type: member2email,
+                required: true
+            },
+        }
+
+        return schema;
+    }
+}
+
+class Member extends PreMember {
+    static get schema() {
+        let schema = {
+            ...super.schema,
+            $labels: ['Учетная запись', 'Пользователь'],
+
+            
+            hash: String,
+            /* ref: {
+                type: String,
+                required: true,
+                default: (obj) => {
+                    return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
+                }
+            }, */
             group: {
                 type: String,
                 required: true,
@@ -138,22 +169,18 @@ class Member extends Account {
                 type: Date
             },
 
-            referer: {
+            /* referer: {
                 type: referer,
                 required: true
-            },
+            }, */
 
             referals: [referal],
-            /* referals1: [{
-                type: referal,
-                required: true
-            }],
-            referals2: referal, */
+            
 
-            email: {
+            /* email: {
                 type: member2email,
                 required: true
-            },
+            }, */
             list: {
                 type: member2list,
                 required: true
@@ -320,7 +347,8 @@ class email2member extends Relation {
             ...super.schema,
             $start: Email,
             $type: 'принадлежит',
-            $end: Member
+            $end: Account
+            //$end: Member
         }
 
         return schema;
@@ -333,7 +361,8 @@ class member2email extends Relation {
         let schema = {
             ...super.schema,
             $direction: 'in',
-            $start: Member,
+            $start: Account,
+            //$start: Member,
             $type: 'принадлежит',
             $end: Email
         }
@@ -375,4 +404,4 @@ class referal extends member2member {
     }
 }
 
-module.exports = { Account, Club, Member, Email, List, RootList, RootMember, Anonymous, Role };
+module.exports = { Account, Club, Member, Email, List, RootList, RootMember, Anonymous, Role, PreMember };

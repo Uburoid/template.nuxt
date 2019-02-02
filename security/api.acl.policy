@@ -25,7 +25,7 @@ allow, *, UI, menus, *, *, *
 //deny,*,*,*,{path:'=/inspire'},=invalid
 
 allow, *, Account, *, *, *, *
-deny, Аноним, Account, =get, *, *, =exists, 405
+//deny, Аноним, Account, ^(?!get).*$, *, *, =exists, 405
 
 deny, Пользователи, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *, 403
 allow, Администраторы, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *

@@ -10,5 +10,9 @@
     "editor.formatOnSave": false,
     "editor.tabSize": 4,
     "editor.autoIndent": true,
-    "editor.detectIndentation": true
+    "editor.detectIndentation": true,
+    "files.associations": {
+        "*.policy": "csv",
+        "*.model": "csv",
+    },
   }
