@@ -219,7 +219,7 @@ class BaseModel {
             result.select = data.$select;
 
             result.start = data.$parent;// || $start.write({});
-            result.end = $end.write(data);
+            result.end = $end.write(data, options);
             result.required = data.$required;
             //result.length = data.$length;
         }
@@ -256,7 +256,7 @@ class BaseModel {
                         
                         memo.relations = memo.relations || {};
                         memo.relations[key] = memo.relations[key] || [];
-                        memo.relations[key].push(type.write(value));
+                        memo.relations[key].push(type.write(value, options));
                     });
 
                 }
@@ -280,7 +280,8 @@ class BaseModel {
                         memo[key] = value;
                     }
                     else {
-                        params[key] = (system && options.populate_system) ? field.default(value) : value;
+                        system ? options.populate_system ? params[key] = field.default(value) : void 0 : params[key] = value;
+                        //params[key] = (system && options.populate_system) ? field.default(value) : value;
                     }
 
                     if(isKey === true) {
@@ -975,7 +976,7 @@ class Graph extends BaseModel {
                 //required: true,
                 //system: true,
                 system: true,
-                set_on: 'create',
+                //set_on: 'create',
                 default: () => this.name
             }
         }

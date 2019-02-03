@@ -439,13 +439,24 @@ let multipartDetector = function(req, res, next) {
 
             file.on('end', function(...args) {
                 console.log('File [' + fieldname + '] Finished', args);
-                req.body['files'] = req.body['files'] || {};
-                req.body.files[fieldname] = {
+
+                req.body[fieldname] = {
                     filename,
                     encoding, 
                     mimetype,
                     stream: memStream
                 }
+
+                req.body['streams'] = req.body['streams'] || {};
+                req.body.streams[fieldname] = req.body[fieldname];
+
+                /* req.body['files'] = req.body['files'] || {};
+                req.body.files[fieldname] = {
+                    filename,
+                    encoding, 
+                    mimetype,
+                    stream: memStream
+                } */
             });
 
             file.pipe(memStream);
@@ -453,7 +464,7 @@ let multipartDetector = function(req, res, next) {
 
         busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
             console.log('Field [' + fieldname + ']: value: ' + val, fieldnameTruncated, valTruncated, encoding, mimetype);
-            req.body[fieldname] = val;
+            req.body[fieldname] = JSON.parse(val);
         });
     
         busboy.on('finish', function() {

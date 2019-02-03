@@ -56,16 +56,56 @@
                     <v-window-item :value="'Имя и пароль'">
                         <v-card-text>
                             <v-text-field
-                                label="Password"
-                                type="password"
-                            ></v-text-field>
+                                label="Name"
+                                v-model="account.name"
+                            />
                             <v-text-field
-                                label="Confirm Password"
-                                type="password"
-                            ></v-text-field>
-                            <span class="caption grey--text text--darken-1">
-                                Please enter a password for your account
-                            </span>
+                                v-model="account.password"
+                                :append-icon="show_password ? 'visibility_off' : 'visibility'"
+                                :type="show_password ? 'text' : 'password'"
+                                label="Password"
+                                hint="Please enter a password for your account"
+                                @click:append="show_password = !show_password"
+                            />
+                        </v-card-text>
+                    </v-window-item>
+
+                    <v-window-item :value="'Аватар'">
+                        <v-card-text class="text-xs-center">
+                            <no-ssr>
+
+                                    <!-- initial-image="https://zhanziyang.github.io/vue-croppa/static/500.jpeg" -->
+                                <croppa v-model="croppa"
+                                    :width="150"
+                                    :height="150"
+                                    
+                                    prevent-white-space
+                                    initial-image="/api/member._avatar"
+                                    
+                                    :canvas-color="'default'"
+                                    :placeholder="'Choose an image'"
+                                    :placeholder-font-size="14"
+                                    :placeholder-color="'default'"
+                                    :accept="'image/*'"
+                                    :file-size-limit="0"
+                                    :quality="2"
+                                    :zoom-speed="30"
+                                    :disabled="false"
+                                    :disable-drag-and-drop="false"
+                                    :disable-click-to-choose="false"
+                                    :disable-drag-to-move="false"
+                                    :disable-scroll-to-zoom="false"
+                                    :disable-rotation="false"
+
+                                    :reverse-scroll-to-zoom="false"
+                                    :show-remove-button="true"
+                                    :remove-button-color="'black'"
+                                    :remove-button-size="24"
+                                    @init="onInit"
+                                >
+                                    
+                                </croppa>
+                            </no-ssr>
                         </v-card-text>
                     </v-window-item>
 
@@ -139,20 +179,15 @@ export default {
                 //email: 'mychrome51@gmail.com' || 'john@vuetifyjs.com',
                 password: void 0,
                 pin: void 0,
+                picture: void 0,
                 ...cookie
-            }
+            },
+            show_password: false
         }
     },
     data: () => {
         return {
-            /* account: {
-                referer: {},
-                ref: void 0,
-                name: void 0,
-                email: 'john@vuetifyjs.com',
-                password: void 0,
-                pin: void 0
-            } */
+            croppa: {}
         }
         
     },
@@ -167,7 +202,8 @@ export default {
                 { name: 'далее', from: 'PIN', to: 'Имя и пароль', button: {right: true}, action: self.$server.account.checkPIN},
                 //{ name: 'далее', from: 'PIN', to: 'Имя и пароль1' },
                 { name: 'отправить повторно', from: 'PIN', to: 'PIN', action: self.$server.account.checkEmail },
-                { name: 'далее', from: 'Имя и пароль', to: 'Поздравляем', action: self.$server.account.recoverPassword, button: {right: true} },
+                { name: 'далее', from: 'Имя и пароль', to: 'Аватар', button: {right: true} },
+                { name: 'далее', from: 'Аватар', to: 'Поздравляем', action: self.upload, button: {right: true} },
                 { name: 'сбросить', from: 'Поздравляем', to: 'EMail' },
                 { name: '$goto', from: '*', to: (state) => state },
                 { name: 'сбросить', from: 'ОШИБКА', to: 'EMail', button: {right: false}},
@@ -215,9 +251,12 @@ export default {
                             self.$store.commit('SET_ERROR', void 0)
 
                             let result = action && await action(self.account, { cache: false });
-                            self.$store.state.error ? reject() || setImmediate(() => this.$goto('ОШИБКА')) : resolve();
-
-                            if(!self.$store.state.error) {
+                            if(self.$store.state.error) {
+                                reject();
+                                !self.$store.state.error.display && setTimeout(() => this.$goto('ОШИБКА'), 0);
+                            }
+                            else {
+                                resolve();
                                 self.$set(self.$data, 'account', { ...self.account, ...result });
                             }
 
@@ -237,6 +276,32 @@ export default {
         }
     },
     methods: {
+        onInit() {
+            this.croppa.addClipPlugin(function (ctx, x, y, w, h) {
+                ctx.beginPath()
+                ctx.arc(x + w / 2, y + h / 2, w / 2, 0, 2 * Math.PI, true)
+                ctx.closePath()
+            });
+        },
+        async upload() {
+            let blob = await this.croppa.promisedBlob();
+
+            var data = new FormData();
+
+            Object.entries(this.account).forEach(([key, value]) => {
+                value && data.append(key, JSON.stringify(value));
+            });
+
+            let debug = {hello: "world"};
+            let json = new Blob([JSON.stringify(debug, null, 2)], {type : 'application/json'});
+            data.append('blob', json);
+
+            data.set('pictire', blob, 'ava.jpg');
+
+            return await this.$server.account.signup(data, { method: 'post', cache: false });
+
+            //this.croppa.refresh();
+        }
     },
     watch: {
         
@@ -244,3 +309,8 @@ export default {
 }
 </script>
 
+<style scoped>
+    .croppa-container {
+        background-color: transparent;
+    }
+</style>

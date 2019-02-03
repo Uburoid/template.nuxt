@@ -155,19 +155,19 @@ class Member extends PreMember {
                     return generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
                 }
             }, */
-            group: {
+            /* group: {
                 type: String,
                 required: true,
                 default: 'users'
-            },
+            }, */
             picture: String,
             compressed: String,
             country: String,
             phone: String,
             city: String,
-            donate: {
+            /* donate: {
                 type: Date
-            },
+            }, */
 
             /* referer: {
                 type: referer,

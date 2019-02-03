@@ -223,7 +223,7 @@ class Base {
             message: err.message,
             name: err.name,
             stack: err.stack,
-            dialog: false,
+            dialog: err.dialog || false,
             server_error: true,
             display: err.display,
             redirect: err.redirect
@@ -335,6 +335,7 @@ class API extends Base {
             this.token = await this.jwt.refresh(payload, { expiresIn: payload.class === 'Anonymous' ? 0 : '1000s'});
 
             this.res.cookie('$token', this.token, { httpOnly: true });
+            //this.res.cookie('$test', this.token, { httpOnly: true, expires: new Date() });
             //this.res.cookie('page-with-error', '', { expires: new Date() });
         }
 

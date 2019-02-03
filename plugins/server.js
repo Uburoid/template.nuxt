@@ -7,20 +7,29 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
     //debugger
     let { $axios, error, redirect, store, $error } = context;
 
+    method = method.toLowerCase();
+
     cache = cache && process.browser; //USE CACHE IN BROWSER ONLY
 
-    let params = JSON.stringify(payload || {});
-    let key = `${endpoint}:${params}`;
+    let key = void 0;
 
-    typeof(payload) !== 'object' && (payload = { parameter: payload });
+    if(method === 'get') {
+        let params = JSON.stringify(payload || {});
+        key = `${endpoint}:${params}`;
     
-    payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
+        typeof(payload) !== 'object' && (payload = { parameter: payload });
+        
+        payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
+    
+        
+    }
 
-    let response = cache && axios_cache.get(key);
+    let response = cache && key && axios_cache.get(key);
 
     if(!response) {
-        headers = headers || {};
-        !process.browser && context.req && context.req.headers.cookie && (headers = { ...headers, cookie: context.req.headers.cookie });
+        //let cookies = context.app.$cookies.getAll();
+        /* headers = headers || {};
+        !process.browser && $axios.defaults.ssr.cookies && (headers = { ...headers, cookie: $axios.defaults.ssr.cookies.join(';') }); */
 
         let config = {
             url: endpoint,
@@ -34,7 +43,10 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         try {
             response = await $axios(config);
 
-            cache && axios_cache.set(key, response);
+            cache && key && axios_cache.set(key, response);
+            /* let cookies = context.app.$cookies.getAll();
+            const cookiesRes = context.app.$cookies.getAll({ fromRes: true })
+            console.log(cookiesRes) */
 
             //let { data, data: { flags } } = response;
 

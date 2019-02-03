@@ -134,10 +134,6 @@ class Account extends SecuredAPI {
         return shadow;        
     }
 
-    async signup() {
-
-    }
-
     static async shadow(_id) {
         debugger
 
@@ -192,6 +188,20 @@ class Account extends SecuredAPI {
 
     }
 
+    async signup(account) {
+        if(account._id) {
+            let preMember = await PreMember.findOne({
+                _id: account._id,
+                role: true,
+                referer: true,
+                email: true
+            });
+
+            return preMember;
+        }
+        else throw { message: 'Somthing went wrong while processing signup.', display: false };
+    }
+
     async checkPIN(account) {
         let { email: address } = account;
 
@@ -215,6 +225,8 @@ class Account extends SecuredAPI {
                     role: true
                 });
     
+                this.payload._id && !shadow && (shadow = await this.signout(this.payload));
+
                 let preMember = await Anonymous.transformTo(PreMember, {
                     _id: shadow._id,
                     role: shadow.role,
@@ -222,13 +234,17 @@ class Account extends SecuredAPI {
                     referer,
                     email
                 });
-                
+
                 email = await Email.save({
                     ...email,
+                    member: preMember,
                     verified: true
                 });
 
-                //return { ...account, email: address, pin: email.pin };
+                //let intersect = require('../intersect');
+                //account = intersect(account, preMember);
+
+                return { ...account, _id: preMember._id, name: preMember.name };
             }
         }
 
@@ -236,7 +252,7 @@ class Account extends SecuredAPI {
     }
 
     async checkEmail(account) {
-        debugger
+        //debugger
         let { email: address } = account;
 
         let email = await Email.findOne({
@@ -246,11 +262,11 @@ class Account extends SecuredAPI {
 
         if(email && email.verified) {
             //email.verified = false;
-            if(email.member) {
+            if(email.member && email.member.class === 'Member') {
                 throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
             }
 
-            return { ...account, email: address, pin: email.pin };
+            return { ...account, email: address, pin: email.pin, _id: email.member._id, name: email.member.name };
         }
         
         let pin = generate('0123456789', 10);
@@ -272,13 +288,14 @@ class Account extends SecuredAPI {
             html: `Ваш адрес был указан при регистрации на сайте <a href="https://atlant.club">atlant.club</a>.<br><strong><br>Пин-код: ${pin}</strong><br><br>Если Вы не регистрировались на нашем сайте, то просто проигнорируйте данное сообщение.<br><br>С уважением, администрация <a href="https://atlant.club">atlant.club</a>.`
         });
 
-        if(error) throw error;
+        if(error) throw { ...error, message: 'Error while sending confirmation email', dialog: true };
 
-        return { ...account, email: address };
+        return { ...account, email: address, pin };
+        //return { ...account, email: address };
     }
 
     async checkReferer({ referer }) {
-        debugger
+        //debugger
         let found = referer && referer.ref && await Member.findOne({
             ref: referer.ref
         });

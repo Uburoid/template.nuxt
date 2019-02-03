@@ -1,6 +1,9 @@
 export default async (context) => {
-    let { app, store, route, redirect, req, res } = context;
+    let { isServer, app, store, route, redirect, req, res } = context;
 
+    /* if (!process.browser) {
+        req.headers.cookie && (context.$axios.defaults.headers.common.cookie = req.headers.cookie);
+    } */
     //debugger
 
     route.query.referer && store.commit('SET_REFERER', route.query.referer);
