@@ -308,7 +308,7 @@ class API extends Base {
         }
         else this.payload = await this.jwt.verify(this.token);
 
-        if(this.res.locals && this.res.locals.token_expired) {
+        if(this.res.locals && this.res.locals.token_expired) { //redundant code
             const { Account } = require('./account');
             this.payload = await Account.signout(this.payload);
         }
