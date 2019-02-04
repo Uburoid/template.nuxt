@@ -1,5 +1,14 @@
 
 (async () => {
+    let models1 = require('./models');
+
+    let roles = await models1.Role.find({
+        name: ['Пользователи', 'Администраторы'],
+        inherits: true
+    });
+
+    console.log(roles);
+    
     return
     /* const neo4j = require('neo4j-driver').v1;
     const driver = neo4j.driver('bolt://206.81.24.70:7687', neo4j.auth.basic("neo4j", "123"), {disableLosslessIntegers: true}); //WARNING: POSSIBLE NUMBER DATA LOSS!!!
@@ -153,6 +162,7 @@
             }) */
 
     //driver.query
+
     return
     let { Relation } = require('./models/base_model');
     let models = require('./models');
