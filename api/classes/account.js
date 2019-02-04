@@ -203,7 +203,7 @@ class Account extends SecuredAPI {
     }
 
     async checkPIN(account) {
-        let { email: address } = account;
+        let { email: { address }} = account;
 
         let email = address && await Email.findOne({
             address
@@ -253,9 +253,9 @@ class Account extends SecuredAPI {
 
     async checkEmail(account) {
         //debugger
-        let { email: address } = account;
+        let { email: { address }} = account;
 
-        let email = await Email.findOne({
+        let email = address && await Email.findOne({
             address,
             member: true
         });
@@ -266,7 +266,7 @@ class Account extends SecuredAPI {
                 throw { message: 'Пользователь с указанным адресом зарегистрирован.', display: false }
             }
 
-            return { ...account, email: address, pin: email.pin, _id: email.member._id, name: email.member.name };
+            return email.member;//{ ...account, email: address, pin: email.pin, _id: email.member._id, name: email.member.name };
         }
         
         let pin = generate('0123456789', 10);
@@ -290,7 +290,7 @@ class Account extends SecuredAPI {
 
         if(error) throw { ...error, message: 'Error while sending confirmation email', dialog: true };
 
-        return { ...account, email: address, pin };
+        return { ...account, ...email };
         //return { ...account, email: address };
     }
 

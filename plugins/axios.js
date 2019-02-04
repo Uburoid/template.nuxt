@@ -28,7 +28,7 @@ export default (context, inject) => {
 
     let onRequest = (config => {
         process.browser ? console.log(`browser API call: ${config.url}`) : console.log(`server API call: ${config.url}`);
-        console.log(context.req);
+        //console.log(context.req);
 
         config.headers = config.headers || { common: {}};
         !process.browser && config.ssr.cookies.length && (config.headers.common = { ...config.headers.common, cookie: config.ssr.cookies.join(';') });

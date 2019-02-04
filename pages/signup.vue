@@ -27,7 +27,7 @@
 
                             <v-text-field
                                 label="Email"
-                                v-model="account.email"
+                                v-model="account.email.address"
                             />
 
                             <span class="caption grey--text text--darken-1">
@@ -40,12 +40,12 @@
                     <v-window-item :value="'PIN'">
                         <v-card-text>
                             <h3 class="mb-4">
-                                On the given email {{ account.email }} was send a PIN code. Check email and enter PIN in the text box below
+                                On the given email {{ account.email.address }} was send a PIN code. Check email and enter PIN in the text box below
                             </h3>
 
                             <v-text-field
                                 label="PIN"
-                                v-model="account.pin"
+                                v-model="account.email.pin"
                             />
                             <span class="caption grey--text text--darken-1">
                                 Please enter a confirmation PIN
@@ -174,7 +174,7 @@ export default {
                 referer: store.state.referer ? { ref: store.state.referer } : {},
                 ref: void 0,
                 name: void 0,
-                email: void 0,
+                email: { address: void 0 },
                 //email: 'john@vuetifyjs.com',
                 //email: 'mychrome51@gmail.com' || 'john@vuetifyjs.com',
                 password: void 0,
