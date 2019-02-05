@@ -11,7 +11,7 @@ let classes = {
     ...acl
 }
 
-const Types = Object.entries(classes).reduce((memo, item) => {
+const Classes = Object.entries(classes).reduce((memo, item) => {
     memo[item[0].toLowerCase()] = item[1];
     
     return memo;
@@ -61,8 +61,8 @@ const code = () => {
     
     let classes = {};
 
-    for(let class_instance in Types) {
-        const instance = Types[class_instance];
+    for(let class_instance in Classes) {
+        const instance = Classes[class_instance];
         const name = instance.name.toLowerCase();
 
         classes[name] = classes[name] || {};
@@ -133,6 +133,6 @@ const code = () => {
 }
 
 module.exports = {
-    Types,
+    Classes,
     code: code()
 }
