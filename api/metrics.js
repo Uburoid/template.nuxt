@@ -1,5 +1,5 @@
 const uaParser = require('ua-parser-js');
-const { Browser, OS, Device, Vendor, Version, Account, IP } = require('./models/metrics_models');
+const { Browser, OS, Device, Vendor, Version, Account, IP } = require('./classes/models/metrics_models');
 
 class Metrics {
     constructor({ req, res }) {

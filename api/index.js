@@ -1,6 +1,6 @@
 
 (async () => {
-    let models1 = require('./models');
+    let models1 = require('./classes/models');
 
     let roles = await models1.Role.find({
         name: ['Пользователи', 'Администраторы'],
@@ -496,8 +496,9 @@ let multipartDetector = function(req, res, next) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
-const { Types, code } = require('./classes');
+const path = require.resolve(process.env.INIT_CWD + '/api/classes');
+const { Classes, code } = require(path);
+//const { Classes, code } = require(process.env.PROJECT_ROOT || './classes');
 const { loadDefaultKeyPair } = require('./jwt');
 
 /* router.all('/_load_default_key_pair_', async (req, res) => {
@@ -729,7 +730,7 @@ router.all(patterns, multipartDetector, async (req, res, next) => {
 
     let { type, action = 'get' } = req.params;
 
-    let object = new Types[type.toLowerCase()]({ req, res });
+    let object = new Classes[type.toLowerCase()]({ req, res });
 
     try {
         let result = await object[action](req.body);

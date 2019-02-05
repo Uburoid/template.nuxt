@@ -40,7 +40,7 @@ export default async (context) => {
         store.commit('SET_ERROR', { ...store.state.error, clear: true });
     }
 
-    let response = await app.$server.ui.pageData({ path: route.path }, { cache: false });
+    let response = await app.$server.ui.route({ path: route.path }, { cache: false });
     
 
     if (response) {

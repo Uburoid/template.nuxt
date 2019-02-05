@@ -5,7 +5,7 @@ const { Metrics } = require('../metrics');
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-const { Role } = require('../models');
+const { Role } = require('./models');
 
 let roles = new Promise(resolve => {
     Role.find({ inherits: true })
@@ -102,7 +102,7 @@ class Base {
 
         this.req = req;
         this.res = res;
-        this.route = route;
+        this.$route = route;
 
         let self = this;
 
@@ -308,10 +308,10 @@ class API extends Base {
         }
         else this.payload = await this.jwt.verify(this.token);
 
-        if(this.res.locals && this.res.locals.token_expired) { //redundant code
+        /* if(this.res.locals && this.res.locals.token_expired) { //redundant code
             const { Account } = require('./account');
             this.payload = await Account.signout(this.payload);
-        }
+        } */
 
         this.res.locals && (this.res.locals.payload = this.payload);
         //if(this.payload.err) throw this.payload.err;

@@ -5,7 +5,7 @@ const generate = require('nanoid/generate');
 
 const path = require('path');
 
-const models = require('../models');
+const models = require('./models');
 const { PreMember, Member, Anonymous, Role, Email, List, RootMember } = models;
 
 const { Messanger } = require('../messenger');

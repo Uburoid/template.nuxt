@@ -1,7 +1,7 @@
 const { driver } = require('../db');
 const { schema: Schema, normalize } = require('normalizr');
 
-const intersect = require('../intersect');
+const intersect = require('../../intersect');
 
 const generate = require('nanoid/generate');
 const cypher = require('decypher').helpers;
