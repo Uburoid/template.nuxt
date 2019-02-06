@@ -84,7 +84,7 @@ dist
 node_modules
 /dist
 .history
-uploads
+#uploads
 # local env files
 .env.local
 .env.*.local
@@ -107,3 +107,4 @@ yarn-error.log*
 #*.csv
 /backup
 /cicd
+package-lock.json

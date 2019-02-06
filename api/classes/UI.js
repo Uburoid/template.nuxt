@@ -18,16 +18,16 @@ class UI extends SecuredAPI {
 
     }
 
-    async pageData({ path }) {
+    async route({ path }) {
         //debugger
         //console.log('REQUEST:', this.req.headers['x-forwarded-for'], this.req.client.remoteAddress, this.res.connection.remoteAddress, this.res.socket._sockname);
 
         path = path === '/' ? 'Welcome to us' : path.slice(1);
 
-        const { Types: classes } = require('./index');
+        const { Classes } = require('./index');
 
         let type = path.toLowerCase();
-        let object = classes[type] && new classes[type](...this.args);
+        let object = Classes[type] && new classes[type](...this.args);
 
         const ip = this.req.headers['x-forwarded-for'] || this.req.connection.remoteAddress;
 

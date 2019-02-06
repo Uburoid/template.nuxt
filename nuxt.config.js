@@ -27,6 +27,7 @@ module.exports = {
 
     env: {
         baseURL: `${process.env.API_PROTOCOL || 'http'}://${process.env.API_HOST || 'localhost'}${process.env.API_PORT ? ':' + process.env.API_PORT : ''}${process.env.API_SUFFIX}`,
+        PROJECT_ROOT: process.cwd(),
         //externalURL: process.env.EXTERNAL_API,
         server: {
             //externalURL: process.env.EXTERNAL_API,

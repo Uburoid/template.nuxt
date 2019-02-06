@@ -13,7 +13,7 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
 
     let key = void 0;
 
-    if(method === 'get') {
+    /* if(method === 'get') {
         let params = JSON.stringify(payload || {});
         key = `${endpoint}:${params}`;
     
@@ -22,8 +22,15 @@ let execute = async ({ context, cache = true, method = 'get', endpoint = '/', pa
         payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
     
         
-    }
+    } */
 
+    let params = JSON.stringify(payload || {});
+    key = `${endpoint}:${params}`;
+
+    typeof(payload) !== 'object' && (payload = { parameter: payload });
+    
+    payload = { ...payload, page_exists: !!context.route.matched.length ? 'exists' : 'not-exists' };
+    
     let response = cache && key && axios_cache.get(key);
 
     if(!response) {

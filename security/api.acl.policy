@@ -3,7 +3,7 @@
 //allow, *, *, *, *, =valid
 //deny, *, *, *, *, =invalid
 
-//deny, Аноним, *, pageData, {path:'=/inspire'}, *
+//deny, Аноним, *, route, {path:'=/inspire'}, *
 
 deny, Аноним, *, *, *, *, *, 403
 deny, *, *, *, *, *, =not-exists, 404
@@ -12,8 +12,8 @@ deny, *, *, *, *, *, =not-exists, 404
 
 deny, Пользователи, *, *, *, =invalid, *, 401
 allow, Пользователи, *, *, *, =valid, *
-allow, Пользователи, *, pageData, { path: '=/news' }, *, *
-allow, *, *, pageData, {path:'(/$)|(/signin$)|(/signup$)'}, *, *
+allow, Пользователи, *, route, { path: '=/news' }, *, *
+allow, *, *, route, {path:'(/$)|(/signin$)|(/signup$)'}, *, *
 
 allow, *, *, *, { path: '=/404' }, *, *
 
@@ -27,5 +27,5 @@ allow, *, UI, menus, *, *, *
 allow, *, Account, *, *, *, *
 //deny, Аноним, Account, ^(?!get).*$, *, *, =exists, 405
 
-deny, Пользователи, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *, 403
-allow, Администраторы, *, pageData, {path:'(/users$)|(/ACL.*$)'}, =valid, *
+deny, Пользователи, *, route, {path:'(/users$)|(/ACL.*$)'}, =valid, *, 403
+allow, Администраторы, *, route, {path:'(/users$)|(/ACL.*$)'}, =valid, *

@@ -12,7 +12,8 @@ let cache = new LRU({
 const loadDefaultKeyPair = async () => {
 
     let pair = cache.get('$');
-    
+    console.log(`KEYS: ${pair && pair.public_key}`);
+
     if(!pair) {    
         let saveTo = path.join(process.cwd(), 'keys');
         fs.ensureDirSync(saveTo);

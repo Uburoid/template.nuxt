@@ -1,6 +1,6 @@
 
 (async () => {
-    let models1 = require('./models');
+    let models1 = require('./classes/models');
 
     let roles = await models1.Role.find({
         name: ['Пользователи', 'Администраторы'],
